@@ -248,23 +248,63 @@ const STARTER_MEMBERS = [
 
 const STARTER_STREAMS = [
   {
-    id: 'stream_1',
-    memberName: 'Marcus "Red" Vance',
+    id: 'stream_rn_1',
+    memberName: 'Lawrence "Vance" Williams',
     platform: 'kick',
-    channelSlug: 'rednetwork_gta',
-    title: 'RED NETWORK // Vault Heist & Southside Patrol [GTA RP]',
+    channelSlug: '8bitheadflicker',
+    title: 'RED NETWORK // Southside Patrol & Vault Heist [GTA RP]',
     isLive: true,
+    thumbnailUrl: 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp',
+    viewers: 2480,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
   {
-    id: 'stream_2',
+    id: 'stream_rn_2',
+    memberName: 'Damian "Ghost" Cross',
+    platform: 'kick',
+    channelSlug: '8bit_goldy',
+    title: 'Ghost | Night Ambush & Stash Defense #lifeinsoulcity',
+    isLive: true,
+    thumbnailUrl: 'https://images.kick.com/video_thumbnails/8Pv540wHTkq9/7aTFtRVrFQVh/720.webp',
+    viewers: 998,
+    addedBy: 'Leader',
+    createdAt: nowIso(),
+  },
+  {
+    id: 'stream_rn_3',
     memberName: 'Jax "Trigger" Thorne',
     platform: 'twitch',
     channelSlug: 'trigger_rp',
-    title: 'Trigger Thorne | Gang Shootout & Stash Run | RN Syndicate',
+    title: 'Trigger Thorne | Gang Shootout & Heavy Weapon Drop',
     isLive: true,
+    thumbnailUrl: 'https://images.kick.com/video_thumbnails/a7kpdxzAUVGL/d9ydaexsyxdP/720.webp',
+    viewers: 850,
     addedBy: 'Trigger',
+    createdAt: nowIso(),
+  },
+  {
+    id: 'stream_rn_4',
+    memberName: 'Elena "Viper" Reyes',
+    platform: 'youtube',
+    channelSlug: 'M7lc1UVf-VE',
+    title: 'Vinewood Patrol & High Speed Police Pursuit | Red Network Syndicate',
+    isLive: true,
+    thumbnailUrl: 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg',
+    viewers: 1250,
+    addedBy: 'Viper',
+    createdAt: nowIso(),
+  },
+  {
+    id: 'stream_rn_5',
+    memberName: 'Leo "Cortex" Morales',
+    platform: 'kick',
+    channelSlug: '8bit_rusherwow',
+    title: 'Cortex | Underground Weapon Trade & Warehouse Logistics #S8UL',
+    isLive: true,
+    thumbnailUrl: 'https://images.kick.com/video_thumbnails/VJepo1jdZuaC/AwWzVQBIT6FL/720.webp',
+    viewers: 496,
+    addedBy: 'Leader',
     createdAt: nowIso(),
   },
 ];
@@ -979,13 +1019,52 @@ export const store = {
   },
 
   async addStream(payload) {
+    let thumb = payload.thumbnailUrl || '';
+    let streamTitle = payload.title || '';
+    let viewerCount = Number(payload.viewers || 0);
+
+    if (payload.platform === 'kick' && payload.channelSlug) {
+      try {
+        const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(payload.channelSlug)}`);
+        if (kickRes.ok) {
+          const kickData = await kickRes.json();
+          if (kickData?.livestream) {
+            if (!thumb && kickData.livestream.thumbnail?.url) {
+              thumb = kickData.livestream.thumbnail.url;
+            }
+            if (!streamTitle && kickData.livestream.session_title) {
+              streamTitle = kickData.livestream.session_title;
+            }
+            if (!viewerCount && kickData.livestream.viewer_count) {
+              viewerCount = kickData.livestream.viewer_count;
+            }
+          }
+        }
+      } catch (e) {
+        // Ignore network failure
+      }
+      if (!thumb) {
+        thumb = 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp';
+      }
+    } else if (payload.platform === 'youtube' && payload.channelSlug && !thumb) {
+      if (payload.channelSlug.length === 11) {
+        thumb = `https://img.youtube.com/vi/${payload.channelSlug}/hqdefault.jpg`;
+      } else {
+        thumb = 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg';
+      }
+    } else if (payload.platform === 'twitch' && payload.channelSlug && !thumb) {
+      thumb = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${payload.channelSlug}-640x360.jpg`;
+    }
+
     const stream = {
       id: makeId('stream'),
       memberName: payload.memberName || 'Operative',
       platform: payload.platform || 'kick',
       channelSlug: payload.channelSlug || '',
-      title: payload.title || '',
+      title: streamTitle || `${payload.memberName || 'Operative'} | Red Network GTA RP Operations`,
       isLive: payload.isLive !== false,
+      thumbnailUrl: thumb,
+      viewers: viewerCount || 100,
       addedBy: payload.addedBy || 'Operative',
       createdAt: nowIso(),
     };

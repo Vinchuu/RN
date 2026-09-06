@@ -59,6 +59,8 @@ const StreamSchema = new mongoose.Schema({
   channelSlug: { type: String, required: true },
   title: { type: String, default: '' },
   isLive: { type: Boolean, default: true },
+  thumbnailUrl: { type: String, default: '' },
+  viewers: { type: Number, default: 0 },
   addedBy: { type: String, default: 'system' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { timestamps: true });

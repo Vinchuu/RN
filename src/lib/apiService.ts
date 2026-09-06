@@ -109,6 +109,8 @@ export interface StreamChannel {
   isLive?: boolean;
   addedBy: string;
   createdAt: string;
+  thumbnailUrl?: string;
+  viewers?: number;
 }
 
 export interface WarPov {
