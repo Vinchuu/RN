@@ -1,0 +1,475 @@
+{
+  "members": [
+    {
+      "id": "rn_mem_1",
+      "name": "Lawrence Williams",
+      "alias": "Vance",
+      "rank": "leader",
+      "contribution": 50000,
+      "hasPaid": true,
+      "status": "in-city",
+      "phone": "555-0101",
+      "discordId": "",
+      "joinDate": "2026-01-01",
+      "order": 1
+    },
+    {
+      "id": "rn_mem_2",
+      "name": "Damian Cross",
+      "alias": "Ghost",
+      "rank": "underboss",
+      "contribution": 50000,
+      "hasPaid": true,
+      "status": "active",
+      "phone": "555-0102",
+      "discordId": "",
+      "joinDate": "2026-01-15",
+      "order": 2
+    },
+    {
+      "id": "rn_mem_3",
+      "name": "Jax \"Trigger\" Thorne",
+      "alias": "Trigger",
+      "rank": "enforcer",
+      "contribution": 50000,
+      "hasPaid": true,
+      "status": "in-city",
+      "phone": "555-0103",
+      "discordId": "",
+      "joinDate": "2026-02-01",
+      "order": 3
+    },
+    {
+      "id": "rn_mem_4",
+      "name": "Elena \"Viper\" Reyes",
+      "alias": "Viper",
+      "rank": "hitman",
+      "contribution": 50000,
+      "hasPaid": false,
+      "status": "active",
+      "phone": "555-0104",
+      "discordId": "",
+      "joinDate": "2026-02-10",
+      "order": 4
+    },
+    {
+      "id": "rn_mem_5",
+      "name": "Leo \"Cortex\" Morales",
+      "alias": "Cortex",
+      "rank": "soldier",
+      "contribution": 50000,
+      "hasPaid": true,
+      "status": "active",
+      "phone": "555-0105",
+      "discordId": "",
+      "joinDate": "2026-03-01",
+      "order": 5
+    },
+    {
+      "id": "rn_mem_6",
+      "name": "Ronnie Cole",
+      "alias": "Rookie",
+      "rank": "recruit",
+      "contribution": 50000,
+      "hasPaid": false,
+      "status": "loa",
+      "phone": "555-0106",
+      "discordId": "",
+      "joinDate": "2026-03-04",
+      "order": 6
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_starter_1",
+      "description": "Pacific Standard Bank Take",
+      "amount": 320000,
+      "type": "income",
+      "category": "heist",
+      "addedBy": "Leader",
+      "date": "2026-09-06"
+    },
+    {
+      "id": "tx_starter_2",
+      "description": "Arsenal & Body Armor Restock",
+      "amount": 85000,
+      "type": "expense",
+      "category": "arsenal",
+      "addedBy": "Underboss",
+      "date": "2026-09-06"
+    }
+  ],
+  "items": [
+    {
+      "id": "item_wpn_1",
+      "name": "Heavy Pistol .45",
+      "price": 3500,
+      "quantity": 14,
+      "maxCapacity": 30,
+      "category": "weapons",
+      "description": "High caliber syndicate standard sidearm.",
+      "lastUpdated": "2026-09-06T10:18:43.692Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_wpn_2",
+      "name": "Micro SMG 9mm",
+      "price": 8500,
+      "quantity": 8,
+      "maxCapacity": 20,
+      "category": "weapons",
+      "description": "Rapid spray compact automatic for drive-bys.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_wpn_3",
+      "name": "Special Carbine 5.56",
+      "price": 22000,
+      "quantity": 4,
+      "maxCapacity": 10,
+      "category": "weapons",
+      "description": "Heavy duty tactical assault rifle for gang wars.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_ammo_1",
+      "name": "9mm Ammunition Box (250 rnds)",
+      "price": 1200,
+      "quantity": 45,
+      "maxCapacity": 100,
+      "category": "ammo",
+      "description": "Pistol & SMG combat rounds.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Underboss"
+    },
+    {
+      "id": "item_ammo_2",
+      "name": "5.56mm Rifle Ammo Box (200 rnds)",
+      "price": 2400,
+      "quantity": 28,
+      "maxCapacity": 80,
+      "category": "ammo",
+      "description": "High velocity penetration rounds.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Underboss"
+    },
+    {
+      "id": "item_armor_1",
+      "name": "Tactical Heavy Body Armor",
+      "price": 3000,
+      "quantity": 22,
+      "maxCapacity": 50,
+      "category": "armor",
+      "description": "Reinforced ballistic vest with Red Network insignia.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_med_1",
+      "name": "Military Medkit",
+      "price": 1500,
+      "quantity": 35,
+      "maxCapacity": 100,
+      "category": "meds",
+      "description": "Full trauma care kit for firefight stabilization.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Underboss"
+    },
+    {
+      "id": "item_med_2",
+      "name": "Oxycodone Pills (x10)",
+      "price": 800,
+      "quantity": 60,
+      "maxCapacity": 150,
+      "category": "meds",
+      "description": "Rapid pain relief & adrenaline booster.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Enforcer"
+    },
+    {
+      "id": "item_tool_1",
+      "name": "Advanced Lockpick Set",
+      "price": 2500,
+      "quantity": 18,
+      "maxCapacity": 40,
+      "category": "tools",
+      "description": "High grade tension wrenches for vehicle & door entry.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Enforcer"
+    },
+    {
+      "id": "item_tool_2",
+      "name": "Thermite Breach Charge",
+      "price": 12500,
+      "quantity": 5,
+      "maxCapacity": 15,
+      "category": "tools",
+      "description": "Incendiary compound for melting vault locks & security panels.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_tool_3",
+      "name": "Encrypted Radio & GPS",
+      "price": 1800,
+      "quantity": 20,
+      "maxCapacity": 30,
+      "category": "tools",
+      "description": "Secure frequency radio tuner for syndicate comms.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    },
+    {
+      "id": "item_contra_1",
+      "name": "Red Kush Brick (1kg)",
+      "price": 15000,
+      "quantity": 12,
+      "maxCapacity": 50,
+      "category": "contraband",
+      "description": "Syndicate grown high purity grade contraband.",
+      "lastUpdated": "2026-09-06T10:18:43.693Z",
+      "updatedBy": "Red Boss"
+    }
+  ],
+  "orders": [],
+  "streams": [
+    {
+      "id": "stream_1",
+      "memberName": "Marcus \"Red\" Vance",
+      "platform": "kick",
+      "channelSlug": "rednetwork_gta",
+      "title": "RED NETWORK // Vault Heist & Southside Patrol [GTA RP]",
+      "isLive": true,
+      "addedBy": "Leader",
+      "createdAt": "2026-09-06T10:18:43.693Z"
+    },
+    {
+      "id": "stream_2",
+      "memberName": "Jax \"Trigger\" Thorne",
+      "platform": "twitch",
+      "channelSlug": "trigger_rp",
+      "title": "Trigger Thorne | Gang Shootout & Stash Run | RN Syndicate",
+      "isLive": true,
+      "addedBy": "Trigger",
+      "createdAt": "2026-09-06T10:18:43.693Z"
+    }
+  ],
+  "wars": [
+    {
+      "id": "war_1",
+      "rivalGang": "Ballas",
+      "outcome": "W",
+      "date": "2026-03-05",
+      "location": "Grove Street Cul-de-sac",
+      "score": "RN 15 - 3 Ballas",
+      "summary": "Full tactical wipeout of Ballas frontline after an ambush at Grove Street. Controlled all rooftops and secured the weapon crate.",
+      "addedBy": "Red Leader",
+      "povs": [
+        {
+          "id": "pov_1_1",
+          "operativeName": "Marcus \"Red\" Vance",
+          "title": "Leader POV // Assault Lead & Flank",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "platform": "youtube"
+        },
+        {
+          "id": "pov_1_2",
+          "operativeName": "Jax \"Trigger\" Thorne",
+          "title": "Trigger POV // Heavy Sniper Overwatch",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "platform": "youtube"
+        }
+      ]
+    },
+    {
+      "id": "war_2",
+      "rivalGang": "Los Santos Vagos",
+      "outcome": "W",
+      "date": "2026-03-02",
+      "location": "Rancho Projects",
+      "score": "RN 12 - 5 Vagos",
+      "summary": "Retaliation raid over stolen weapons shipment. Vagos compound breached and perimeter secured.",
+      "addedBy": "Red Leader",
+      "povs": [
+        {
+          "id": "pov_2_1",
+          "operativeName": "Dante \"Ghost\" Rossi",
+          "title": "Ghost POV // Alleyway Push & SMG Spray",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "platform": "youtube"
+        }
+      ]
+    },
+    {
+      "id": "war_3",
+      "rivalGang": "Marabunta Grande",
+      "outcome": "L",
+      "date": "2026-02-24",
+      "location": "El Burro Heights Oil Refinery",
+      "score": "RN 6 - 9 Marabunta",
+      "summary": "Night skirmish at oil tanks. Heavy police crossfire resulted in tactical call to disengage and regroup.",
+      "addedBy": "Red Leader",
+      "povs": [
+        {
+          "id": "pov_3_1",
+          "operativeName": "Elena \"Viper\" Reyes",
+          "title": "Viper POV // Defensive Smoke & Extraction",
+          "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "platform": "youtube"
+        }
+      ]
+    }
+  ],
+  "weeklyPaymentRecords": [
+    {
+      "id": "wk_1788699951799_u4460j",
+      "memberId": "rn_mem_1",
+      "memberName": "Marcus \"Red\" Vance",
+      "weekNumber": 1,
+      "weekStart": "2026-09-06T10:18:43.693Z",
+      "weekEnd": "2026-09-06T15:05:06.616Z",
+      "contribution": 50000,
+      "hasPaid": true,
+      "markedBy": "Red Leader",
+      "markedAt": "2026-09-06T15:05:06.618Z",
+      "paymentDate": "2026-09-06"
+    },
+    {
+      "id": "wk_1788707036971_y9wtpl",
+      "memberId": "rn_mem_5",
+      "memberName": "Leo \"Cortex\" Morales",
+      "weekNumber": 1,
+      "weekStart": "2026-09-06T15:04:10.012Z",
+      "weekEnd": "2026-09-06T15:04:10.012Z",
+      "contribution": 50000,
+      "hasPaid": true,
+      "markedBy": "Red Leader",
+      "markedAt": "2026-09-06T15:04:10.014Z",
+      "paymentDate": "2026-09-06"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log_1788707106630_owqvc7",
+      "action": "dues_paid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PAID for Marcus \"Red\" Vance ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:05:06.630Z"
+    },
+    {
+      "id": "log_1788707103614_vhjhcp",
+      "action": "dues_unpaid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PENDING for Marcus \"Red\" Vance ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:05:03.614Z"
+    },
+    {
+      "id": "log_1788707050027_v10gqf",
+      "action": "dues_paid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PAID for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:04:10.027Z"
+    },
+    {
+      "id": "log_1788707039820_45ihmj",
+      "action": "dues_unpaid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PENDING for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:03:59.820Z"
+    },
+    {
+      "id": "log_1788707039148_2qjcr9",
+      "action": "dues_paid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PAID for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:03:59.148Z"
+    },
+    {
+      "id": "log_1788707038650_fc7m4l",
+      "action": "dues_unpaid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PENDING for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:03:58.650Z"
+    },
+    {
+      "id": "log_1788707037964_vt2rtk",
+      "action": "dues_paid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PAID for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:03:57.964Z"
+    },
+    {
+      "id": "log_1788707036984_7ts6p7",
+      "action": "dues_unpaid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PENDING for Leo \"Cortex\" Morales ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T15:03:56.984Z"
+    },
+    {
+      "id": "log_1788699952815_s7lr10",
+      "action": "dues_paid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PAID for Marcus \"Red\" Vance ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T13:05:52.815Z"
+    },
+    {
+      "id": "log_1788699951848_fc27fp",
+      "action": "dues_unpaid",
+      "category": "dues",
+      "description": "Week 1 dues marked as PENDING for Marcus \"Red\" Vance ($50,000)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-06T13:05:51.848Z"
+    },
+    {
+      "id": "log_init",
+      "action": "system_initialized",
+      "category": "system",
+      "description": "Red Network Syndicate Mainframe Online.",
+      "details": {
+        "initDate": "2026-09-06T10:18:43.693Z"
+      },
+      "performedBy": "System",
+      "timestamp": "2026-09-06T10:18:43.693Z"
+    }
+  ],
+  "cycle": {
+    "id": "main",
+    "currentWeekNumber": 1,
+    "cycleStartDate": "2026-09-06T10:18:43.693Z",
+    "lastResetAt": "2026-09-06T10:18:43.693Z",
+    "lastResetBy": "RED COMMAND"
+  },
+  "gangFund": {
+    "id": "main",
+    "baseAmount": 350000,
+    "lastUpdated": "2026-09-06T10:18:43.694Z",
+    "updatedBy": "system"
+  },
+  "announcement": {
+    "id": "main",
+    "text": "🔴 RED NETWORK ALERT: Weekly dues are $50,000. All operatives report to Stash Warehouse for Syndicate Operations!",
+    "updatedBy": "Red Command",
+    "updatedAt": "2026-09-06T10:18:43.693Z"
+  }
+}
