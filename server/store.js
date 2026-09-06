@@ -251,11 +251,11 @@ const STARTER_STREAMS = [
     id: 'stream_rn_1',
     memberName: 'Lawrence "Vance" Williams',
     platform: 'kick',
-    channelSlug: '8bitheadflicker',
-    title: 'RED NETWORK // Southside Patrol & Vault Heist [GTA RP]',
-    isLive: true,
-    thumbnailUrl: 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp',
-    viewers: 2480,
+    channelSlug: 'msdplays',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -264,22 +264,22 @@ const STARTER_STREAMS = [
     memberName: 'Damian "Ghost" Cross',
     platform: 'kick',
     channelSlug: '8bit_goldy',
-    title: 'Ghost | Night Ambush & Stash Defense #lifeinsoulcity',
-    isLive: true,
-    thumbnailUrl: 'https://images.kick.com/video_thumbnails/8Pv540wHTkq9/7aTFtRVrFQVh/720.webp',
-    viewers: 998,
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
   {
     id: 'stream_rn_3',
     memberName: 'Jax "Trigger" Thorne',
-    platform: 'twitch',
-    channelSlug: 'trigger_rp',
-    title: 'Trigger Thorne | Gang Shootout & Heavy Weapon Drop',
-    isLive: true,
-    thumbnailUrl: 'https://images.kick.com/video_thumbnails/a7kpdxzAUVGL/d9ydaexsyxdP/720.webp',
-    viewers: 850,
+    platform: 'kick',
+    channelSlug: '8bitheadflicker',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Trigger',
     createdAt: nowIso(),
   },
@@ -287,11 +287,11 @@ const STARTER_STREAMS = [
     id: 'stream_rn_4',
     memberName: 'Elena "Viper" Reyes',
     platform: 'youtube',
-    channelSlug: 'M7lc1UVf-VE',
-    title: 'Vinewood Patrol & High Speed Police Pursuit | Red Network Syndicate',
-    isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg',
-    viewers: 1250,
+    channelSlug: 'PRATEEKYT',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Viper',
     createdAt: nowIso(),
   },
@@ -300,10 +300,10 @@ const STARTER_STREAMS = [
     memberName: 'Leo "Cortex" Morales',
     platform: 'kick',
     channelSlug: '8bit_rusherwow',
-    title: 'Cortex | Underground Weapon Trade & Warehouse Logistics #S8UL',
-    isLive: true,
-    thumbnailUrl: 'https://images.kick.com/video_thumbnails/VJepo1jdZuaC/AwWzVQBIT6FL/720.webp',
-    viewers: 496,
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -532,65 +532,121 @@ function fundSnapshotLocal() {
 async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
   let title = '';
   let thumbnailUrl = '';
-  let viewers = 100;
-  let isLive = true;
+  let viewers = 0;
+  let isLive = false;
 
-  if (platform === 'kick' && channelSlug) {
+  const cleanSlug = (channelSlug || '').trim().replace(/^@/, '');
+
+  if (platform === 'kick' && cleanSlug) {
     try {
-      const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(channelSlug)}`);
+      const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(cleanSlug)}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        },
+      });
       if (kickRes.ok) {
         const kickData = await kickRes.json();
+        // Kick ONLY has .livestream when currently live
         if (kickData?.livestream) {
           isLive = true;
-          if (kickData.livestream.session_title) {
-            title = kickData.livestream.session_title;
-          }
-          if (kickData.livestream.thumbnail?.url) {
-            thumbnailUrl = kickData.livestream.thumbnail.url;
-          }
-          if (kickData.livestream.viewer_count) {
-            viewers = kickData.livestream.viewer_count;
-          }
+          title = kickData.livestream.session_title || '';
+          thumbnailUrl = kickData.livestream.thumbnail?.url || kickData.user?.profile_pic || '';
+          viewers = Number(kickData.livestream.viewer_count || 0);
         } else {
+          // Channel is offline - do NOT show recent stream or previous_livestreams
           isLive = false;
+          title = '';
+          thumbnailUrl = '';
+          viewers = 0;
         }
       }
     } catch (e) {
-      // Ignore network errors
+      // Ignore network failures
     }
-    if (!thumbnailUrl) {
-      thumbnailUrl = 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp';
-    }
-  } else if (platform === 'youtube' && channelSlug) {
-    if (channelSlug.length === 11) {
-      thumbnailUrl = `https://img.youtube.com/vi/${channelSlug}/hqdefault.jpg`;
+  } else if (platform === 'youtube' && cleanSlug) {
+    if (cleanSlug.length === 11) {
       try {
-        const ytRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${channelSlug}&format=json`);
-        if (ytRes.ok) {
-          const ytData = await ytRes.json();
-          if (ytData?.title) {
-            title = ytData.title;
+        const liveCheck = await fetch(`https://www.youtube.com/watch?v=${cleanSlug}`, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        });
+        const html = await liveCheck.text();
+        const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true');
+        if (liveActive) {
+          const ytRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${cleanSlug}&format=json`);
+          if (ytRes.ok) {
+            const ytData = await ytRes.json();
+            title = ytData?.title || '';
+            thumbnailUrl = ytData?.thumbnail_url || `https://img.youtube.com/vi/${cleanSlug}/hqdefault.jpg`;
+            isLive = true;
           }
+        } else {
+          isLive = false;
+          title = '';
+          thumbnailUrl = '';
+          viewers = 0;
         }
       } catch (e) {}
     } else {
-      thumbnailUrl = 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg';
-    }
-  } else if (platform === 'twitch' && channelSlug) {
-    thumbnailUrl = `https://images.kick.com/video_thumbnails/a7kpdxzAUVGL/d9ydaexsyxdP/720.webp`;
-    try {
-      const decRes = await fetch(`https://decapi.me/twitch/title/${encodeURIComponent(channelSlug)}`);
-      if (decRes.ok) {
-        const text = await decRes.text();
-        if (text && !text.includes('not found') && !text.includes('Error')) {
-          title = text.trim();
+      try {
+        const liveRes = await fetch(`https://www.youtube.com/@${cleanSlug}/live`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
+          redirect: 'follow',
+        });
+        const html = await liveRes.text();
+        const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true');
+        if (liveActive) {
+          const vidMatch = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+          if (vidMatch) {
+            const oeRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${vidMatch[1]}&format=json`);
+            if (oeRes.ok) {
+              const oe = await oeRes.json();
+              title = oe.title || '';
+              thumbnailUrl = oe.thumbnail_url || `https://img.youtube.com/vi/${vidMatch[1]}/hqdefault.jpg`;
+              isLive = true;
+            }
+          }
+        } else {
+          // Channel is offline - do NOT show recent uploaded videos or past streams
+          isLive = false;
+          title = '';
+          thumbnailUrl = '';
+          viewers = 0;
         }
+      } catch (e) {}
+    }
+  } else if (platform === 'twitch' && cleanSlug) {
+    try {
+      const [tRes, uRes, vRes, aRes] = await Promise.all([
+        fetch(`https://decapi.me/twitch/title/${encodeURIComponent(cleanSlug)}`),
+        fetch(`https://decapi.me/twitch/uptime/${encodeURIComponent(cleanSlug)}`),
+        fetch(`https://decapi.me/twitch/viewercount/${encodeURIComponent(cleanSlug)}`),
+        fetch(`https://decapi.me/twitch/avatar/${encodeURIComponent(cleanSlug)}`),
+      ]);
+      const t = (await tRes.text()).trim();
+      const u = (await uRes.text()).trim();
+      const v = (await vRes.text()).trim();
+      const a = (await aRes.text()).trim();
+
+      // Only live if uptime is active and not reporting offline
+      if (u && !u.toLowerCase().includes('offline') && !u.toLowerCase().includes('not found')) {
+        isLive = true;
+        title = (t && !t.toLowerCase().includes('not found')) ? t : '';
+        viewers = parseInt(v, 10) || 0;
+        thumbnailUrl = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${cleanSlug}-640x360.jpg`;
+      } else {
+        // Channel is offline - do NOT show past broadcast title
+        isLive = false;
+        title = '';
+        thumbnailUrl = '';
+        viewers = 0;
       }
     } catch (e) {}
   }
 
-  if (!title) {
-    title = `${memberName} | Red Network Operations`;
+  if (isLive && !title) {
+    title = `${memberName} // Live Operation`;
   }
 
   return { title, thumbnailUrl, viewers, isLive };
@@ -1079,10 +1135,38 @@ export const store = {
 
   // --- Streams ---
   async getStreams() {
+    let list = [];
     if (isMongoConnected()) {
-      return await StreamModel.find({}).sort({ createdAt: -1 }).lean();
+      list = await StreamModel.find({}).sort({ createdAt: -1 }).lean();
+    } else {
+      list = db.streams || [];
     }
-    return db.streams || [];
+
+    // Dynamically refresh live metadata for all registered streams so nothing is hardcoded
+    const refreshed = await Promise.all(
+      list.map(async (s) => {
+        try {
+          const live = await fetchLiveStreamMetadata(s.platform, s.channelSlug, s.memberName);
+          return {
+            ...s,
+            title: live.isLive ? live.title : '',
+            thumbnailUrl: live.isLive ? live.thumbnailUrl : '',
+            viewers: live.isLive ? (live.viewers || 0) : 0,
+            isLive: !!live.isLive,
+          };
+        } catch {
+          return {
+            ...s,
+            title: '',
+            thumbnailUrl: '',
+            viewers: 0,
+            isLive: false,
+          };
+        }
+      })
+    );
+
+    return refreshed;
   },
 
   async addStream(payload) {

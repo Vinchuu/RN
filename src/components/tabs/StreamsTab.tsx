@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useMemo } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
@@ -12,23 +11,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Radio,
-  Tv,
   Plus,
   Trash2,
+  Edit2,
   ExternalLink,
   Play,
   Users,
-  Video,
-  Flame,
-  Sparkles,
-  CheckCircle2,
   Eye,
   Search,
-  Filter,
   X,
+  Tv,
 } from "lucide-react";
-import { apiService, StreamChannel } from "@/lib/apiService";
+import { apiService, StreamChannel, GangMember } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
 
 interface StreamsTabProps {
@@ -37,24 +31,50 @@ interface StreamsTabProps {
 
 export function StreamsTab({ userMode }: StreamsTabProps) {
   const [streams, setStreams] = useState<StreamChannel[]>([]);
+  const [members, setMembers] = useState<GangMember[]>([]);
   const [selectedStream, setSelectedStream] = useState<StreamChannel | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingStream, setEditingStream] = useState<StreamChannel | null>(null);
+
+  // Filters & Sorting matching RED NETWORK Crimson Aesthetic
+  const [showFilter, setShowFilter] = useState<"live" | "all" | "offline">("live");
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortBy, setSortBy] = useState<"viewers-desc" | "viewers-asc" | "recent" | "alpha">("viewers-desc");
 
-  // Form State
+  // Form State (Add) - Zero hardcoded title input
   const [memberName, setMemberName] = useState("");
   const [platform, setPlatform] = useState<"kick" | "youtube" | "twitch">("kick");
-  const [title, setTitle] = useState("");
   const [urlInput, setUrlInput] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
 
+  // Form State (Edit) - Zero hardcoded title input
+  const [editMemberName, setEditMemberName] = useState("");
+  const [editPlatform, setEditPlatform] = useState<"kick" | "youtube" | "twitch">("kick");
+  const [editUrlInput, setEditUrlInput] = useState("");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Permissions: Leader & Member can edit; Leader can delete
   const canAdd = userMode === "admin" || userMode === "gangmember";
+  const canEdit = userMode === "admin" || userMode === "gangmember";
+  const canDelete = userMode === "admin";
   const isLeader = userMode === "admin";
 
   useEffect(() => {
     let isSubscribed = true;
+
+    // Fetch registered gang members for channel linking
+    apiService.getMembers().then((data) => {
+      if (isSubscribed && Array.isArray(data)) {
+        setMembers(data);
+        if (data.length > 0 && !memberName) {
+          setMemberName(data[0].name);
+        }
+      }
+    });
 
     apiService.getStreams()
       .then((data) => {
@@ -81,7 +101,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     };
   }, []);
 
-  // Parse Channel Slug
+  // Parse Channel Slug from URL or text
   const extractChannelSlug = (input: string, plat: "kick" | "youtube" | "twitch"): string => {
     let clean = input.trim().replace(/^@/, "");
     if (clean.includes("kick.com/")) {
@@ -102,7 +122,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     return clean;
   };
 
-  // Add Stream
+  // Add Registered Stream (No hardcoded title, fetched dynamically from broadcast)
   const handleAddStream = async () => {
     if (!memberName.trim() || !urlInput.trim()) {
       alert("Operative Name and Stream URL/Handle are required!");
@@ -121,16 +141,13 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
         memberName: memberName.trim(),
         platform,
         channelSlug,
-        title: title.trim() || `${memberName.trim()} | Red Network GTA RP Stream`,
         isLive: true,
         addedBy: isLeader ? "Red Leader" : memberName.trim(),
       });
 
       soundFx.playSuccessSound();
       setIsAddOpen(false);
-      setMemberName("");
       setUrlInput("");
-      setTitle("");
     } catch (err: any) {
       soundFx.playErrorSound();
       alert(err.message || "Failed to add stream");
@@ -139,10 +156,60 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     }
   };
 
-  // Delete Stream
+  // Open Edit Modal
+  const handleOpenEdit = (stream: StreamChannel) => {
+    soundFx.playClickSound();
+    setEditingStream(stream);
+    setEditMemberName(stream.memberName);
+    setEditPlatform(stream.platform);
+    setEditUrlInput(
+      stream.platform === "kick"
+        ? `https://kick.com/${stream.channelSlug}`
+        : stream.platform === "twitch"
+        ? `https://twitch.tv/${stream.channelSlug}`
+        : stream.channelSlug.length === 11
+        ? `https://youtube.com/watch?v=${stream.channelSlug}`
+        : `https://youtube.com/@${stream.channelSlug}`
+    );
+  };
+
+  // Save Edit Stream (Auto re-fetches title & live data)
+  const handleSaveEdit = async () => {
+    if (!editingStream) return;
+    if (!editMemberName.trim() || !editUrlInput.trim()) {
+      alert("Operative Name and Stream URL/Handle are required!");
+      return;
+    }
+
+    const channelSlug = extractChannelSlug(editUrlInput, editPlatform);
+    if (!channelSlug) {
+      alert("Could not parse channel name from input");
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      await apiService.updateStream(editingStream.id, {
+        memberName: editMemberName.trim(),
+        platform: editPlatform,
+        channelSlug,
+        isLive: true,
+      });
+
+      soundFx.playSuccessSound();
+      setEditingStream(null);
+    } catch (err: any) {
+      soundFx.playErrorSound();
+      alert(err.message || "Failed to update stream");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  // Delete Stream (Leader Only)
   const handleDeleteStream = async (id: string, name: string) => {
-    if (!isLeader) return;
-    if (!confirm(`Remove broadcast channel for "${name}"?`)) return;
+    if (!canDelete) return;
+    if (!confirm(`Are you sure you want to remove the registered broadcast feed for "${name}"?`)) return;
     try {
       await apiService.deleteStream(id, "Red Leader");
       soundFx.playErrorSound();
@@ -152,20 +219,27 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     }
   };
 
-  // Filter streams
-  const filteredStreams = streams.filter((s) => {
-    const q = searchQuery.toLowerCase();
-    const matchesQuery =
-      !q ||
-      s.memberName.toLowerCase().includes(q) ||
-      s.channelSlug.toLowerCase().includes(q) ||
-      (s.title && s.title.toLowerCase().includes(q));
+  // Format viewers count (e.g. 2713 -> 2.7K, 583 -> 583)
+  const formatViewers = (val?: number) => {
+    if (!val || val === 0) return "0";
+    if (val >= 1000) {
+      return (val / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    }
+    return val.toString();
+  };
 
-    const matchesPlatform =
-      platformFilter === "all" || s.platform === platformFilter;
-
-    return matchesQuery && matchesPlatform;
-  });
+  // Get external URL
+  const getChannelUrl = (stream: StreamChannel) => {
+    if (stream.platform === "kick") return `https://kick.com/${stream.channelSlug}`;
+    if (stream.platform === "twitch") return `https://twitch.tv/${stream.channelSlug}`;
+    if (stream.platform === "youtube") {
+      if (stream.channelSlug.length === 11) {
+        return `https://www.youtube.com/watch?v=${stream.channelSlug}`;
+      }
+      return `https://youtube.com/@${stream.channelSlug}`;
+    }
+    return "#";
+  };
 
   // Embed Player URL Generator
   const getEmbedUrl = (stream: StreamChannel): string => {
@@ -185,76 +259,197 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     return "";
   };
 
-  const getPlatformBadge = (plat: string) => {
-    if (plat === "kick") {
-      return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-[#53FC18]/10 border border-[#53FC18]/50 text-[#53FC18]">
-          KICK
-        </span>
-      );
+  // Live Thumbnail Generator (Authentic stream thumbnail or empty for tactical standby)
+  const getThumbnailSrc = (stream: StreamChannel) => {
+    if (stream.thumbnailUrl) return stream.thumbnailUrl;
+    if (stream.platform === "youtube" && stream.channelSlug.length === 11) {
+      return `https://img.youtube.com/vi/${stream.channelSlug}/hqdefault.jpg`;
     }
-    if (plat === "twitch") {
-      return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-[#9146FF]/10 border border-[#9146FF]/50 text-[#bf94ff]">
-          TWITCH
-        </span>
-      );
-    }
-    return (
-      <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-[#FF0000]/10 border border-[#FF0000]/50 text-[#ff6666]">
-        YOUTUBE
-      </span>
-    );
+    return "";
   };
 
-  // Platform card border class
-  const getPlatformCardBorder = (plat: string) => {
-    if (plat === "kick") return "hover:border-[#53FC18]/60 hover:shadow-[0_0_20px_rgba(83,252,24,0.25)]";
-    if (plat === "twitch") return "hover:border-[#9146FF]/60 hover:shadow-[0_0_20px_rgba(145,70,255,0.25)]";
-    return "hover:border-[#FF0000]/60 hover:shadow-[0_0_20px_rgba(255,0,0,0.25)]";
-  };
+  // Filter & Sort Logic
+  const filteredStreams = useMemo(() => {
+    let result = streams.filter((s) => {
+      // Show filter (live / all / offline)
+      if (showFilter === "live" && !s.isLive) return false;
+      if (showFilter === "offline" && s.isLive) return false;
+
+      // Platform filter
+      if (platformFilter !== "all" && s.platform !== platformFilter) return false;
+
+      // Search query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matches =
+          s.memberName.toLowerCase().includes(q) ||
+          s.channelSlug.toLowerCase().includes(q) ||
+          (s.title && s.title.toLowerCase().includes(q));
+        if (!matches) return false;
+      }
+
+      return true;
+    });
+
+    // Sorting
+    result.sort((a, b) => {
+      if (sortBy === "viewers-desc") {
+        return (b.viewers || 0) - (a.viewers || 0);
+      }
+      if (sortBy === "viewers-asc") {
+        return (a.viewers || 0) - (b.viewers || 0);
+      }
+      if (sortBy === "alpha") {
+        return (a.title || a.memberName).localeCompare(b.title || b.memberName);
+      }
+      if (sortBy === "recent") {
+        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+      }
+      return 0;
+    });
+
+    return result;
+  }, [streams, showFilter, platformFilter, searchQuery, sortBy]);
+
+  const liveCount = streams.filter((s) => !!s.isLive).length;
 
   return (
-    <div className="space-y-6 font-rajdhani">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
-              SYNDICATE BROADCAST FEEDS
-            </h2>
-            <span className="flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950/90 border border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-              </span>
-              {streams.length} Active Gang Streams
+    <div className="space-y-5 font-rajdhani">
+      {/* Top Control Bar with RED NETWORK Crimson Styling */}
+      <div className="bg-black/90 border border-red-900/60 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-[0_0_20px_rgba(239,68,68,0.12)] backdrop-blur-md">
+        {/* Left: Show Dropdown & Platform Toggles */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-red-400 font-semibold text-sm tracking-wide">
+              Show:
             </span>
+            <select
+              value={showFilter}
+              onChange={(e) => setShowFilter(e.target.value as any)}
+              className="bg-[#0e0406] border border-red-900/70 hover:border-red-600 rounded-lg px-3 py-1.5 text-sm text-white font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
+            >
+              <option value="live">Live ({liveCount})</option>
+              <option value="all">All Registered ({streams.length})</option>
+              <option value="offline">Offline ({streams.length - liveCount})</option>
+            </select>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Watch Red Network operatives live stream GTA RP operations on Kick, Twitch, and YouTube.
-          </p>
+
+          {/* Platform Toggles */}
+          <div className="flex items-center gap-1.5 border-l border-red-900/60 pl-3">
+            {/* YouTube button */}
+            <button
+              onClick={() => {
+                soundFx.playClickSound();
+                setPlatformFilter(platformFilter === "youtube" ? "all" : "youtube");
+              }}
+              title="Filter YouTube streams"
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                platformFilter === "youtube"
+                  ? "bg-[#e50914] text-white ring-2 ring-red-400 shadow-[0_0_12px_rgba(229,9,20,0.6)]"
+                  : "bg-[#e50914]/80 hover:bg-[#e50914] text-white/90 hover:text-white"
+              }`}
+            >
+              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+            </button>
+
+            {/* Kick button */}
+            <button
+              onClick={() => {
+                soundFx.playClickSound();
+                setPlatformFilter(platformFilter === "kick" ? "all" : "kick");
+              }}
+              title="Filter Kick streams"
+              className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm tracking-tighter transition-all font-sans ${
+                platformFilter === "kick"
+                  ? "bg-[#53fc18] text-black ring-2 ring-white shadow-[0_0_14px_rgba(83,252,24,0.7)]"
+                  : "bg-[#53fc18]/85 hover:bg-[#53fc18] text-black"
+              }`}
+            >
+              K
+            </button>
+
+            {/* Twitch button */}
+            <button
+              onClick={() => {
+                soundFx.playClickSound();
+                setPlatformFilter(platformFilter === "twitch" ? "all" : "twitch");
+              }}
+              title="Filter Twitch streams"
+              className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all font-sans ${
+                platformFilter === "twitch"
+                  ? "bg-[#9146ff] text-white ring-2 ring-purple-300 shadow-[0_0_12px_rgba(145,70,255,0.6)]"
+                  : "bg-[#9146ff]/80 hover:bg-[#9146ff] text-white"
+              }`}
+            >
+              TW
+            </button>
+          </div>
         </div>
 
-        {/* Action Button */}
-        {canAdd && (
-          <Button
-            onClick={() => {
-              soundFx.playClickSound();
-              setIsAddOpen(true);
-            }}
-            className="btn-gang flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Link My Stream Feed
-          </Button>
-        )}
+        {/* Center: Search input */}
+        <div className="relative flex-1 min-w-[190px] max-w-md">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-red-500/70" />
+          <Input
+            placeholder="Search registered operatives or streams..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-8 py-1.5 h-9 bg-[#0e0406] border-red-900/60 rounded-lg text-sm text-white placeholder:text-zinc-500 focus:border-red-500 focus:ring-0"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Right: Sort By, Showing Counter & Add Action */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-red-400 font-semibold text-sm tracking-wide">
+              Sort By:
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-[#0e0406] border border-red-900/70 hover:border-red-600 rounded-lg px-3 py-1.5 text-sm text-white font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
+            >
+              <option value="viewers-desc">Viewers (High to Low)</option>
+              <option value="viewers-asc">Viewers (Low to High)</option>
+              <option value="recent">Recent Streams</option>
+              <option value="alpha">Alphabetical (A - Z)</option>
+            </select>
+          </div>
+
+          {/* Showing badge (Red Theme) */}
+          <div className="border border-red-500/50 bg-red-950/60 text-red-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-[0_0_10px_rgba(239,68,68,0.25)] whitespace-nowrap">
+            <Eye className="w-3.5 h-3.5 text-red-400" />
+            <span>Showing: {filteredStreams.length} Registered</span>
+          </div>
+
+          {/* Register Stream button */}
+          {canAdd && (
+            <Button
+              size="sm"
+              onClick={() => {
+                soundFx.playClickSound();
+                setIsAddOpen(true);
+              }}
+              className="btn-gang h-9 text-xs flex items-center gap-1.5 px-3 whitespace-nowrap shadow-[0_0_15px_rgba(239,68,68,0.4)]"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Register Feed
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Embedded Theater Player (if a stream is selected) */}
+      {/* Embedded Theater Player (when user clicks any stream) */}
       {selectedStream && (
         <Card className="card-gang overflow-hidden border-2 border-red-600/70 shadow-[0_0_50px_rgba(220,38,38,0.45)] animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-3.5 bg-black/95 border-b border-red-900/60 flex items-center justify-between">
+          <div className="p-3 bg-black/95 border-b border-red-900/60 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -263,22 +458,16 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
               <h3 className="font-orbitron font-bold text-sm text-white flex items-center gap-2">
                 THEATER: {selectedStream.memberName}
               </h3>
-              {getPlatformBadge(selectedStream.platform)}
-              <span className="hidden sm:inline text-xs text-muted-foreground font-mono">
+              <span className="text-xs text-red-400 font-mono">
                 /{selectedStream.channelSlug}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <a
-                href={selectedStream.platform === "kick"
-                  ? `https://kick.com/${selectedStream.channelSlug}`
-                  : selectedStream.platform === "twitch"
-                    ? `https://twitch.tv/${selectedStream.channelSlug}`
-                    : `https://youtube.com/@${selectedStream.channelSlug}`
-                }
+                href={getChannelUrl(selectedStream)}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-muted-foreground hover:text-white flex items-center gap-1 px-2.5 py-1 rounded bg-black/60 border border-red-900/40"
+                className="text-xs text-zinc-300 hover:text-white flex items-center gap-1 px-2.5 py-1 rounded bg-black/60 border border-red-900/40"
               >
                 <ExternalLink className="w-3 h-3" />
                 <span className="hidden sm:inline">Open Channel</span>
@@ -287,7 +476,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                 size="sm"
                 variant="ghost"
                 onClick={() => setSelectedStream(null)}
-                className="h-8 w-8 p-0 text-muted-foreground hover:text-white hover:bg-red-950/60"
+                className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-red-950/60"
                 title="Exit Theater Mode"
               >
                 <X className="w-4 h-4" />
@@ -307,174 +496,241 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
         </Card>
       )}
 
-      {/* Search & Filter */}
-      <Card className="card-gang p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-          <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search streamer or title..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
-            />
-          </div>
-
-          <div className="sm:col-span-2 flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-            <button
-              onClick={() => setPlatformFilter("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${platformFilter === "all"
-                  ? "bg-red-700 text-white shadow-[0_0_12px_rgba(239,68,68,0.5)] border border-red-500/50"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
-                }`}
-            >
-              All Platforms ({streams.length})
-            </button>
-            <button
-              onClick={() => setPlatformFilter("kick")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${platformFilter === "kick"
-                  ? "bg-[#53FC18]/20 border border-[#53FC18] text-[#53FC18] shadow-[0_0_12px_rgba(83,252,24,0.3)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
-                }`}
-            >
-              Kick ({streams.filter((s) => s.platform === "kick").length})
-            </button>
-            <button
-              onClick={() => setPlatformFilter("twitch")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${platformFilter === "twitch"
-                  ? "bg-[#9146FF]/20 border border-[#9146FF] text-[#bf94ff] shadow-[0_0_12px_rgba(145,70,255,0.3)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
-                }`}
-            >
-              Twitch ({streams.filter((s) => s.platform === "twitch").length})
-            </button>
-            <button
-              onClick={() => setPlatformFilter("youtube")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${platformFilter === "youtube"
-                  ? "bg-[#FF0000]/20 border border-[#FF0000] text-[#ff6666] shadow-[0_0_12px_rgba(255,0,0,0.3)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
-                }`}
-            >
-              YouTube ({streams.filter((s) => s.platform === "youtube").length})
-            </button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Streams Grid */}
+      {/* Grid of Stream Cards - Red Theme, 4 Columns */}
       {loading ? (
-        <div className="py-16 text-center text-red-400 font-orbitron animate-pulse">
-          Connecting to satellite broadcast feeds...
+        <div className="py-20 text-center text-red-400 font-orbitron animate-pulse">
+          Connecting to satellite broadcast feeds & refreshing live streams...
         </div>
       ) : filteredStreams.length === 0 ? (
         <Card className="card-gang p-12 text-center text-muted-foreground">
           <Tv className="w-12 h-12 mx-auto text-red-500/40 mb-3" />
-          <p className="text-lg">No active broadcast feeds found.</p>
+          <p className="text-lg">No registered syndicate feeds matching the current filters.</p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setShowFilter("all");
+              setPlatformFilter("all");
+              setSearchQuery("");
+            }}
+            className="mt-4 border-red-900/60 hover:bg-red-950/40 text-red-300"
+          >
+            Reset All Filters
+          </Button>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredStreams.map((stream) => (
-            <Card
+            <div
               key={stream.id}
-              className={`card-gang p-4.5 transition-all duration-200 flex flex-col justify-between group ${getPlatformCardBorder(stream.platform)}`}
+              className="bg-[#0e0507] border border-red-900/50 hover:border-red-500/80 rounded-xl overflow-hidden shadow-lg transition-all duration-200 flex flex-col group hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]"
             >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-950 via-black to-neutral-900 border border-red-800/50 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                      <Radio className="w-5 h-5 text-red-400 animate-pulse" />
-                    </div>
-                    <div>
-                      <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
-                        {stream.memberName}
-                      </h3>
-                      <div className="mt-0.5 flex items-center gap-1.5">
-                        {getPlatformBadge(stream.platform)}
-                        <span className="text-xs text-muted-foreground font-mono">
-                          /{stream.channelSlug}
-                        </span>
-                      </div>
-                    </div>
+              {/* Thumbnail Container (16:9) with real thumbnail */}
+              <div
+                className="aspect-video relative overflow-hidden bg-black/90 cursor-pointer"
+                onClick={() => {
+                  soundFx.playClickSound();
+                  setSelectedStream(stream);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                {getThumbnailSrc(stream) ? (
+                  <img
+                    src={getThumbnailSrc(stream)}
+                    alt={stream.title || stream.memberName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-950/50 via-black to-[#140508] p-4 text-center border-b border-red-900/40">
+                    <Tv className="w-8 h-8 text-red-500/60 mb-1.5" />
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-red-400 font-bold">
+                      {stream.isLive ? "LIVE FEED ACTIVE" : "OFFLINE // STANDBY"}
+                    </span>
+                    <span className="text-[10px] text-zinc-400 font-mono mt-0.5">
+                      {stream.memberName} • @{stream.channelSlug}
+                    </span>
                   </div>
+                )}
 
-                  {isLeader && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteStream(stream.id, stream.memberName)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-red-400 hover:bg-red-950/60"
-                      title="Remove Feed"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  )}
+                {/* Top-Left Platform Badge */}
+                {stream.platform === "kick" ? (
+                  <div className="absolute top-2.5 left-2.5 bg-[#53FC18] text-black font-black text-sm w-7 h-7 rounded flex items-center justify-center shadow-md font-sans tracking-tighter select-none pointer-events-none">
+                    K
+                  </div>
+                ) : stream.platform === "twitch" ? (
+                  <div className="absolute top-2.5 left-2.5 bg-[#9146FF] text-white font-bold text-xs w-7 h-7 rounded flex items-center justify-center shadow-md font-sans select-none pointer-events-none">
+                    TW
+                  </div>
+                ) : (
+                  <div className="absolute top-2.5 left-2.5 bg-[#FF0000] text-white w-7 h-7 rounded flex items-center justify-center shadow-md select-none pointer-events-none">
+                    <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                  </div>
+                )}
+
+                {/* Top-Right LIVE Badge */}
+                {stream.isLive !== false ? (
+                  <div className="absolute top-2.5 right-2.5 bg-black/80 backdrop-blur-sm border border-red-500/60 text-red-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1.5 shadow-md select-none pointer-events-none">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                    </span>
+                    LIVE
+                  </div>
+                ) : (
+                  <div className="absolute top-2.5 right-2.5 bg-black/80 backdrop-blur-sm border border-zinc-700 text-zinc-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow-md select-none pointer-events-none">
+                    OFFLINE
+                  </div>
+                )}
+
+                {/* Hover Play Icon Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="bg-red-600 text-white p-3 rounded-full shadow-lg transform group-hover:scale-110 transition-transform">
+                    <Play className="w-5 h-5 fill-current ml-0.5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Stream Meta Information (Red Theme) */}
+              <div className="p-3.5 flex flex-col flex-1 justify-between gap-2.5 bg-[#0e0507]">
+                <div>
+                  {/* Stream Title (Clamped to 2 Lines - Fetched Live from Stream) */}
+                  <h4
+                    onClick={() => {
+                      soundFx.playClickSound();
+                      setSelectedStream(stream);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    title={stream.isLive ? (stream.title || `${stream.memberName} Live Operation`) : `${stream.memberName} // Offline Standby`}
+                    className="text-white font-semibold text-sm line-clamp-2 leading-snug min-h-[2.5rem] group-hover:text-red-300 transition-colors cursor-pointer"
+                  >
+                    {stream.isLive ? (stream.title || `${stream.memberName} Live Operation`) : `${stream.memberName} // Offline Standby`}
+                  </h4>
+
+                  {/* Registered Operative & Channel Slug (Red Accent) */}
+                  <div
+                    onClick={() => {
+                      soundFx.playClickSound();
+                      setSelectedStream(stream);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="text-red-400 text-xs font-medium hover:underline cursor-pointer flex items-center gap-1.5 mt-1"
+                  >
+                    <span className="font-semibold text-zinc-200">{stream.memberName}</span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-red-400 font-mono">@{stream.channelSlug}</span>
+                  </div>
                 </div>
 
-                <p className="text-xs text-muted-foreground mt-3 line-clamp-2">
-                  {stream.title || `${stream.memberName} | Red Network GTA RP Operations`}
-                </p>
-              </div>
+                {/* Bottom Row: Viewers Count & Actions (Edit for Member/Leader, Delete for Leader) */}
+                <div className="pt-2 border-t border-red-900/40 flex items-center justify-between gap-2">
+                  {/* Viewers */}
+                  <div className="text-zinc-400 text-xs flex items-center gap-1.5 font-medium">
+                    {stream.isLive ? (
+                      <>
+                        <Users className="w-3.5 h-3.5 text-red-500/70" />
+                        <span>{formatViewers(stream.viewers)}</span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-500 font-mono text-[11px]">STANDBY</span>
+                    )}
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="mt-4 pt-3 border-t border-red-900/30 flex items-center gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    soundFx.playClickSound();
-                    setSelectedStream(stream);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  className="flex-1 btn-gang text-xs flex items-center justify-center gap-1.5"
-                >
-                  <Play className="w-3.5 h-3.5 fill-current" />
-                  Launch Theater
-                </Button>
-                <a
-                  href={stream.platform === "kick"
-                    ? `https://kick.com/${stream.channelSlug}`
-                    : stream.platform === "twitch"
-                      ? `https://twitch.tv/${stream.channelSlug}`
-                      : `https://youtube.com/@${stream.channelSlug}`
-                  }
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2 rounded-lg bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white hover:border-red-500 transition-colors"
-                  title="Open in External Tab"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  {/* Actions */}
+                  <div className="flex items-center gap-1">
+                    {/* External Link */}
+                    <a
+                      href={getChannelUrl(stream)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="p-1.5 text-zinc-400 hover:text-white hover:bg-red-950/50 rounded transition-colors"
+                      title="Open in External Platform"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+
+                    {/* Edit Button: Accessible to Leader & Member */}
+                    {canEdit && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(stream);
+                        }}
+                        className="h-7 w-7 p-0 text-zinc-400 hover:text-yellow-400 hover:bg-yellow-950/40"
+                        title="Edit Registered Feed"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+
+                    {/* Delete Button: Accessible to Leader Only */}
+                    {canDelete && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteStream(stream.id, stream.memberName);
+                        }}
+                        className="h-7 w-7 p-0 text-zinc-400 hover:text-red-400 hover:bg-red-950/60"
+                        title="Remove Registered Feed (Leader Only)"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
 
-      {/* Add Stream Modal */}
+      {/* Register Stream Modal - NO Title input (title is dynamically fetched from stream) */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-md bg-black/90 border border-red-900/60 text-foreground backdrop-blur-2xl">
+        <DialogContent className="sm:max-w-md bg-[#0e0507] border border-red-900/80 text-foreground backdrop-blur-2xl shadow-[0_0_30px_rgba(220,38,38,0.3)]">
           <DialogHeader>
             <DialogTitle className="text-xl font-orbitron text-gang-glow">
-              LINK BROADCAST CHANNEL
+              REGISTER OPERATIVE BROADCAST FEED
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 font-rajdhani">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Operative Name</Label>
-              <Input
-                placeholder="e.g. Marcus Vance"
-                value={memberName}
-                onChange={(e) => setMemberName(e.target.value)}
-                className="bg-black/50 border-red-900/50"
-              />
+              <Label className="text-xs text-red-300 uppercase font-semibold">Registered Operative</Label>
+              {members.length > 0 ? (
+                <select
+                  value={memberName}
+                  onChange={(e) => setMemberName(e.target.value)}
+                  className="w-full px-3 py-2 bg-black/70 border border-red-900/60 rounded-lg text-sm text-foreground focus:outline-none focus:border-red-500"
+                >
+                  {members.map((m) => (
+                    <option key={m.id} value={m.name}>
+                      {m.name} ({m.rank.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Input
+                  placeholder="e.g. Lawrence Williams"
+                  value={memberName}
+                  onChange={(e) => setMemberName(e.target.value)}
+                  className="bg-black/70 border-red-900/60 focus:border-red-500"
+                />
+              )}
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Platform</Label>
+              <Label className="text-xs text-red-300 uppercase font-semibold">Broadcast Platform</Label>
               <select
                 value={platform}
                 onChange={(e) => setPlatform(e.target.value as any)}
-                className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                className="w-full px-3 py-2 bg-black/70 border border-red-900/60 rounded-lg text-sm text-foreground focus:outline-none focus:border-red-500"
               >
                 <option value="kick">Kick.com</option>
                 <option value="twitch">Twitch.tv</option>
@@ -483,34 +739,27 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Channel URL or Username</Label>
+              <Label className="text-xs text-red-300 uppercase font-semibold">Channel URL or Username</Label>
               <Input
                 placeholder={
                   platform === "kick"
-                    ? "kick.com/yourchannel"
+                    ? "kick.com/yourhandle"
                     : platform === "twitch"
-                      ? "twitch.tv/yourchannel"
-                      : "youtube.com/@channel or video ID"
+                    ? "twitch.tv/yourhandle"
+                    : "youtube.com/@channel or video ID"
                 }
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                className="bg-black/50 border-red-900/50"
+                className="bg-black/70 border-red-900/60 focus:border-red-500"
               />
-            </div>
-
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Stream Title / Job Focus</Label>
-              <Input
-                placeholder="e.g. Red Network // Bank Job & Southside Territory War"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="bg-black/50 border-red-900/50"
-              />
+              <p className="text-[11px] text-zinc-400">
+                The stream title, real live thumbnail, and viewer count will automatically be fetched directly from the broadcast.
+              </p>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsAddOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="hover:bg-red-950/40">
               Cancel
             </Button>
             <Button
@@ -518,7 +767,82 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
               disabled={isPublishing}
               className="btn-gang"
             >
-              {isPublishing ? "Linking..." : "Publish Broadcast"}
+              {isPublishing ? "Registering..." : "Register Broadcast"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Stream Modal - NO Title input (title is dynamically re-fetched from stream) */}
+      <Dialog open={!!editingStream} onOpenChange={(open) => !open && setEditingStream(null)}>
+        <DialogContent className="sm:max-w-md bg-[#0e0507] border border-red-900/80 text-foreground backdrop-blur-2xl shadow-[0_0_30px_rgba(220,38,38,0.3)]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-orbitron text-gang-glow">
+              EDIT REGISTERED BROADCAST FEED
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3.5 py-2 font-rajdhani">
+            <div className="space-y-1">
+              <Label className="text-xs text-red-300 uppercase font-semibold">Registered Operative</Label>
+              {members.length > 0 ? (
+                <select
+                  value={editMemberName}
+                  onChange={(e) => setEditMemberName(e.target.value)}
+                  className="w-full px-3 py-2 bg-black/70 border border-red-900/60 rounded-lg text-sm text-foreground focus:outline-none focus:border-red-500"
+                >
+                  {members.map((m) => (
+                    <option key={m.id} value={m.name}>
+                      {m.name} ({m.rank.toUpperCase()})
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <Input
+                  value={editMemberName}
+                  onChange={(e) => setEditMemberName(e.target.value)}
+                  className="bg-black/70 border-red-900/60 focus:border-red-500"
+                />
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-red-300 uppercase font-semibold">Broadcast Platform</Label>
+              <select
+                value={editPlatform}
+                onChange={(e) => setEditPlatform(e.target.value as any)}
+                className="w-full px-3 py-2 bg-black/70 border border-red-900/60 rounded-lg text-sm text-foreground focus:outline-none focus:border-red-500"
+              >
+                <option value="kick">Kick.com</option>
+                <option value="twitch">Twitch.tv</option>
+                <option value="youtube">YouTube</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-red-300 uppercase font-semibold">Channel URL or Username</Label>
+              <Input
+                placeholder="e.g. kick.com/channel or youtube.com/@channel"
+                value={editUrlInput}
+                onChange={(e) => setEditUrlInput(e.target.value)}
+                className="bg-black/70 border-red-900/60 focus:border-red-500"
+              />
+              <p className="text-[11px] text-zinc-400">
+                Updating channel will automatically re-fetch the live stream title, thumbnail, and viewer count directly from the stream.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditingStream(null)} className="hover:bg-red-950/40">
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={isSavingEdit}
+              className="btn-gang"
+            >
+              {isSavingEdit ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
