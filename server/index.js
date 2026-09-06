@@ -473,6 +473,16 @@ app.post('/api/streams', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.put('/api/streams/:id', async (req, res) => {
+  try {
+    const stream = await store.updateStream(req.params.id, req.body || {}, req.body?.performedBy || 'Operative');
+    await emitStreams();
+    await emitAuditLogs();
+    res.json(stream);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.delete('/api/streams/:id', async (req, res) => {
   try {
     await store.deleteStream(req.params.id, req.body?.performedBy || 'Leader');

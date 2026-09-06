@@ -309,6 +309,12 @@ export const apiService = {
       body: JSON.stringify(stream),
     });
   },
+  async updateStream(id: string, updates: Partial<StreamChannel>): Promise<StreamChannel> {
+    return request<StreamChannel>(`/api/streams/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  },
   async deleteStream(id: string, performedBy?: string): Promise<{ ok: boolean }> {
     return request<{ ok: boolean }>(`/api/streams/${id}`, {
       method: 'DELETE',

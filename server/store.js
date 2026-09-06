@@ -467,7 +467,7 @@ function persist(data) {
   const tmp = `${DB_PATH}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf8');
   fs.copyFileSync(tmp, DB_PATH);
-  try { fs.unlinkSync(tmp); } catch {}
+  try { fs.unlinkSync(tmp); } catch { }
 }
 
 let db = load();
@@ -527,6 +527,73 @@ function fundSnapshotLocal() {
     lastUpdated: db.gangFund?.lastUpdated || nowIso(),
     updatedBy: db.gangFund?.updatedBy || 'system',
   };
+}
+
+async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
+  let title = '';
+  let thumbnailUrl = '';
+  let viewers = 100;
+  let isLive = true;
+
+  if (platform === 'kick' && channelSlug) {
+    try {
+      const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(channelSlug)}`);
+      if (kickRes.ok) {
+        const kickData = await kickRes.json();
+        if (kickData?.livestream) {
+          isLive = true;
+          if (kickData.livestream.session_title) {
+            title = kickData.livestream.session_title;
+          }
+          if (kickData.livestream.thumbnail?.url) {
+            thumbnailUrl = kickData.livestream.thumbnail.url;
+          }
+          if (kickData.livestream.viewer_count) {
+            viewers = kickData.livestream.viewer_count;
+          }
+        } else {
+          isLive = false;
+        }
+      }
+    } catch (e) {
+      // Ignore network errors
+    }
+    if (!thumbnailUrl) {
+      thumbnailUrl = 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp';
+    }
+  } else if (platform === 'youtube' && channelSlug) {
+    if (channelSlug.length === 11) {
+      thumbnailUrl = `https://img.youtube.com/vi/${channelSlug}/hqdefault.jpg`;
+      try {
+        const ytRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${channelSlug}&format=json`);
+        if (ytRes.ok) {
+          const ytData = await ytRes.json();
+          if (ytData?.title) {
+            title = ytData.title;
+          }
+        }
+      } catch (e) {}
+    } else {
+      thumbnailUrl = 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg';
+    }
+  } else if (platform === 'twitch' && channelSlug) {
+    thumbnailUrl = `https://images.kick.com/video_thumbnails/a7kpdxzAUVGL/d9ydaexsyxdP/720.webp`;
+    try {
+      const decRes = await fetch(`https://decapi.me/twitch/title/${encodeURIComponent(channelSlug)}`);
+      if (decRes.ok) {
+        const text = await decRes.text();
+        if (text && !text.includes('not found') && !text.includes('Error')) {
+          title = text.trim();
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!title) {
+    title = `${memberName} | Red Network Operations`;
+  }
+
+  return { title, thumbnailUrl, viewers, isLive };
 }
 
 export const store = {
@@ -1019,52 +1086,21 @@ export const store = {
   },
 
   async addStream(payload) {
-    let thumb = payload.thumbnailUrl || '';
-    let streamTitle = payload.title || '';
-    let viewerCount = Number(payload.viewers || 0);
+    const platform = payload.platform || 'kick';
+    const channelSlug = payload.channelSlug || '';
+    const memberName = payload.memberName || 'Operative';
 
-    if (payload.platform === 'kick' && payload.channelSlug) {
-      try {
-        const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(payload.channelSlug)}`);
-        if (kickRes.ok) {
-          const kickData = await kickRes.json();
-          if (kickData?.livestream) {
-            if (!thumb && kickData.livestream.thumbnail?.url) {
-              thumb = kickData.livestream.thumbnail.url;
-            }
-            if (!streamTitle && kickData.livestream.session_title) {
-              streamTitle = kickData.livestream.session_title;
-            }
-            if (!viewerCount && kickData.livestream.viewer_count) {
-              viewerCount = kickData.livestream.viewer_count;
-            }
-          }
-        }
-      } catch (e) {
-        // Ignore network failure
-      }
-      if (!thumb) {
-        thumb = 'https://images.kick.com/video_thumbnails/oiGVy9clssnp/QkMignSDQHVZ/720.webp';
-      }
-    } else if (payload.platform === 'youtube' && payload.channelSlug && !thumb) {
-      if (payload.channelSlug.length === 11) {
-        thumb = `https://img.youtube.com/vi/${payload.channelSlug}/hqdefault.jpg`;
-      } else {
-        thumb = 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg';
-      }
-    } else if (payload.platform === 'twitch' && payload.channelSlug && !thumb) {
-      thumb = `https://static-cdn.jtvnw.net/previews-ttv/live_user_${payload.channelSlug}-640x360.jpg`;
-    }
+    const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
 
     const stream = {
       id: makeId('stream'),
-      memberName: payload.memberName || 'Operative',
-      platform: payload.platform || 'kick',
-      channelSlug: payload.channelSlug || '',
-      title: streamTitle || `${payload.memberName || 'Operative'} | Red Network GTA RP Operations`,
-      isLive: payload.isLive !== false,
-      thumbnailUrl: thumb,
-      viewers: viewerCount || 100,
+      memberName,
+      platform,
+      channelSlug,
+      title: liveMeta.title,
+      isLive: liveMeta.isLive,
+      thumbnailUrl: payload.thumbnailUrl || liveMeta.thumbnailUrl,
+      viewers: Number(payload.viewers || liveMeta.viewers),
       addedBy: payload.addedBy || 'Operative',
       createdAt: nowIso(),
     };
@@ -1087,6 +1123,62 @@ export const store = {
       performedBy: stream.addedBy,
     });
     return stream;
+  },
+
+  async updateStream(id, payload, performedBy = 'Operative') {
+    let existing;
+    if (isMongoConnected()) {
+      existing = await StreamModel.findOne({ id }).lean();
+    } else {
+      existing = (db.streams || []).find((s) => s.id === id);
+    }
+    if (!existing) throw new Error('Stream feed not found');
+
+    const platform = payload.platform || existing.platform;
+    const channelSlug = payload.channelSlug !== undefined ? payload.channelSlug : existing.channelSlug;
+    const memberName = payload.memberName || existing.memberName;
+
+    const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
+
+    const updatedData = {
+      ...existing,
+      memberName,
+      platform,
+      channelSlug,
+      title: liveMeta.title,
+      isLive: liveMeta.isLive,
+      thumbnailUrl: payload.thumbnailUrl || liveMeta.thumbnailUrl,
+      viewers: Number(payload.viewers || liveMeta.viewers),
+      updatedAt: nowIso(),
+    };
+
+    if (isMongoConnected()) {
+      const updated = await StreamModel.findOneAndUpdate(
+        { id },
+        { $set: updatedData },
+        { new: true }
+      ).lean();
+      await this.addAuditLog({
+        action: 'stream_update',
+        category: 'streams',
+        description: `Broadcast feed updated for ${memberName} (${platform.toUpperCase()}: ${channelSlug})`,
+        performedBy,
+      });
+      return updated;
+    }
+
+    const index = (db.streams || []).findIndex((s) => s.id === id);
+    if (index !== -1) {
+      db.streams[index] = updatedData;
+      save();
+    }
+    await this.addAuditLog({
+      action: 'stream_update',
+      category: 'streams',
+      description: `Broadcast feed updated for ${memberName} (${platform.toUpperCase()}: ${channelSlug})`,
+      performedBy,
+    });
+    return updatedData;
   },
 
   async deleteStream(id, performedBy = 'Leader') {
