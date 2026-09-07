@@ -111,6 +111,13 @@ io.on('connection', async (socket) => {
   }
 });
 
+// Periodic stream live status refresher (every 60s)
+setInterval(async () => {
+  try {
+    await emitStreams();
+  } catch {}
+}, 60000);
+
 // Health check
 app.get('/api/health', (_req, res) => {
   res.json({

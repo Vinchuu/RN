@@ -307,6 +307,18 @@ const STARTER_STREAMS = [
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
+  {
+    id: 'stream_rn_6',
+    memberName: 'Ronnie "Rookie" Cole',
+    platform: 'kick',
+    channelSlug: 'flashnxtgaming',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
+    addedBy: 'Leader',
+    createdAt: nowIso(),
+  },
 ];
 
 const DEFAULT_ANNOUNCEMENT = {

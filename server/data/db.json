@@ -236,6 +236,18 @@
   "orders": [],
   "streams": [
     {
+      "id": "stream_1788802517184_zraito",
+      "memberName": "Ronnie Cole",
+      "platform": "kick",
+      "channelSlug": "flashnxtgaming",
+      "title": "Syndicate Meeting | Veer Done | #8bit #lifeinsoulcity",
+      "isLive": true,
+      "thumbnailUrl": "https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp?versionId=wEPpbOMuX7Oo9P6GKDo26maNyS1O5Ase",
+      "viewers": 279,
+      "addedBy": "Operative",
+      "createdAt": "2026-09-07T17:35:17.184Z"
+    },
+    {
       "id": "stream_rn_1",
       "memberName": "Lawrence \"Vance\" Williams",
       "platform": "kick",
@@ -391,6 +403,15 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log_1788802517206_gcu4bo",
+      "action": "stream_add",
+      "category": "streams",
+      "description": "Broadcast feed linked for Ronnie Cole (KICK: flashnxtgaming)",
+      "details": {},
+      "performedBy": "Operative",
+      "timestamp": "2026-09-07T17:35:17.206Z"
+    },
     {
       "id": "log_1788719595689_slki1w",
       "action": "stream_remove",
