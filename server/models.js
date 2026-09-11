@@ -67,7 +67,12 @@ const StreamSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const WeeklyRecordSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+    default: () => `wk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  },
   memberId: { type: String, required: true },
   memberName: { type: String, required: true },
   weekStart: { type: String, required: true },

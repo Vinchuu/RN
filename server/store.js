@@ -550,6 +550,14 @@ export function isMongoConnected() {
 export async function seedMongoIfEmpty() {
   if (!isMongoConnected()) return;
   try {
+    // Repair any weekly records with null or missing id from legacy upserts
+    const badWeekly = await WeeklyRecordModel.find({
+      $or: [{ id: null }, { id: { $exists: false } }, { id: '' }]
+    });
+    for (const bad of badWeekly) {
+      await WeeklyRecordModel.updateOne({ _id: bad._id }, { $set: { id: makeId('wk') } });
+    }
+
     const memCount = await MemberModel.countDocuments();
     if (memCount === 0) {
       await MemberModel.insertMany(STARTER_MEMBERS);
@@ -803,7 +811,7 @@ export const store = {
 
   async updateMember(id, payload) {
     if (isMongoConnected()) {
-      const updated = await MemberModel.findOneAndUpdate({ id }, { $set: payload }, { new: true }).lean();
+      const updated = await MemberModel.findOneAndUpdate({ id }, { $set: payload }, { returnDocument: 'after' }).lean();
       return updated;
     }
     const idx = db.members.findIndex((m) => m.id === id);
@@ -883,7 +891,7 @@ export const store = {
       updatedBy: payload.updatedBy || 'Leader',
     };
     if (isMongoConnected()) {
-      const updated = await ItemModel.findOneAndUpdate({ id }, { $set: updateData }, { new: true }).lean();
+      const updated = await ItemModel.findOneAndUpdate({ id }, { $set: updateData }, { returnDocument: 'after' }).lean();
       return updated;
     }
     const idx = db.items.findIndex((i) => i.id === id);
@@ -957,7 +965,7 @@ export const store = {
 
   async updateOrder(id, payload) {
     if (isMongoConnected()) {
-      return await OrderModel.findOneAndUpdate({ id }, { $set: payload }, { new: true }).lean();
+      return await OrderModel.findOneAndUpdate({ id }, { $set: payload }, { returnDocument: 'after' }).lean();
     }
     const idx = db.orders.findIndex((o) => o.id === id);
     if (idx === -1) return null;
@@ -1077,7 +1085,7 @@ export const store = {
       const fund = await GangFundModel.findOneAndUpdate(
         { id: 'main' },
         { $set: { baseAmount: amt, baseSvcAmount: svcAmt, lastUpdated: nowIso(), updatedBy } },
-        { new: true, upsert: true }
+        { returnDocument: 'after', upsert: true }
       ).lean();
       return await this.getGangFund();
     }
@@ -1100,18 +1108,50 @@ export const store = {
 
   async upsertWeeklyPaymentRecord(payload) {
     const { memberId, weekNumber } = payload;
+    const generatedId = payload.id || makeId('wk');
     const updateData = {
       ...payload,
       markedAt: nowIso(),
     };
+    if (!updateData.id) {
+      delete updateData.id;
+    }
 
     let record;
     if (isMongoConnected()) {
-      record = await WeeklyRecordModel.findOneAndUpdate(
-        { memberId, weekNumber },
-        { $set: updateData },
-        { new: true, upsert: true }
-      ).lean();
+      // Proactively heal any records with null or missing id so duplicate null id index error never triggers
+      try {
+        const nullRecords = await WeeklyRecordModel.find({
+          $or: [{ id: null }, { id: { $exists: false } }, { id: '' }],
+        });
+        for (const bad of nullRecords) {
+          await WeeklyRecordModel.updateOne({ _id: bad._id }, { $set: { id: makeId('wk') } });
+        }
+      } catch (e) {
+        console.warn('Auto-repair warning for weekly records:', e.message);
+      }
+
+      const existing = await WeeklyRecordModel.findOne({ memberId, weekNumber });
+      if (existing) {
+        const toSet = { ...updateData };
+        if (!existing.id) {
+          toSet.id = generatedId;
+        }
+        record = await WeeklyRecordModel.findOneAndUpdate(
+          { _id: existing._id },
+          { $set: toSet },
+          { returnDocument: 'after' }
+        ).lean();
+      } else {
+        record = await WeeklyRecordModel.findOneAndUpdate(
+          { memberId, weekNumber },
+          {
+            $set: updateData,
+            $setOnInsert: { id: generatedId },
+          },
+          { returnDocument: 'after', upsert: true, setDefaultsOnInsert: true }
+        ).lean();
+      }
     } else {
       if (!db.weeklyPaymentRecords) db.weeklyPaymentRecords = [];
       const idx = db.weeklyPaymentRecords.findIndex(
@@ -1122,7 +1162,7 @@ export const store = {
         record = db.weeklyPaymentRecords[idx];
       } else {
         const item = {
-          id: makeId('wk'),
+          id: generatedId,
           ...updateData,
         };
         db.weeklyPaymentRecords.push(item);
@@ -1214,7 +1254,7 @@ export const store = {
     };
 
     if (isMongoConnected()) {
-      await CycleModel.findOneAndUpdate({ id: 'main' }, { $set: updatedCycle }, { new: true, upsert: true });
+      await CycleModel.findOneAndUpdate({ id: 'main' }, { $set: updatedCycle }, { returnDocument: 'after', upsert: true });
     } else {
       db.cycle = updatedCycle;
       save();
@@ -1344,7 +1384,7 @@ export const store = {
       const updated = await StreamModel.findOneAndUpdate(
         { id },
         { $set: updatedData },
-        { new: true }
+        { returnDocument: 'after' }
       ).lean();
       await this.addAuditLog({
         action: 'stream_update',
@@ -1409,7 +1449,7 @@ export const store = {
       const updated = await AnnouncementModel.findOneAndUpdate(
         { id: 'main' },
         { $set: annData },
-        { new: true, upsert: true }
+        { returnDocument: 'after', upsert: true }
       ).lean();
       return updated;
     }
@@ -1468,7 +1508,7 @@ export const store = {
 
   async updateWar(id, payload) {
     if (isMongoConnected()) {
-      return await WarModel.findOneAndUpdate({ id }, { $set: payload }, { new: true }).lean();
+      return await WarModel.findOneAndUpdate({ id }, { $set: payload }, { returnDocument: 'after' }).lean();
     }
     if (!db.wars) db.wars = [];
     const idx = db.wars.findIndex((w) => w.id === id);
