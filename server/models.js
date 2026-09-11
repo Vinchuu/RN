@@ -81,6 +81,7 @@ const WeeklyRecordSchema = new mongoose.Schema({
   contribution: { type: Number, required: true },
   contributionSvc: { type: Number, default: 100 },
   hasPaid: { type: Boolean, default: false },
+  hasPaidSvc: { type: Boolean, default: false },
   paymentDate: { type: String },
   markedBy: { type: String, default: 'Leader' },
   markedAt: { type: String, default: () => new Date().toISOString() },

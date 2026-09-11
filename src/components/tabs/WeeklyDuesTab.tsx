@@ -142,9 +142,10 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
   const isCurrentWeekSelected = selectedWeek === cycle.currentWeekNumber;
 
-  // Helper to get hasPaidSvc from record notes
+  // Helper to get hasPaidSvc from record notes or direct field
   const getHasPaidSvc = (memberId: string): boolean => {
     const rec = weeklyRecords.find((r) => r.memberId === memberId && r.weekNumber === selectedWeek);
+    if (rec?.hasPaidSvc !== undefined) return !!rec.hasPaidSvc;
     if (!rec?.notes) return false;
     try {
       const parsed = JSON.parse(rec.notes);
@@ -166,6 +167,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
       const currentlyPaid = isCurrentWeekSelected ? !!member.hasPaid : !!recordForWeek?.hasPaid;
       const nextPaidState = !currentlyPaid;
+      const currentSvcState = getHasPaidSvc(member.id);
 
       await apiService.upsertWeeklyPaymentRecord({
         memberId: member.id,
@@ -176,6 +178,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         contribution: member.contribution || 50000,
         contributionSvc: member.contributionSvc ?? 100,
         hasPaid: nextPaidState,
+        hasPaidSvc: currentSvcState,
         paymentDate: nextPaidState ? new Date().toISOString().split("T")[0] : undefined,
         markedBy: "Red Leader",
         notes: (() => {
@@ -228,6 +231,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         contribution: member.contribution || 50000,
         contributionSvc: member.contributionSvc ?? 100,
         hasPaid: isCurrentWeekSelected ? !!member.hasPaid : !!recordForWeek?.hasPaid,
+        hasPaidSvc: nextSvcState,
         markedBy: "Red Leader",
         notes: JSON.stringify({ ...existingNotes, hasPaidSvc: nextSvcState }),
       });
@@ -245,6 +249,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
           const updated = [...prev];
           updated[idx] = {
             ...updated[idx],
+            hasPaidSvc: nextSvcState,
             notes: JSON.stringify({ ...existingNotes, hasPaidSvc: nextSvcState }),
           };
           return updated;

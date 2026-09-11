@@ -388,6 +388,7 @@ app.put('/api/weekly-payment-records', async (req, res) => {
     const record = await store.upsertWeeklyPaymentRecord(req.body || {});
     await emitWeekly();
     await emitMembers();
+    await emitTransactions();
     await emitAuditLogs();
     res.json(record);
   } catch (err) {
@@ -398,6 +399,7 @@ app.delete('/api/weekly-payment-records/:id', async (req, res) => {
   try {
     await store.deleteWeeklyPaymentRecord(req.params.id);
     await emitWeekly();
+    await emitTransactions();
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -419,6 +421,7 @@ app.post('/api/cycle/reset', async (req, res) => {
     const result = await store.resetWeeklyCycle(performedBy);
     await emitWeekly();
     await emitMembers();
+    await emitTransactions();
     await emitAuditLogs();
     res.json(result);
   } catch (err) {

@@ -1171,6 +1171,104 @@ export const store = {
       save();
     }
 
+    // Determine hasPaidSvc
+    let hasPaidSvc = payload.hasPaidSvc;
+    if (hasPaidSvc === undefined && payload.notes) {
+      try {
+        const parsed = JSON.parse(payload.notes);
+        if (parsed.hasPaidSvc !== undefined) hasPaidSvc = !!parsed.hasPaidSvc;
+      } catch {}
+    }
+    if (hasPaidSvc !== undefined) {
+      updateData.hasPaidSvc = !!hasPaidSvc;
+    }
+
+    // Manage SVC Dues Transaction in Vault Ledger
+    if (hasPaidSvc !== undefined) {
+      const svcTxId = `tx_dues_svc_${memberId}_wk${weekNumber}`;
+      const svcAmt = Number(payload.contributionSvc !== undefined ? payload.contributionSvc : 100);
+      if (hasPaidSvc === true) {
+        const svcTx = {
+          id: svcTxId,
+          description: `Week ${weekNumber} SVC Dues - ${payload.memberName || memberId}`,
+          amount: svcAmt,
+          currency: 'svc',
+          type: 'income',
+          category: 'dues',
+          addedBy: payload.markedBy || 'Red Leader',
+          date: nowIso().split('T')[0],
+        };
+        if (isMongoConnected()) {
+          await TransactionModel.findOneAndUpdate(
+            { id: svcTxId },
+            { $set: svcTx },
+            { returnDocument: 'after', upsert: true }
+          );
+        } else {
+          if (!db.transactions) db.transactions = [];
+          const exIdx = db.transactions.findIndex((t) => t.id === svcTxId);
+          if (exIdx !== -1) {
+            db.transactions[exIdx] = svcTx;
+          } else {
+            db.transactions.unshift(svcTx);
+          }
+          save();
+        }
+      } else {
+        if (isMongoConnected()) {
+          await TransactionModel.deleteOne({ id: svcTxId });
+        } else {
+          if (db.transactions) {
+            db.transactions = db.transactions.filter((t) => t.id !== svcTxId);
+            save();
+          }
+        }
+      }
+    }
+
+    // Manage Cash Dues Transaction in Vault Ledger
+    if (payload.hasPaid !== undefined) {
+      const cashTxId = `tx_dues_cash_${memberId}_wk${weekNumber}`;
+      const cashAmt = Number(payload.contribution || 50000);
+      if (payload.hasPaid === true) {
+        const cashTx = {
+          id: cashTxId,
+          description: `Week ${weekNumber} Dues - ${payload.memberName || memberId}`,
+          amount: cashAmt,
+          currency: 'cash',
+          type: 'income',
+          category: 'dues',
+          addedBy: payload.markedBy || 'Red Leader',
+          date: payload.paymentDate || nowIso().split('T')[0],
+        };
+        if (isMongoConnected()) {
+          await TransactionModel.findOneAndUpdate(
+            { id: cashTxId },
+            { $set: cashTx },
+            { returnDocument: 'after', upsert: true }
+          );
+        } else {
+          if (!db.transactions) db.transactions = [];
+          const exIdx = db.transactions.findIndex((t) => t.id === cashTxId);
+          if (exIdx !== -1) {
+            db.transactions[exIdx] = cashTx;
+          } else {
+            db.transactions.unshift(cashTx);
+          }
+          save();
+        }
+      } else {
+        if (isMongoConnected()) {
+          await TransactionModel.deleteOne({ id: cashTxId });
+        } else {
+          if (db.transactions) {
+            db.transactions = db.transactions.filter((t) => t.id !== cashTxId);
+            save();
+          }
+        }
+      }
+    }
+
     // Also update member's hasPaid status if it's the current week
     const currentCycle = await this.getCycle();
     if (weekNumber === currentCycle.currentWeekNumber) {
@@ -1179,10 +1277,11 @@ export const store = {
 
     // Record audit log
     const statusText = payload.hasPaid ? 'PAID' : 'PENDING';
+    const svcStatusText = hasPaidSvc ? ' | SVC: PAID' : '';
     await this.addAuditLog({
       action: payload.hasPaid ? 'dues_paid' : 'dues_unpaid',
       category: 'dues',
-      description: `Week ${weekNumber} dues marked as ${statusText} for ${payload.memberName || memberId} ($${(payload.contribution || 0).toLocaleString()})`,
+      description: `Week ${weekNumber} dues marked as ${statusText}${svcStatusText} for ${payload.memberName || memberId} ($${(payload.contribution || 0).toLocaleString()})`,
       performedBy: payload.markedBy || 'Leader',
     });
 
@@ -1191,8 +1290,20 @@ export const store = {
 
   async deleteWeeklyPaymentRecord(id) {
     if (isMongoConnected()) {
+      const rec = await WeeklyRecordModel.findOne({ id }).lean();
+      if (rec) {
+        await TransactionModel.deleteMany({
+          id: { $in: [`tx_dues_cash_${rec.memberId}_wk${rec.weekNumber}`, `tx_dues_svc_${rec.memberId}_wk${rec.weekNumber}`] }
+        });
+      }
       await WeeklyRecordModel.deleteOne({ id });
     } else {
+      const rec = (db.weeklyPaymentRecords || []).find((r) => r.id === id);
+      if (rec) {
+        db.transactions = (db.transactions || []).filter(
+          (t) => t.id !== `tx_dues_cash_${rec.memberId}_wk${rec.weekNumber}` && t.id !== `tx_dues_svc_${rec.memberId}_wk${rec.weekNumber}`
+        );
+      }
       db.weeklyPaymentRecords = (db.weeklyPaymentRecords || []).filter((r) => r.id !== id);
       save();
     }

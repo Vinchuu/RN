@@ -80,6 +80,7 @@ export interface WeeklyPaymentRecord {
   contribution: number;
   contributionSvc?: number;
   hasPaid: boolean;
+  hasPaidSvc?: boolean;
   paymentDate?: string;
   markedBy: string;
   markedAt: string;
