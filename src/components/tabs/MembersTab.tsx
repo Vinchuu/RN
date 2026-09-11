@@ -35,6 +35,9 @@ import {
   AlertTriangle,
   Radio,
   Coins,
+  Copy,
+  Check,
+  MessageSquare,
 } from "lucide-react";
 import { apiService, Member } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -64,10 +67,13 @@ export function MembersTab({ userMode }: MembersTabProps) {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newMember, setNewMember] = useState({
     name: "",
+    alias: "",
     rank: "recruit",
+    status: "active",
     contribution: 50000,
     contributionSvc: 100,
     phone: "",
+    discordId: "",
   });
 
   // Edit Member State
@@ -117,10 +123,13 @@ export function MembersTab({ userMode }: MembersTabProps) {
       setIsAddOpen(false);
       setNewMember({
         name: "",
+        alias: "",
         rank: "recruit",
+        status: "active",
         contribution: 50000,
         contributionSvc: 100,
         phone: "",
+        discordId: "",
       });
     } catch (err: any) {
       soundFx.playErrorSound();
@@ -133,10 +142,13 @@ export function MembersTab({ userMode }: MembersTabProps) {
     try {
       await apiService.updateMember(editingMember.id, {
         name: editingMember.name,
+        alias: editingMember.alias || "",
         rank: editingMember.rank,
+        status: editingMember.status || "active",
         contribution: Number(editingMember.contribution),
         contributionSvc: Number(editingMember.contributionSvc ?? 100),
-        phone: editingMember.phone,
+        phone: editingMember.phone || "",
+        discordId: editingMember.discordId || "",
       });
       soundFx.playSuccessSound();
       setIsEditOpen(false);
@@ -197,7 +209,14 @@ export function MembersTab({ userMode }: MembersTabProps) {
   // Filtered members
   const filteredMembers = members.filter((m) => {
     const q = searchQuery.toLowerCase();
-    return !q || m.name.toLowerCase().includes(q) || (m.phone && m.phone.includes(q));
+    return (
+      !q ||
+      m.name.toLowerCase().includes(q) ||
+      (m.alias && m.alias.toLowerCase().includes(q)) ||
+      (m.phone && m.phone.includes(q)) ||
+      (m.discordId && m.discordId.toLowerCase().includes(q)) ||
+      (m.rank && m.rank.toLowerCase().includes(q))
+    );
   });
 
   const totalQuotaExpected = members.reduce((sum, m) => sum + (m.contribution || 0), 0);
@@ -209,6 +228,32 @@ export function MembersTab({ userMode }: MembersTabProps) {
     return (
       <span className={`px-2 py-0.5 rounded text-[11px] font-orbitron font-bold uppercase border ${r?.color || "bg-neutral-900 border-neutral-700 text-neutral-400"}`}>
         {rank === "leader" ? "👑 " : ""}{r?.label || rank}
+      </span>
+    );
+  };
+
+  const getStatusBadge = (status?: string) => {
+    const s = (status || "active").toLowerCase();
+    if (s === "in-city") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          In-City
+        </span>
+      );
+    }
+    if (s === "loa") {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-950/80 border border-amber-500/60 text-amber-300">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+          On LOA
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-cyan-950/80 border border-cyan-500/60 text-cyan-300">
+        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+        Active
       </span>
     );
   };
@@ -343,15 +388,23 @@ export function MembersTab({ userMode }: MembersTabProps) {
               {/* Header Info */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-900 to-black border border-red-600/40 flex items-center justify-center font-orbitron font-extrabold text-red-300 text-lg shadow-md">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-900 to-black border border-red-600/40 flex items-center justify-center font-orbitron font-extrabold text-red-300 text-lg shadow-md shrink-0">
                     {member.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
-                      {member.name}
-                    </h3>
-                    <div className="mt-1 flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
+                        {member.name}
+                      </h3>
+                      {member.alias && (
+                        <span className="text-red-400 font-mono text-xs italic font-semibold">
+                          "{member.alias}"
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                       {getRankBadge(member.rank)}
+                      {getStatusBadge(member.status)}
                     </div>
                   </div>
                 </div>
@@ -383,6 +436,34 @@ export function MembersTab({ userMode }: MembersTabProps) {
                   </div>
                 )}
               </div>
+
+              {/* Contact Comms Bar (Phone & Discord) */}
+              {(member.phone || member.discordId) && (
+                <div className="mt-3 flex items-center gap-2 text-xs flex-wrap">
+                  {member.phone && (
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPhone(member.id, member.phone || "")}
+                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-black/60 border border-red-900/40 text-neutral-300 hover:border-red-500 hover:text-white transition-colors font-mono text-[11px]"
+                      title="Click to copy phone"
+                    >
+                      <Phone className="w-3 h-3 text-red-400" />
+                      <span>{member.phone}</span>
+                      {copiedId === member.id ? (
+                        <Check className="w-3 h-3 text-emerald-400 ml-0.5" />
+                      ) : (
+                        <Copy className="w-3 h-3 text-neutral-500 ml-0.5" />
+                      )}
+                    </button>
+                  )}
+                  {member.discordId && (
+                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-indigo-950/40 border border-indigo-800/40 text-indigo-300 font-mono text-[11px]">
+                      <MessageSquare className="w-3 h-3 text-indigo-400" />
+                      <span>{member.discordId}</span>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Stats / Details Divider */}
               <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-3 gap-2 text-xs font-rajdhani">
@@ -428,14 +509,25 @@ export function MembersTab({ userMode }: MembersTabProps) {
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 font-rajdhani">
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
-              <Input
-                placeholder="e.g. Victor Roman"
-                value={newMember.name}
-                onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                className="bg-black/50 border-red-900/50"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+                <Input
+                  placeholder="e.g. Victor Roman"
+                  value={newMember.name}
+                  onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+                  className="bg-black/50 border-red-900/50"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Alias / Call-Sign</Label>
+                <Input
+                  placeholder="e.g. Trigger"
+                  value={newMember.alias}
+                  onChange={(e) => setNewMember({ ...newMember, alias: e.target.value })}
+                  className="bg-black/50 border-red-900/50 font-mono"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -455,6 +547,43 @@ export function MembersTab({ userMode }: MembersTabProps) {
               </div>
 
               <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Status</Label>
+                <select
+                  value={newMember.status}
+                  onChange={(e) => setNewMember({ ...newMember, status: e.target.value })}
+                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                >
+                  <option value="active">Active</option>
+                  <option value="in-city">In-City</option>
+                  <option value="loa">On LOA</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Phone Number</Label>
+                <Input
+                  placeholder="555-0199"
+                  value={newMember.phone}
+                  onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
+                  className="bg-black/50 border-red-900/50 font-mono"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Discord ID / Tag</Label>
+                <Input
+                  placeholder="roman#1234"
+                  value={newMember.discordId}
+                  onChange={(e) => setNewMember({ ...newMember, discordId: e.target.value })}
+                  className="bg-black/50 border-red-900/50 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Dues ($)</Label>
                 <Input
                   type="number"
@@ -463,18 +592,18 @@ export function MembersTab({ userMode }: MembersTabProps) {
                   className="bg-black/50 border-red-900/50 font-mono"
                 />
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
-                <Coins className="w-3 h-3" /> Weekly SVC Dues <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
-              </Label>
-              <Input
-                type="number"
-                value={newMember.contributionSvc}
-                onChange={(e) => setNewMember({ ...newMember, contributionSvc: Number(e.target.value) })}
-                className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
-              />
+              <div className="space-y-1">
+                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                  <Coins className="w-3 h-3" /> Weekly SVC Dues
+                </Label>
+                <Input
+                  type="number"
+                  value={newMember.contributionSvc}
+                  onChange={(e) => setNewMember({ ...newMember, contributionSvc: Number(e.target.value) })}
+                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                />
+              </div>
             </div>
           </div>
 
@@ -500,13 +629,25 @@ export function MembersTab({ userMode }: MembersTabProps) {
             </DialogHeader>
 
             <div className="space-y-3.5 py-2 font-rajdhani">
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
-                <Input
-                  value={editingMember.name}
-                  onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+                  <Input
+                    value={editingMember.name}
+                    onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
+                    className="bg-black/50 border-red-900/50"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground uppercase">Alias / Call-Sign</Label>
+                  <Input
+                    placeholder="e.g. Trigger"
+                    value={editingMember.alias || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, alias: e.target.value })}
+                    className="bg-black/50 border-red-900/50 font-mono"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -526,6 +667,43 @@ export function MembersTab({ userMode }: MembersTabProps) {
                 </div>
 
                 <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground uppercase">Status</Label>
+                  <select
+                    value={editingMember.status || "active"}
+                    onChange={(e) => setEditingMember({ ...editingMember, status: e.target.value })}
+                    className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="in-city">In-City</option>
+                    <option value="loa">On LOA</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground uppercase">Phone Number</Label>
+                  <Input
+                    placeholder="555-0199"
+                    value={editingMember.phone || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, phone: e.target.value })}
+                    className="bg-black/50 border-red-900/50 font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground uppercase">Discord ID / Tag</Label>
+                  <Input
+                    placeholder="roman#1234"
+                    value={editingMember.discordId || ""}
+                    onChange={(e) => setEditingMember({ ...editingMember, discordId: e.target.value })}
+                    className="bg-black/50 border-red-900/50 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Quota ($)</Label>
                   <Input
                     type="number"
@@ -534,18 +712,18 @@ export function MembersTab({ userMode }: MembersTabProps) {
                     className="bg-black/50 border-red-900/50 font-mono"
                   />
                 </div>
-              </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
-                  <Coins className="w-3 h-3" /> Weekly SVC Quota <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
-                </Label>
-                <Input
-                  type="number"
-                  value={editingMember.contributionSvc ?? 100}
-                  onChange={(e) => setEditingMember({ ...editingMember, contributionSvc: Number(e.target.value) })}
-                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
-                />
+                <div className="space-y-1">
+                  <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                    <Coins className="w-3 h-3" /> Weekly SVC Quota
+                  </Label>
+                  <Input
+                    type="number"
+                    value={editingMember.contributionSvc ?? 100}
+                    onChange={(e) => setEditingMember({ ...editingMember, contributionSvc: Number(e.target.value) })}
+                    className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                  />
+                </div>
               </div>
             </div>
 
