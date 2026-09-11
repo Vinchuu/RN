@@ -27,17 +27,12 @@ import {
   Plus,
   Trash2,
   Edit,
-  Phone,
-  Calendar,
   CheckCircle2,
   Clock,
   Flame,
   AlertTriangle,
   Radio,
   Coins,
-  Copy,
-  Check,
-  MessageSquare,
 } from "lucide-react";
 import { apiService, Member } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -67,13 +62,10 @@ export function MembersTab({ userMode }: MembersTabProps) {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newMember, setNewMember] = useState({
     name: "",
-    alias: "",
     rank: "recruit",
     status: "active",
     contribution: 50000,
     contributionSvc: 100,
-    phone: "",
-    discordId: "",
   });
 
   // Edit Member State
@@ -123,13 +115,10 @@ export function MembersTab({ userMode }: MembersTabProps) {
       setIsAddOpen(false);
       setNewMember({
         name: "",
-        alias: "",
         rank: "recruit",
         status: "active",
         contribution: 50000,
         contributionSvc: 100,
-        phone: "",
-        discordId: "",
       });
     } catch (err: any) {
       soundFx.playErrorSound();
@@ -142,13 +131,10 @@ export function MembersTab({ userMode }: MembersTabProps) {
     try {
       await apiService.updateMember(editingMember.id, {
         name: editingMember.name,
-        alias: editingMember.alias || "",
         rank: editingMember.rank,
         status: editingMember.status || "active",
         contribution: Number(editingMember.contribution),
         contributionSvc: Number(editingMember.contributionSvc ?? 100),
-        phone: editingMember.phone || "",
-        discordId: editingMember.discordId || "",
       });
       soundFx.playSuccessSound();
       setIsEditOpen(false);
@@ -167,16 +153,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
     } catch (err: any) {
       alert(err.message || "Failed to remove member");
     }
-  };
-
-  // Copy phone helper
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const handleCopyPhone = (id: string, phone: string) => {
-    soundFx.playClickSound();
-    navigator.clipboard.writeText(phone);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
   };
 
   // Quick dues toggle on member card for Leader
@@ -212,9 +188,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
     return (
       !q ||
       m.name.toLowerCase().includes(q) ||
-      (m.alias && m.alias.toLowerCase().includes(q)) ||
-      (m.phone && m.phone.includes(q)) ||
-      (m.discordId && m.discordId.toLowerCase().includes(q)) ||
       (m.rank && m.rank.toLowerCase().includes(q))
     );
   });
@@ -360,7 +333,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
         <div className="relative w-full">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search member by name or phone..."
+            placeholder="Search member by name or rank..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
@@ -392,16 +365,9 @@ export function MembersTab({ userMode }: MembersTabProps) {
                     {member.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
-                        {member.name}
-                      </h3>
-                      {member.alias && (
-                        <span className="text-red-400 font-mono text-xs italic font-semibold">
-                          "{member.alias}"
-                        </span>
-                      )}
-                    </div>
+                    <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
+                      {member.name}
+                    </h3>
                     <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                       {getRankBadge(member.rank)}
                       {getStatusBadge(member.status)}
@@ -436,34 +402,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
                   </div>
                 )}
               </div>
-
-              {/* Contact Comms Bar (Phone & Discord) */}
-              {(member.phone || member.discordId) && (
-                <div className="mt-3 flex items-center gap-2 text-xs flex-wrap">
-                  {member.phone && (
-                    <button
-                      type="button"
-                      onClick={() => handleCopyPhone(member.id, member.phone || "")}
-                      className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-black/60 border border-red-900/40 text-neutral-300 hover:border-red-500 hover:text-white transition-colors font-mono text-[11px]"
-                      title="Click to copy phone"
-                    >
-                      <Phone className="w-3 h-3 text-red-400" />
-                      <span>{member.phone}</span>
-                      {copiedId === member.id ? (
-                        <Check className="w-3 h-3 text-emerald-400 ml-0.5" />
-                      ) : (
-                        <Copy className="w-3 h-3 text-neutral-500 ml-0.5" />
-                      )}
-                    </button>
-                  )}
-                  {member.discordId && (
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-indigo-950/40 border border-indigo-800/40 text-indigo-300 font-mono text-[11px]">
-                      <MessageSquare className="w-3 h-3 text-indigo-400" />
-                      <span>{member.discordId}</span>
-                    </div>
-                  )}
-                </div>
-              )}
 
               {/* Stats / Details Divider */}
               <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-3 gap-2 text-xs font-rajdhani">
@@ -509,25 +447,14 @@ export function MembersTab({ userMode }: MembersTabProps) {
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 font-rajdhani">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
-                <Input
-                  placeholder="e.g. Victor Roman"
-                  value={newMember.name}
-                  onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Alias / Call-Sign</Label>
-                <Input
-                  placeholder="e.g. Trigger"
-                  value={newMember.alias}
-                  onChange={(e) => setNewMember({ ...newMember, alias: e.target.value })}
-                  className="bg-black/50 border-red-900/50 font-mono"
-                />
-              </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+              <Input
+                placeholder="e.g. Tatya Vinchu"
+                value={newMember.name}
+                onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
+                className="bg-black/50 border-red-900/50"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -557,28 +484,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
                   <option value="in-city">In-City</option>
                   <option value="loa">On LOA</option>
                 </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Phone Number</Label>
-                <Input
-                  placeholder="555-0199"
-                  value={newMember.phone}
-                  onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
-                  className="bg-black/50 border-red-900/50 font-mono"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Discord ID / Tag</Label>
-                <Input
-                  placeholder="roman#1234"
-                  value={newMember.discordId}
-                  onChange={(e) => setNewMember({ ...newMember, discordId: e.target.value })}
-                  className="bg-black/50 border-red-900/50 font-mono"
-                />
               </div>
             </div>
 
@@ -629,25 +534,14 @@ export function MembersTab({ userMode }: MembersTabProps) {
             </DialogHeader>
 
             <div className="space-y-3.5 py-2 font-rajdhani">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
-                  <Input
-                    value={editingMember.name}
-                    onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
-                    className="bg-black/50 border-red-900/50"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Alias / Call-Sign</Label>
-                  <Input
-                    placeholder="e.g. Trigger"
-                    value={editingMember.alias || ""}
-                    onChange={(e) => setEditingMember({ ...editingMember, alias: e.target.value })}
-                    className="bg-black/50 border-red-900/50 font-mono"
-                  />
-                </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+                <Input
+                  placeholder="e.g. Tatya Vinchu"
+                  value={editingMember.name}
+                  onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
+                  className="bg-black/50 border-red-900/50"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -677,28 +571,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
                     <option value="in-city">In-City</option>
                     <option value="loa">On LOA</option>
                   </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Phone Number</Label>
-                  <Input
-                    placeholder="555-0199"
-                    value={editingMember.phone || ""}
-                    onChange={(e) => setEditingMember({ ...editingMember, phone: e.target.value })}
-                    className="bg-black/50 border-red-900/50 font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Discord ID / Tag</Label>
-                  <Input
-                    placeholder="roman#1234"
-                    value={editingMember.discordId || ""}
-                    onChange={(e) => setEditingMember({ ...editingMember, discordId: e.target.value })}
-                    className="bg-black/50 border-red-900/50 font-mono"
-                  />
                 </div>
               </div>
 

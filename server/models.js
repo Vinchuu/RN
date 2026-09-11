@@ -3,14 +3,11 @@ import mongoose from 'mongoose';
 const MemberSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
-  alias: { type: String, default: '' },
   rank: { type: String, default: 'recruit' },
   contribution: { type: Number, default: 50000 },
   contributionSvc: { type: Number, default: 100 },
   hasPaid: { type: Boolean, default: false },
   status: { type: String, default: 'active' }, // active | in-city | loa
-  phone: { type: String, default: '' },
-  discordId: { type: String, default: '' },
   joinDate: { type: String, default: () => new Date().toISOString() },
   order: { type: Number, default: 0 },
 }, { timestamps: true });

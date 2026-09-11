@@ -3,14 +3,11 @@ import { io, Socket } from 'socket.io-client';
 export interface Member {
   id: string;
   name: string;
-  alias?: string;
   rank?: string;
   contribution: number;
   contributionSvc?: number;
   hasPaid: boolean;
   status?: string; // active | in-city | loa
-  phone?: string;
-  discordId?: string;
   joinDate: string;
   order: number;
 }

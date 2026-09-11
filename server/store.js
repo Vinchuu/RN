@@ -773,14 +773,11 @@ export const store = {
     const member = {
       id: makeId('mem'),
       name: payload.name || 'New Operative',
-      alias: payload.alias || '',
       rank: payload.rank || 'recruit',
       contribution: Number(payload.contribution || 50000),
       contributionSvc: Number(payload.contributionSvc !== undefined ? payload.contributionSvc : 100),
       hasPaid: !!payload.hasPaid,
       status: payload.status || 'active',
-      phone: payload.phone || '',
-      discordId: payload.discordId || '',
       joinDate: payload.joinDate || nowIso().split('T')[0],
       order: Number(payload.order || (db.members?.length || 0) + 1),
     };

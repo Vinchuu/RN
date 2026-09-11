@@ -453,10 +453,15 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-red-950 bg-black/90 py-4 px-4 text-center text-xs font-rajdhani text-muted-foreground">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-          <span className="font-orbitron font-bold text-foreground tracking-wider">RED NETWORK</span>
+      <footer className="border-t border-red-950 bg-black/90 py-4 px-4 text-xs font-rajdhani text-muted-foreground">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+            <span className="font-orbitron font-bold text-foreground tracking-wider">RED NETWORK</span>
+          </div>
+          <div className="text-muted-foreground font-mono text-xs">
+            Developed by <span className="text-red-400 font-bold">Tatya Vinchu</span> <span className="text-zinc-400">(om006)</span>
+          </div>
         </div>
       </footer>
 
