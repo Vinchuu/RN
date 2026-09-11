@@ -34,6 +34,7 @@ import {
   Flame,
   AlertTriangle,
   Radio,
+  Coins,
 } from "lucide-react";
 import { apiService, Member } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -65,6 +66,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
     name: "",
     rank: "recruit",
     contribution: 50000,
+    contributionSvc: 100,
     phone: "",
   });
 
@@ -117,6 +119,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
         name: "",
         rank: "recruit",
         contribution: 50000,
+        contributionSvc: 100,
         phone: "",
       });
     } catch (err: any) {
@@ -132,6 +135,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
         name: editingMember.name,
         rank: editingMember.rank,
         contribution: Number(editingMember.contribution),
+        contributionSvc: Number(editingMember.contributionSvc ?? 100),
         phone: editingMember.phone,
       });
       soundFx.playSuccessSound();
@@ -381,15 +385,23 @@ export function MembersTab({ userMode }: MembersTabProps) {
               </div>
 
               {/* Stats / Details Divider */}
-              <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-2 gap-2 text-xs font-rajdhani">
+              <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-3 gap-2 text-xs font-rajdhani">
                 <div>
-                  <span className="text-muted-foreground block text-[11px]">Weekly Quota</span>
+                  <span className="text-muted-foreground block text-[11px]">Cash Quota</span>
                   <span className="font-mono font-bold text-amber-400">
                     ${(member.contribution || 0).toLocaleString()}
                   </span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block text-[11px]">Current Dues Status</span>
+                  <span className="text-muted-foreground block text-[11px] flex items-center gap-0.5">
+                    <Coins className="w-3 h-3 text-cyan-400" /> SVC Quota
+                  </span>
+                  <span className="font-mono font-bold text-cyan-400">
+                    {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[9px] text-cyan-300 font-orbitron">SVC</span>
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Cash Dues</span>
                   {member.hasPaid ? (
                     <span className="text-emerald-400 font-semibold flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Paid
@@ -443,7 +455,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Weekly Dues Quota ($)</Label>
+                <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Dues ($)</Label>
                 <Input
                   type="number"
                   value={newMember.contribution}
@@ -451,6 +463,18 @@ export function MembersTab({ userMode }: MembersTabProps) {
                   className="bg-black/50 border-red-900/50 font-mono"
                 />
               </div>
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                <Coins className="w-3 h-3" /> Weekly SVC Dues <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+              </Label>
+              <Input
+                type="number"
+                value={newMember.contributionSvc}
+                onChange={(e) => setNewMember({ ...newMember, contributionSvc: Number(e.target.value) })}
+                className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+              />
             </div>
           </div>
 
@@ -502,7 +526,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Weekly Quota ($)</Label>
+                  <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Quota ($)</Label>
                   <Input
                     type="number"
                     value={editingMember.contribution}
@@ -510,6 +534,18 @@ export function MembersTab({ userMode }: MembersTabProps) {
                     className="bg-black/50 border-red-900/50 font-mono"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                  <Coins className="w-3 h-3" /> Weekly SVC Quota <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+                </Label>
+                <Input
+                  type="number"
+                  value={editingMember.contributionSvc ?? 100}
+                  onChange={(e) => setEditingMember({ ...editingMember, contributionSvc: Number(e.target.value) })}
+                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                />
               </div>
             </div>
 

@@ -6,6 +6,7 @@ export interface Member {
   alias?: string;
   rank?: string;
   contribution: number;
+  contributionSvc?: number;
   hasPaid: boolean;
   status?: string; // active | in-city | loa
   phone?: string;
@@ -25,6 +26,7 @@ export interface Transaction {
   id: string;
   description: string;
   amount: number;
+  currency?: 'cash' | 'svc';
   date: string;
   type: 'income' | 'expense';
   category: string;
@@ -35,6 +37,7 @@ export interface Item {
   id: string;
   name: string;
   price: number;
+  priceSvc?: number;
   quantity: number;
   maxCapacity?: number;
   category: 'weapons' | 'ammo' | 'armor' | 'meds' | 'tools' | 'contraband' | 'gear' | string;
@@ -52,8 +55,10 @@ export interface Order {
     itemName: string;
     quantity: number;
     price: number;
+    priceSvc?: number;
   }[];
   totalAmount: number;
+  currency?: 'cash' | 'svc';
   status: 'pending' | 'approved' | 'completed' | 'cancelled';
   category?: string;
   orderDate: string;
@@ -63,6 +68,8 @@ export interface GangFund {
   id: string;
   baseAmount: number;
   totalAmount?: number;
+  baseSvcAmount?: number;
+  totalSvcAmount?: number;
   lastUpdated: string;
   updatedBy: string;
 }
@@ -75,6 +82,7 @@ export interface WeeklyPaymentRecord {
   weekEnd: string;
   weekNumber: number;
   contribution: number;
+  contributionSvc?: number;
   hasPaid: boolean;
   paymentDate?: string;
   markedBy: string;
@@ -243,10 +251,10 @@ export const apiService = {
   async getGangFund(): Promise<GangFund> {
     return request<GangFund>('/api/gangfund');
   },
-  async updateGangFund(baseAmount: number, updatedBy?: string): Promise<GangFund> {
+  async updateGangFund(baseAmount: number, baseSvcAmount?: number, updatedBy?: string): Promise<GangFund> {
     return request<GangFund>('/api/gangfund', {
       method: 'PUT',
-      body: JSON.stringify({ baseAmount, updatedBy }),
+      body: JSON.stringify({ baseAmount, baseSvcAmount, updatedBy }),
     });
   },
 

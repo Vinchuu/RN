@@ -6,6 +6,7 @@ const MemberSchema = new mongoose.Schema({
   alias: { type: String, default: '' },
   rank: { type: String, default: 'recruit' },
   contribution: { type: Number, default: 50000 },
+  contributionSvc: { type: Number, default: 100 },
   hasPaid: { type: Boolean, default: false },
   status: { type: String, default: 'active' }, // active | in-city | loa
   phone: { type: String, default: '' },
@@ -18,6 +19,7 @@ const TransactionSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   description: { type: String, required: true },
   amount: { type: Number, required: true },
+  currency: { type: String, enum: ['cash', 'svc'], default: 'cash' },
   type: { type: String, enum: ['income', 'expense'], required: true },
   category: { type: String, default: 'operation' },
   addedBy: { type: String, default: 'Leader' },
@@ -28,6 +30,7 @@ const ItemSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   price: { type: Number, default: 0 },
+  priceSvc: { type: Number, default: 0 },
   quantity: { type: Number, default: 0 },
   maxCapacity: { type: Number, default: 100 },
   category: { type: String, default: 'weapons' }, // weapons | ammo | armor | meds | tools | contraband | gear
@@ -45,8 +48,10 @@ const OrderSchema = new mongoose.Schema({
     itemName: String,
     quantity: Number,
     price: Number,
+    priceSvc: Number,
   }],
   totalAmount: { type: Number, required: true },
+  currency: { type: String, enum: ['cash', 'svc'], default: 'cash' },
   status: { type: String, enum: ['pending', 'approved', 'completed', 'cancelled'], default: 'pending' },
   category: { type: String, default: 'gear' },
   orderDate: { type: String, default: () => new Date().toISOString() },
@@ -73,6 +78,7 @@ const WeeklyRecordSchema = new mongoose.Schema({
   weekEnd: { type: String, required: true },
   weekNumber: { type: Number, required: true },
   contribution: { type: Number, required: true },
+  contributionSvc: { type: Number, default: 100 },
   hasPaid: { type: Boolean, default: false },
   paymentDate: { type: String },
   markedBy: { type: String, default: 'Leader' },
@@ -92,7 +98,8 @@ const AuditLogSchema = new mongoose.Schema({
 
 const GangFundSchema = new mongoose.Schema({
   id: { type: String, default: 'main', unique: true },
-  baseAmount: { type: Number, default: 250000 },
+  baseAmount: { type: Number, default: 350000 },
+  baseSvcAmount: { type: Number, default: 15000 },
   lastUpdated: { type: String, default: () => new Date().toISOString() },
   updatedBy: { type: String, default: 'system' },
 }, { timestamps: true });

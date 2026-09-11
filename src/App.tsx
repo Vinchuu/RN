@@ -20,6 +20,7 @@ import {
   Award,
   Swords,
   Wallet,
+  Coins,
 } from "lucide-react";
 import { LoginModal, UserMode } from "./components/auth/LoginModal";
 import { MembersTab } from "./components/tabs/MembersTab";
@@ -45,6 +46,7 @@ export function App() {
 
   // Syndicate Metrics
   const [fundBalance, setFundBalance] = useState<number>(350000);
+  const [svcBalance, setSvcBalance] = useState<number>(15000);
   const [membersCount, setMembersCount] = useState<number>(6);
   const [cycle, setCycle] = useState<Cycle>({
     currentWeekNumber: 1,
@@ -112,7 +114,10 @@ export function App() {
 
     // Initial data fetch
     apiService.getGangFund().then((fund) => {
-      if (fund) setFundBalance(fund.totalAmount ?? fund.baseAmount ?? 350000);
+      if (fund) {
+        setFundBalance(fund.totalAmount ?? fund.baseAmount ?? 350000);
+        setSvcBalance(fund.totalSvcAmount ?? fund.baseSvcAmount ?? 15000);
+      }
     }).catch(console.error);
 
     apiService.getMembers().then((m) => {
@@ -130,7 +135,10 @@ export function App() {
 
     // Socket realtime subscriptions
     const unsubFund = apiService.subscribeToGangFund((fund) => {
-      if (fund) setFundBalance(fund.totalAmount ?? fund.baseAmount ?? 350000);
+      if (fund) {
+        setFundBalance(fund.totalAmount ?? fund.baseAmount ?? 350000);
+        setSvcBalance(fund.totalSvcAmount ?? fund.baseSvcAmount ?? 15000);
+      }
     });
 
     const unsubMembers = apiService.subscribeToMembers((m) => {
@@ -303,9 +311,22 @@ export function App() {
                 <DollarSign className="w-4 h-4 text-emerald-400" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">Total Funds</span>
+                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">Total Cash</span>
                 <span className="text-sm font-mono font-extrabold text-emerald-400 leading-tight">
                   ${fundBalance.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            {/* SVC Crypto HUD */}
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-black/60 border border-red-900/50 hover:border-cyan-500/40 transition-colors shadow-inner">
+              <div className="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.25)]">
+                <Coins className="w-4 h-4 text-cyan-400" />
+              </div>
+              <div className="text-left font-rajdhani">
+                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">SVC Vault</span>
+                <span className="text-sm font-mono font-extrabold text-cyan-400 leading-tight flex items-center gap-1">
+                  {svcBalance.toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-300">SVC</span>
                 </span>
               </div>
             </div>

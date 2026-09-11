@@ -32,6 +32,7 @@ import {
   Box,
   CheckCircle2,
   Lock,
+  Coins,
 } from "lucide-react";
 import { apiService, Item } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -63,6 +64,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
     quantity: 10,
     maxCapacity: 50,
     price: 3500,
+    priceSvc: 35,
     description: "",
   });
 
@@ -76,6 +78,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
   const [actionQuantity, setActionQuantity] = useState<number>(1);
   const [actionType, setActionType] = useState<"withdraw" | "deposit">("withdraw");
   const [operativeName, setOperativeName] = useState("");
+  const [paymentMode, setPaymentMode] = useState<"cash" | "svc" | "none">("cash");
 
   const isLeader = userMode === "admin";
   const canInteract = userMode === "admin" || userMode === "gangmember";
@@ -145,6 +148,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
         quantity: 10,
         maxCapacity: 50,
         price: 3500,
+        priceSvc: 35,
         description: "",
       });
     } catch (err: any) {
@@ -163,6 +167,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
         quantity: Number(editingItem.quantity),
         maxCapacity: Number(editingItem.maxCapacity),
         price: Number(editingItem.price),
+        priceSvc: Number(editingItem.priceSvc ?? Math.round((editingItem.price || 0) / 100)),
         description: editingItem.description,
         updatedBy: "Red Leader",
       });
@@ -206,24 +211,66 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
         ? Math.max(0, (selectedItemForAction.quantity || 0) - qty)
         : (selectedItemForAction.quantity || 0) + qty;
 
+    const opName = operativeName.trim() || (isLeader ? "Red Leader" : "Red Operative");
+    const unitPriceCash = selectedItemForAction.price || 0;
+    const unitPriceSvc = selectedItemForAction.priceSvc ?? Math.round(unitPriceCash / 100);
+
     try {
       await apiService.updateItem(selectedItemForAction.id, {
         quantity: newQty,
-        updatedBy: operativeName || (isLeader ? "Red Leader" : "Red Operative"),
+        updatedBy: opName,
       });
+
+      // Handle Treasury Transaction if Cash or SVC selected
+      let paymentSummary = "No Treasury Settlement";
+      if (paymentMode === "cash") {
+        const totalCash = qty * unitPriceCash;
+        paymentSummary = `$${totalCash.toLocaleString()} Cash`;
+        if (totalCash > 0) {
+          await apiService.addTransaction({
+            description: `${opName} ${actionType === "withdraw" ? "bought" : "supplied"} ${qty}x ${selectedItemForAction.name}`,
+            amount: totalCash,
+            currency: "cash",
+            type: actionType === "withdraw" ? "income" : "expense",
+            category: actionType === "withdraw" ? "Stash Purchase" : "Stash Supply",
+            addedBy: opName,
+            date: new Date().toISOString().split("T")[0],
+          });
+        }
+      } else if (paymentMode === "svc") {
+        const totalSvc = qty * unitPriceSvc;
+        paymentSummary = `${totalSvc.toLocaleString()} SVC`;
+        if (totalSvc > 0) {
+          await apiService.addTransaction({
+            description: `${opName} ${actionType === "withdraw" ? "bought" : "supplied"} ${qty}x ${selectedItemForAction.name} via Crypto`,
+            amount: totalSvc,
+            currency: "svc",
+            type: actionType === "withdraw" ? "income" : "expense",
+            category: actionType === "withdraw" ? "Stash Purchase (SVC)" : "Stash Supply (SVC)",
+            addedBy: opName,
+            date: new Date().toISOString().split("T")[0],
+          });
+        }
+      }
 
       // Also create an audit log entry for this action
       await apiService.addAuditLog({
         action: actionType === "withdraw" ? "stash_withdraw" : "stash_deposit",
         category: "inventory",
-        description: `${operativeName || "Operative"} ${actionType === "withdraw" ? "withdrew" : "deposited"} ${qty}x ${selectedItemForAction.name} (Stock now: ${newQty})`,
-        performedBy: operativeName || (isLeader ? "Red Leader" : "Red Operative"),
+        description: `${opName} ${actionType === "withdraw" ? "withdrew" : "deposited"} ${qty}x ${selectedItemForAction.name} [${paymentSummary}] (Stock now: ${newQty})`,
+        performedBy: opName,
       });
 
-      soundFx.playCashSound();
+      if (paymentMode === "svc") {
+        soundFx.playCryptoSound();
+      } else {
+        soundFx.playCashSound();
+      }
+
       setIsWithdrawOpen(false);
       setSelectedItemForAction(null);
       setActionQuantity(1);
+      setPaymentMode("cash");
     } catch (err: any) {
       soundFx.playErrorSound();
       alert(err.message || "Action failed");
@@ -469,6 +516,9 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                       <span className="font-mono font-bold text-lg text-amber-400 block mt-0.5">
                         ${(item.price || 0).toLocaleString()}
                       </span>
+                      <span className="font-mono font-bold text-xs text-cyan-400 flex items-center gap-0.5 mt-0.5">
+                        <Coins className="w-3 h-3" />{(item.priceSvc ?? Math.round((item.price || 0) / 100)).toLocaleString()} SVC
+                      </span>
                       <span className="text-[10px] text-muted-foreground block mt-1">
                         Valuation: ${((item.quantity || 0) * (item.price || 0)).toLocaleString()}
                       </span>
@@ -603,6 +653,18 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
               </div>
             </div>
 
+            <div className="space-y-1">
+              <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+              </Label>
+              <Input
+                type="number"
+                value={newItem.priceSvc}
+                onChange={(e) => setNewItem({ ...newItem, priceSvc: Number(e.target.value) })}
+                className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground uppercase">Starting Quantity</Label>
@@ -694,6 +756,18 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                 </div>
               </div>
 
+              <div className="space-y-1">
+                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                  <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+                </Label>
+                <Input
+                  type="number"
+                  value={editingItem.priceSvc ?? Math.round((editingItem.price || 0) / 100)}
+                  onChange={(e) => setEditingItem({ ...editingItem, priceSvc: Number(e.target.value) })}
+                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground uppercase">Stock Quantity</Label>
@@ -775,14 +849,86 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                 </button>
               </div>
 
-              <div className="p-3 bg-red-950/30 border border-red-900/40 rounded-lg text-xs space-y-1">
+              {/* Payment / Currency Option */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground uppercase flex items-center justify-between">
+                  <span>Settlement Currency Option</span>
+                  <span className="text-[10px] text-red-400 font-mono">Vault Auto-Linked</span>
+                </Label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode("cash")}
+                    className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
+                      paymentMode === "cash"
+                        ? "bg-amber-950/80 text-amber-300 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                    }`}
+                  >
+                    <DollarSign className="w-4 h-4 text-amber-400" />
+                    <span>Cash ($)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode("svc")}
+                    className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
+                      paymentMode === "svc"
+                        ? "bg-cyan-950/80 text-cyan-300 border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
+                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                    }`}
+                  >
+                    <Coins className="w-4 h-4 text-cyan-400" />
+                    <span>SVC (Crypto)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode("none")}
+                    className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
+                      paymentMode === "none"
+                        ? "bg-slate-900 text-slate-200 border-slate-500 shadow-[0_0_12px_rgba(148,163,184,0.3)]"
+                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                    }`}
+                  >
+                    <Package className="w-4 h-4 text-neutral-400" />
+                    <span>No Vault Cost</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-3 bg-red-950/30 border border-red-900/40 rounded-lg text-xs space-y-1.5">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Current Stock in Stash:</span>
                   <span className="font-mono font-bold text-foreground">{selectedItemForAction.quantity} units</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Unit Value:</span>
-                  <span className="font-mono font-bold text-amber-400">${(selectedItemForAction.price || 0).toLocaleString()}</span>
+                  <span className="text-muted-foreground">Unit Price:</span>
+                  <span className="font-mono font-bold text-amber-400">
+                    ${(selectedItemForAction.price || 0).toLocaleString()}{" "}
+                    <span className="text-cyan-400 ml-1">/ {(selectedItemForAction.priceSvc ?? Math.round((selectedItemForAction.price || 0) / 100)).toLocaleString()} SVC</span>
+                  </span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-red-900/40 font-bold items-center">
+                  <span className="text-muted-foreground">
+                    {actionType === "withdraw" ? "You Pay / Vault Receives:" : "You Receive / Vault Pays:"}
+                  </span>
+                  {paymentMode === "cash" && (
+                    <span className="font-mono text-amber-400 text-sm">
+                      ${(Number(actionQuantity) * (selectedItemForAction.price || 0)).toLocaleString()} Cash
+                    </span>
+                  )}
+                  {paymentMode === "svc" && (
+                    <span className="font-mono text-cyan-400 text-sm flex items-center gap-1">
+                      <Coins className="w-3.5 h-3.5" />
+                      {(Number(actionQuantity) * (selectedItemForAction.priceSvc ?? Math.round((selectedItemForAction.price || 0) / 100))).toLocaleString()} SVC
+                    </span>
+                  )}
+                  {paymentMode === "none" && (
+                    <span className="font-mono text-muted-foreground text-xs">
+                      $0 (Free Handover)
+                    </span>
+                  )}
                 </div>
               </div>
 

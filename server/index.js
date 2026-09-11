@@ -367,7 +367,7 @@ app.get('/api/gangfund', async (_req, res) => {
 });
 app.put('/api/gangfund', async (req, res) => {
   try {
-    const fund = await store.updateGangFund(req.body?.baseAmount, req.body?.updatedBy);
+    const fund = await store.updateGangFund(req.body?.baseAmount, req.body?.baseSvcAmount, req.body?.updatedBy);
     await emitFund();
     res.json(fund);
   } catch (err) {

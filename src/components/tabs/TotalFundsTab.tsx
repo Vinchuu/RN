@@ -22,6 +22,7 @@ import {
   TrendingUp,
   Search,
   Lock,
+  Coins,
 } from "lucide-react";
 import { apiService, Transaction, GangFund } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -36,14 +37,17 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [txFilter, setTxFilter] = useState<"all" | "income" | "expense">("all");
+  const [currencyFilter, setCurrencyFilter] = useState<"all" | "cash" | "svc">("all");
 
   // Edit Total Funds Base Modal
   const [isEditFundOpen, setIsEditFundOpen] = useState(false);
   const [newBaseFundInput, setNewBaseFundInput] = useState<string>("");
+  const [newBaseSvcInput, setNewBaseSvcInput] = useState<string>("");
 
   // Record Transaction Modal
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
   const [txType, setTxType] = useState<"income" | "expense">("income");
+  const [txCurrency, setTxCurrency] = useState<"cash" | "svc">("cash");
   const [txAmount, setTxAmount] = useState<string>("");
   const [txCategory, setTxCategory] = useState<string>("Bank Heist");
   const [txDescription, setTxDescription] = useState<string>("");
@@ -64,6 +68,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
           if (fund) {
             setGangFund(fund);
             setNewBaseFundInput(String(fund.baseAmount ?? 350000));
+            setNewBaseSvcInput(String(fund.baseSvcAmount ?? 15000));
           }
           setTransactions(Array.isArray(txs) ? txs : []);
           setLoading(false);
@@ -80,6 +85,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
       if (isSubscribed && fund) {
         setGangFund(fund);
         setNewBaseFundInput(String(fund.baseAmount ?? 350000));
+        setNewBaseSvcInput(String(fund.baseSvcAmount ?? 15000));
       }
     });
 
@@ -96,18 +102,19 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
     };
   }, []);
 
-  // Update base vault funds
+  // Update base vault funds (Cash & SVC)
   const handleUpdateFund = async () => {
     if (!isLeader) return;
-    const amt = Number(newBaseFundInput);
-    if (isNaN(amt) || amt < 0) {
-      alert("Please enter a valid fund amount ($0 or higher).");
+    const amtCash = Number(newBaseFundInput);
+    const amtSvc = Number(newBaseSvcInput);
+    if (isNaN(amtCash) || amtCash < 0 || isNaN(amtSvc) || amtSvc < 0) {
+      alert("Please enter valid positive amounts for both Cash ($) and SVC.");
       return;
     }
     try {
-      const updated = await apiService.updateGangFund(amt, "Red Leader");
+      const updated = await apiService.updateGangFund(amtCash, amtSvc, "Red Leader");
       if (updated) setGangFund(updated);
-      soundFx.playCashSound();
+      soundFx.playCryptoSound();
       setIsEditFundOpen(false);
     } catch (err: any) {
       soundFx.playErrorSound();
@@ -115,10 +122,15 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
     }
   };
 
-  const handleOpenTxModal = (type: "income" | "expense") => {
+  const handleOpenTxModal = (type: "income" | "expense", currency: "cash" | "svc" = "cash") => {
     setTxType(type);
+    setTxCurrency(currency);
     setTxAmount("");
-    setTxCategory(type === "income" ? "Bank Heist" : "Weapon Supply");
+    if (currency === "svc") {
+      setTxCategory(type === "income" ? "Crypto Laundering" : "Encrypted Comms");
+    } else {
+      setTxCategory(type === "income" ? "Bank Heist" : "Weapon Supply");
+    }
     setTxDescription("");
     setIsTxModalOpen(true);
   };
@@ -127,7 +139,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
     if (!isLeader) return;
     const amt = Number(txAmount);
     if (isNaN(amt) || amt <= 0) {
-      alert("Please enter a valid amount greater than $0.");
+      alert(`Please enter a valid amount greater than 0 ${txCurrency === "svc" ? "SVC" : "$"}.`);
       return;
     }
     if (!txDescription.trim()) {
@@ -137,13 +149,16 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
     try {
       await apiService.addTransaction({
         type: txType,
+        currency: txCurrency,
         amount: amt,
         category: txCategory,
         description: txDescription.trim(),
         addedBy: "Red Leader",
         date: new Date().toISOString(),
       });
-      if (txType === "income") {
+      if (txCurrency === "svc") {
+        soundFx.playCryptoSound();
+      } else if (txType === "income") {
         soundFx.playCashSound();
       } else {
         soundFx.playClickSound();
@@ -170,23 +185,35 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
     }
   };
 
-  const vaultTotal = gangFund?.totalAmount ?? gangFund?.baseAmount ?? 350000;
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
+  // Cash calculations
+  const vaultCashTotal = gangFund?.totalAmount ?? gangFund?.baseAmount ?? 350000;
+  const cashIncome = transactions
+    .filter((t) => (!t.currency || t.currency === "cash") && t.type === "income")
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "expense")
+  const cashExpense = transactions
+    .filter((t) => (!t.currency || t.currency === "cash") && t.type === "expense")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  // SVC calculations
+  const vaultSvcTotal = gangFund?.totalSvcAmount ?? gangFund?.baseSvcAmount ?? 15000;
+  const svcIncome = transactions
+    .filter((t) => t.currency === "svc" && t.type === "income")
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+  const svcExpense = transactions
+    .filter((t) => t.currency === "svc" && t.type === "expense")
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   const filteredTransactions = transactions.filter((t) => {
     const matchesType = txFilter === "all" || t.type === txFilter;
+    const txCurr = t.currency || "cash";
+    const matchesCurrency = currencyFilter === "all" || txCurr === currencyFilter;
     const q = searchQuery.toLowerCase();
     const matchesSearch =
       !q ||
       t.description.toLowerCase().includes(q) ||
       (t.category && t.category.toLowerCase().includes(q)) ||
       (t.addedBy && t.addedBy.toLowerCase().includes(q));
-    return matchesType && matchesSearch;
+    return matchesType && matchesCurrency && matchesSearch;
   });
 
   return (
@@ -220,12 +247,12 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 className="bg-black/70 border-amber-500/50 text-amber-300 hover:bg-amber-950/60 font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                Edit Total Funds
+                Edit Vault Reserves
               </Button>
               <Button
                 onClick={() => {
                   soundFx.playClickSound();
-                  handleOpenTxModal("income");
+                  handleOpenTxModal("income", "cash");
                 }}
                 className="bg-emerald-800 hover:bg-emerald-700 text-white font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center gap-1.5"
               >
@@ -235,7 +262,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               <Button
                 onClick={() => {
                   soundFx.playClickSound();
-                  handleOpenTxModal("expense");
+                  handleOpenTxModal("expense", "cash");
                 }}
                 className="bg-rose-900 hover:bg-rose-800 text-rose-100 font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(244,63,94,0.3)] flex items-center gap-1.5"
               >
@@ -249,20 +276,20 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
       {/* KPI Cards Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Funds Balance */}
-        <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
+        {/* Total Cash Funds Balance */}
+        <Card className="card-gang p-4 border-l-4 border-l-emerald-500 relative overflow-hidden group">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Total Funds Balance
+              Total Cash Vault
             </span>
             <Wallet className="w-5 h-5 text-emerald-400" />
           </div>
           <p className="text-2xl font-orbitron font-extrabold text-emerald-400 mt-2 font-mono">
-            ${vaultTotal.toLocaleString()}
+            ${vaultCashTotal.toLocaleString()}
           </p>
           <div className="mt-1 flex items-center justify-between text-xs">
             <span className="text-muted-foreground font-mono">
-              Base Reserve: ${(gangFund?.baseAmount ?? 350000).toLocaleString()}
+              Base: ${(gangFund?.baseAmount ?? 350000).toLocaleString()}
             </span>
             {isLeader && (
               <button
@@ -275,19 +302,57 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
           </div>
         </Card>
 
-        {/* Total Income */}
+        {/* Total SVC Crypto Balance */}
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 relative overflow-hidden group bg-gradient-to-br from-black via-cyan-950/20 to-black">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+                Total SVC Treasury
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-bold">
+                CRYPTO
+              </span>
+            </div>
+            <Coins className="w-5 h-5 text-cyan-400" />
+          </div>
+          <p className="text-2xl font-orbitron font-extrabold text-cyan-400 mt-2 font-mono flex items-center gap-1.5">
+            {vaultSvcTotal.toLocaleString()}{" "}
+            <span className="text-sm font-semibold text-cyan-300">SVC</span>
+          </p>
+          <div className="mt-1 flex items-center justify-between text-xs">
+            <span className="text-muted-foreground font-mono">
+              Base: {(gangFund?.baseSvcAmount ?? 15000).toLocaleString()} SVC
+            </span>
+            {isLeader && (
+              <button
+                onClick={() => setIsEditFundOpen(true)}
+                className="text-cyan-400 hover:text-cyan-300 font-bold underline"
+              >
+                Adjust
+              </button>
+            )}
+          </div>
+        </Card>
+
+        {/* Total Incomes */}
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Total Recorded Income
+              Total Incomes
             </span>
             <ArrowUpRight className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
-            +${totalIncome.toLocaleString()}
-          </p>
-          <span className="text-xs text-muted-foreground">
-            {transactions.filter((t) => t.type === "income").length} income deposits
+          <div className="mt-2 space-y-0.5">
+            <p className="text-lg font-orbitron font-bold text-emerald-400 font-mono">
+              +${cashIncome.toLocaleString()}{" "}
+              <span className="text-xs text-muted-foreground font-normal">Cash</span>
+            </p>
+            <p className="text-sm font-orbitron font-bold text-cyan-400 font-mono">
+              +{svcIncome.toLocaleString()} <span className="text-xs text-cyan-300 font-normal">SVC</span>
+            </p>
+          </div>
+          <span className="text-xs text-muted-foreground block mt-1">
+            {transactions.filter((t) => t.type === "income").length} total deposits
           </span>
         </Card>
 
@@ -295,33 +360,21 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
         <Card className="card-gang p-4 border-l-4 border-l-rose-600">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Total Recorded Expenses
+              Total Expenses
             </span>
             <ArrowDownRight className="w-5 h-5 text-rose-400" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-rose-400 mt-2 font-mono">
-            -${totalExpense.toLocaleString()}
-          </p>
-          <span className="text-xs text-muted-foreground">
-            {transactions.filter((t) => t.type === "expense").length} expense deductions
-          </span>
-        </Card>
-
-        {/* Net Flow */}
-        <Card className="card-gang p-4 border-l-4 border-l-amber-500">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Net Cashflow
-            </span>
-            <Receipt className="w-5 h-5 text-amber-400" />
+          <div className="mt-2 space-y-0.5">
+            <p className="text-lg font-orbitron font-bold text-rose-400 font-mono">
+              -${cashExpense.toLocaleString()}{" "}
+              <span className="text-xs text-muted-foreground font-normal">Cash</span>
+            </p>
+            <p className="text-sm font-orbitron font-bold text-rose-400 font-mono">
+              -{svcExpense.toLocaleString()} <span className="text-xs text-rose-300 font-normal">SVC</span>
+            </p>
           </div>
-          <p className={`text-2xl font-orbitron font-bold mt-2 font-mono ${
-            totalIncome >= totalExpense ? "text-emerald-400" : "text-rose-400"
-          }`}>
-            {totalIncome >= totalExpense ? "+" : "-"}${Math.abs(totalIncome - totalExpense).toLocaleString()}
-          </p>
-          <span className="text-xs text-muted-foreground">
-            {transactions.length} total ledger records
+          <span className="text-xs text-muted-foreground block mt-1">
+            {transactions.filter((t) => t.type === "expense").length} expense records
           </span>
         </Card>
       </div>
@@ -339,7 +392,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
             />
           </div>
 
-          <div className="sm:col-span-2 flex items-center gap-2">
+          <div className="sm:col-span-2 flex items-center gap-1.5 flex-wrap">
             <button
               onClick={() => setTxFilter("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -348,7 +401,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
               }`}
             >
-              All Records ({transactions.length})
+              All ({transactions.length})
             </button>
             <button
               onClick={() => setTxFilter("income")}
@@ -359,7 +412,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               }`}
             >
               <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-              + Income ({transactions.filter((t) => t.type === "income").length})
+              + Income
             </button>
             <button
               onClick={() => setTxFilter("expense")}
@@ -370,7 +423,38 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               }`}
             >
               <ArrowDownRight className="w-3.5 h-3.5 text-rose-400" />
-              - Expense ({transactions.filter((t) => t.type === "expense").length})
+              - Expense
+            </button>
+            <div className="w-px h-5 bg-red-900/40 mx-1"></div>
+            <button
+              onClick={() => setCurrencyFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                currencyFilter === "all"
+                  ? "bg-neutral-700 text-white"
+                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+              }`}
+            >
+              All Currency
+            </button>
+            <button
+              onClick={() => setCurrencyFilter("cash")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                currencyFilter === "cash"
+                  ? "bg-emerald-900 border border-emerald-500/60 text-emerald-300"
+                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+              }`}
+            >
+              <DollarSign className="w-3.5 h-3.5" /> Cash Only
+            </button>
+            <button
+              onClick={() => setCurrencyFilter("svc")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                currencyFilter === "svc"
+                  ? "bg-cyan-900/80 border border-cyan-500/60 text-cyan-300"
+                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+              }`}
+            >
+              <Coins className="w-3.5 h-3.5" /> SVC Only
             </button>
           </div>
         </div>
@@ -429,6 +513,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               ) : (
                 filteredTransactions.map((tx) => {
                   const isInc = tx.type === "income";
+                  const isSvc = tx.currency === "svc";
                   return (
                     <tr key={tx.id} className="hover:bg-red-950/20 transition-colors group">
                       <td className="py-3 px-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
@@ -439,17 +524,28 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                           : "Recently"}
                       </td>
                       <td className="py-3 px-4">
-                        {isInc ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950/80 border border-emerald-500/60 text-emerald-300">
-                            <ArrowUpRight className="w-3 h-3 text-emerald-400" />
-                            + INCOME
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-950/80 border border-rose-500/60 text-rose-300">
-                            <ArrowDownRight className="w-3 h-3 text-rose-400" />
-                            - EXPENSE
-                          </span>
-                        )}
+                        <div className="flex flex-col gap-0.5">
+                          {isInc ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950/80 border border-emerald-500/60 text-emerald-300">
+                              <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                              + INCOME
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-950/80 border border-rose-500/60 text-rose-300">
+                              <ArrowDownRight className="w-3 h-3 text-rose-400" />
+                              - EXPENSE
+                            </span>
+                          )}
+                          {isSvc ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 w-fit">
+                              <Coins className="w-2.5 h-2.5" /> SVC
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-emerald-950/60 border border-emerald-800/50 text-emerald-400/70 w-fit">
+                              <DollarSign className="w-2.5 h-2.5" /> Cash
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3 px-4 font-mono text-xs">
                         <span className="px-2 py-0.5 rounded bg-black/60 border border-neutral-800 text-[10px] font-bold uppercase text-amber-300">
@@ -467,7 +563,11 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                           isInc ? "text-emerald-400" : "text-rose-400"
                         }`}
                       >
-                        {isInc ? `+$${(tx.amount || 0).toLocaleString()}` : `-$${(tx.amount || 0).toLocaleString()}`}
+                          {tx.currency === "svc"
+                          ? `${isInc ? "+" : "-"}${(tx.amount || 0).toLocaleString()} SVC`
+                          : isInc
+                          ? `+$${(tx.amount || 0).toLocaleString()}`
+                          : `-$${(tx.amount || 0).toLocaleString()}`}
                       </td>
                       {isLeader && (
                         <td className="py-3 px-4 text-right">
@@ -503,12 +603,12 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
           <div className="space-y-4 py-3 font-rajdhani text-sm">
             <p className="text-xs text-muted-foreground">
-              Specify the baseline vault reserve allocation. Total calculated balance will equal this base amount plus all recorded incomes minus expenses.
+              Specify the baseline vault reserve allocation. Total calculated balance equals base amount ± recorded transactions.
             </p>
 
             <div>
               <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
-                Base Reserve Amount ($)
+                Base Cash Reserve ($)
               </label>
               <div className="relative">
                 <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" />
@@ -522,6 +622,25 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   className="pl-9 bg-black/80 border-red-800 text-lg font-mono font-bold text-emerald-400 focus:border-emerald-500"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs uppercase font-bold text-cyan-400/80 block mb-1">
+                Base SVC Reserve <span className="font-orbitron text-[10px] bg-cyan-950 border border-cyan-500/60 px-1.5 py-0.5 rounded text-cyan-300 ml-1">CRYPTO</span>
+              </label>
+              <div className="relative">
+                <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                <Input
+                  type="number"
+                  min="0"
+                  step="100"
+                  placeholder="15000"
+                  value={newBaseSvcInput}
+                  onChange={(e) => setNewBaseSvcInput(e.target.value)}
+                  className="pl-9 bg-black/80 border-cyan-900/60 text-lg font-mono font-bold text-cyan-400 focus:border-cyan-500"
+                />
+              </div>
+              <p className="text-[11px] text-cyan-400/60 mt-1">SVC is separate crypto — not equivalent to Cash ($)</p>
             </div>
           </div>
 
@@ -566,7 +685,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 type="button"
                 onClick={() => {
                   setTxType("income");
-                  setTxCategory("Bank Heist");
+                  setTxCategory(txCurrency === "svc" ? "Crypto Laundering" : "Bank Heist");
                 }}
                 className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1 transition-all ${
                   txType === "income"
@@ -580,7 +699,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 type="button"
                 onClick={() => {
                   setTxType("expense");
-                  setTxCategory("Weapon Supply");
+                  setTxCategory(txCurrency === "svc" ? "Encrypted Comms" : "Weapon Supply");
                 }}
                 className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1 transition-all ${
                   txType === "expense"
@@ -592,22 +711,61 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               </button>
             </div>
 
+            {/* Currency Toggle */}
+            <div>
+              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1.5">Currency</label>
+              <div className="flex items-center gap-2 p-1 bg-black/70 rounded-lg border border-red-900/50">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTxCurrency("cash");
+                    setTxCategory(txType === "income" ? "Bank Heist" : "Weapon Supply");
+                  }}
+                  className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                    txCurrency === "cash"
+                      ? "bg-emerald-900 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                      : "text-muted-foreground hover:text-white"
+                  }`}
+                >
+                  <DollarSign className="w-3.5 h-3.5" /> Cash ($)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTxCurrency("svc");
+                    setTxCategory(txType === "income" ? "Crypto Laundering" : "Encrypted Comms");
+                  }}
+                  className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                    txCurrency === "svc"
+                      ? "bg-cyan-900/80 border border-cyan-500/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                      : "text-muted-foreground hover:text-white"
+                  }`}
+                >
+                  <Coins className="w-3.5 h-3.5" /> SVC Crypto
+                </button>
+              </div>
+            </div>
+
             {/* Amount */}
             <div>
               <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
-                Amount ($)
+                Amount {txCurrency === "svc" ? "(SVC)" : "($)"}
               </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                {txCurrency === "svc" ? (
+                  <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                ) : (
+                  <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                )}
                 <Input
                   type="number"
                   min="1"
-                  step="100"
-                  placeholder="e.g. 50000"
+                  step={txCurrency === "svc" ? "10" : "100"}
+                  placeholder={txCurrency === "svc" ? "e.g. 500" : "e.g. 50000"}
                   value={txAmount}
                   onChange={(e) => setTxAmount(e.target.value)}
                   className={`pl-9 bg-black/80 border-red-800 text-base font-mono font-bold ${
-                    txType === "income" ? "text-emerald-400" : "text-rose-400"
+                    txCurrency === "svc" ? "text-cyan-400" : txType === "income" ? "text-emerald-400" : "text-rose-400"
                   }`}
                 />
               </div>

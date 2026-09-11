@@ -34,6 +34,7 @@ import {
   ArrowDownRight,
   Wallet,
   Receipt,
+  Coins,
 } from "lucide-react";
 import { apiService, Member, WeeklyPaymentRecord, Cycle, Transaction, GangFund } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
@@ -60,16 +61,6 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
-
-  // Fund & Transaction Modals
-  const [isEditFundOpen, setIsEditFundOpen] = useState(false);
-  const [newBaseFundInput, setNewBaseFundInput] = useState<string>("");
-  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
-  const [txType, setTxType] = useState<"income" | "expense">("income");
-  const [txAmount, setTxAmount] = useState<string>("");
-  const [txCategory, setTxCategory] = useState<string>("Turf Tax");
-  const [txDescription, setTxDescription] = useState<string>("");
-  const [txFilter, setTxFilter] = useState<"all" | "income" | "expense">("all");
 
   const isLeader = userMode === "admin";
 
@@ -151,10 +142,22 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
   const isCurrentWeekSelected = selectedWeek === cycle.currentWeekNumber;
 
-  // Toggle member payment status
-  const handleTogglePayment = async (member: Member) => {
+  // Helper to get hasPaidSvc from record notes
+  const getHasPaidSvc = (memberId: string): boolean => {
+    const rec = weeklyRecords.find((r) => r.memberId === memberId && r.weekNumber === selectedWeek);
+    if (!rec?.notes) return false;
+    try {
+      const parsed = JSON.parse(rec.notes);
+      return !!parsed.hasPaidSvc;
+    } catch {
+      return false;
+    }
+  };
+
+  // Toggle Cash payment status
+  const handleToggleCashPayment = async (member: Member) => {
     if (!isLeader) return;
-    setTogglingId(member.id);
+    setTogglingId(member.id + "_cash");
 
     try {
       const recordForWeek = weeklyRecords.find(
@@ -171,9 +174,14 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         weekStart: cycle.cycleStartDate,
         weekEnd: new Date().toISOString(),
         contribution: member.contribution || 50000,
+        contributionSvc: member.contributionSvc ?? 100,
         hasPaid: nextPaidState,
         paymentDate: nextPaidState ? new Date().toISOString().split("T")[0] : undefined,
         markedBy: "Red Leader",
+        notes: (() => {
+          const rec = weeklyRecords.find((r) => r.memberId === member.id && r.weekNumber === selectedWeek);
+          try { const existing = rec?.notes ? JSON.parse(rec.notes) : {}; return JSON.stringify(existing); } catch { return "{}"; }
+        })(),
       });
 
       if (nextPaidState) {
@@ -182,7 +190,6 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         soundFx.playClickSound();
       }
 
-      // Refresh members local view
       if (isCurrentWeekSelected) {
         setMembers((prev) =>
           prev.map((m) => (m.id === member.id ? { ...m, hasPaid: nextPaidState } : m))
@@ -190,11 +197,70 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
       }
     } catch (err: any) {
       soundFx.playErrorSound();
-      alert(err.message || "Failed to update payment status");
+      alert(err.message || "Failed to update cash payment status");
     } finally {
       setTogglingId(null);
     }
   };
+
+  // Toggle SVC payment status (stored in record notes as JSON)
+  const handleToggleSvcPayment = async (member: Member) => {
+    if (!isLeader) return;
+    setTogglingId(member.id + "_svc");
+
+    try {
+      const recordForWeek = weeklyRecords.find(
+        (r) => r.memberId === member.id && r.weekNumber === selectedWeek
+      );
+
+      const currentHasPaidSvc = getHasPaidSvc(member.id);
+      const nextSvcState = !currentHasPaidSvc;
+      const existingNotes = (() => {
+        try { return recordForWeek?.notes ? JSON.parse(recordForWeek.notes) : {}; } catch { return {}; }
+      })();
+
+      await apiService.upsertWeeklyPaymentRecord({
+        memberId: member.id,
+        memberName: member.name,
+        weekNumber: selectedWeek,
+        weekStart: cycle.cycleStartDate,
+        weekEnd: new Date().toISOString(),
+        contribution: member.contribution || 50000,
+        contributionSvc: member.contributionSvc ?? 100,
+        hasPaid: isCurrentWeekSelected ? !!member.hasPaid : !!recordForWeek?.hasPaid,
+        markedBy: "Red Leader",
+        notes: JSON.stringify({ ...existingNotes, hasPaidSvc: nextSvcState }),
+      });
+
+      if (nextSvcState) {
+        soundFx.playCryptoSound();
+      } else {
+        soundFx.playClickSound();
+      }
+
+      // Update local records immediately
+      setWeeklyRecords((prev) => {
+        const idx = prev.findIndex((r) => r.memberId === member.id && r.weekNumber === selectedWeek);
+        if (idx !== -1) {
+          const updated = [...prev];
+          updated[idx] = {
+            ...updated[idx],
+            notes: JSON.stringify({ ...existingNotes, hasPaidSvc: nextSvcState }),
+          };
+          return updated;
+        }
+        return prev;
+      });
+    } catch (err: any) {
+      soundFx.playErrorSound();
+      alert(err.message || "Failed to update SVC payment status");
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  // Keep old handleTogglePayment for backward compatibility (same as Cash toggle)
+  const handleTogglePayment = handleToggleCashPayment;
 
   // Execute weekly cycle reset
   const handleWeeklyReset = async () => {
@@ -215,87 +281,14 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
     }
   };
 
-  // Fund & Transaction Handlers
-  const handleUpdateFund = async () => {
-    if (!isLeader) return;
-    const amt = Number(newBaseFundInput);
-    if (isNaN(amt) || amt < 0) {
-      alert("Please enter a valid vault fund amount ($0 or higher).");
-      return;
-    }
-    try {
-      const updated = await apiService.updateGangFund(amt, "Red Leader");
-      if (updated) setGangFund(updated);
-      soundFx.playCashSound();
-      setIsEditFundOpen(false);
-    } catch (err: any) {
-      soundFx.playErrorSound();
-      alert(err.message || "Failed to update vault fund");
-    }
-  };
-
-  const handleOpenTxModal = (type: "income" | "expense") => {
-    setTxType(type);
-    setTxAmount("");
-    setTxCategory(type === "income" ? "Turf Tax" : "Weapon Supply");
-    setTxDescription("");
-    setIsTxModalOpen(true);
-  };
-
-  const handleAddTransaction = async () => {
-    if (!isLeader) return;
-    const amt = Number(txAmount);
-    if (isNaN(amt) || amt <= 0) {
-      alert("Please enter a valid amount greater than $0.");
-      return;
-    }
-    if (!txDescription.trim()) {
-      alert("Please enter a description or note for the transaction.");
-      return;
-    }
-    try {
-      await apiService.addTransaction({
-        type: txType,
-        amount: amt,
-        category: txCategory,
-        description: txDescription.trim(),
-        addedBy: "Red Leader",
-        date: new Date().toISOString(),
-      });
-      if (txType === "income") {
-        soundFx.playCashSound();
-      } else {
-        soundFx.playClickSound();
-      }
-      setIsTxModalOpen(false);
-      setTxAmount("");
-      setTxDescription("");
-    } catch (err: any) {
-      soundFx.playErrorSound();
-      alert(err.message || "Failed to record transaction");
-    }
-  };
-
-  const handleDeleteTransaction = async (id: string) => {
-    if (!isLeader) return;
-    if (!confirm("Are you sure you want to remove this ledger entry?")) return;
-    try {
-      await apiService.deleteTransaction(id);
-      soundFx.playClickSound();
-      setTransactions((prev) => prev.filter((t) => t.id !== id));
-    } catch (err: any) {
-      soundFx.playErrorSound();
-      alert(err.message || "Failed to remove transaction");
-    }
-  };
-
   // Compile member records for selected week
   const weekMemberRows = members.map((m) => {
     const rec = weeklyRecords.find(
       (r) => r.memberId === m.id && r.weekNumber === selectedWeek
     );
 
-    const isPaid = isCurrentWeekSelected ? !!m.hasPaid : !!rec?.hasPaid;
+    const isPaidCash = isCurrentWeekSelected ? !!m.hasPaid : !!rec?.hasPaid;
+    const isPaidSvc = getHasPaidSvc(m.id);
     const paymentDate = isCurrentWeekSelected
       ? m.hasPaid
         ? rec?.paymentDate || "Verified"
@@ -304,31 +297,24 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
     return {
       member: m,
-      isPaid,
+      isPaidCash,
+      isPaidSvc,
       paymentDate,
-      markedBy: rec?.markedBy || (isPaid ? "Leader" : undefined),
+      markedBy: rec?.markedBy || (isPaidCash ? "Leader" : undefined),
     };
   });
 
-  const totalExpected = weekMemberRows.reduce((sum, r) => sum + (r.member.contribution || 0), 0);
-  const totalCollected = weekMemberRows
-    .filter((r) => r.isPaid)
+  const totalCashExpected = weekMemberRows.reduce((sum, r) => sum + (r.member.contribution || 0), 0);
+  const totalCashCollected = weekMemberRows
+    .filter((r) => r.isPaidCash)
     .reduce((sum, r) => sum + (r.member.contribution || 0), 0);
-  const collectionRate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
-  const paidCount = weekMemberRows.filter((r) => r.isPaid).length;
+  const totalSvcExpected = weekMemberRows.reduce((sum, r) => sum + (r.member.contributionSvc ?? 100), 0);
+  const totalSvcCollected = weekMemberRows
+    .filter((r) => r.isPaidSvc)
+    .reduce((sum, r) => sum + (r.member.contributionSvc ?? 100), 0);
 
-  const vaultTotal = gangFund?.totalAmount ?? gangFund?.baseAmount ?? 350000;
-  const totalIncome = transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  const totalExpense = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-
-  const filteredTransactions = transactions.filter((t) => {
-    if (txFilter === "all") return true;
-    return t.type === txFilter;
-  });
+  const collectionRate = totalCashExpected > 0 ? Math.round((totalCashCollected / totalCashExpected) * 100) : 0;
+  const paidCount = weekMemberRows.filter((r) => r.isPaidCash).length;
 
   // Filtered rows
   const filteredRows = weekMemberRows.filter((row) => {
@@ -339,8 +325,8 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
     const matchesStatus =
       statusFilter === "all" ||
-      (statusFilter === "paid" && row.isPaid) ||
-      (statusFilter === "pending" && !row.isPaid);
+      (statusFilter === "paid" && row.isPaidCash) ||
+      (statusFilter === "pending" && !row.isPaidCash);
 
     return matchesSearch && matchesStatus;
   });
@@ -387,58 +373,88 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
       </div>
 
       {/* Progress & Quota Analytics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Cash Quota Expected */}
         <Card className="card-gang p-4 border-l-4 border-l-red-600">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Total Quota Expected
+              Cash Quota Expected
             </span>
             <DollarSign className="w-5 h-5 text-red-400" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-foreground mt-2 font-mono">
-            ${totalExpected.toLocaleString()}
+          <p className="text-xl font-orbitron font-bold text-foreground mt-2 font-mono">
+            ${totalCashExpected.toLocaleString()}
           </p>
           <span className="text-xs text-muted-foreground">
-            Assigned to {members.length} registered syndicate operatives
+            {members.length} registered syndicate operatives
           </span>
         </Card>
 
+        {/* Cash Collected */}
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Collected This Cycle
+              Cash Collected
             </span>
             <TrendingUp className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
-            ${totalCollected.toLocaleString()}
+          <p className="text-xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
+            ${totalCashCollected.toLocaleString()}
           </p>
           <span className="text-xs text-muted-foreground">
             {paidCount} of {members.length} Paid ({collectionRate}%)
           </span>
         </Card>
 
-        <Card className="card-gang p-4 border-l-4 border-l-amber-500">
+        {/* SVC Quota Expected */}
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 bg-gradient-to-br from-black via-cyan-950/20 to-black">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-              Cycle Compliance Rate
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+                SVC Expected
+              </span>
+              <span className="px-1.5 rounded text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-bold">CRYPTO</span>
+            </div>
+            <Coins className="w-5 h-5 text-cyan-400" />
+          </div>
+          <p className="text-xl font-orbitron font-bold text-cyan-400 mt-2 font-mono flex items-center gap-1">
+            {totalSvcExpected.toLocaleString()} <span className="text-sm text-cyan-300">SVC</span>
+          </p>
+          <span className="text-xs text-muted-foreground">
+            Weekly crypto quota for {members.length} operatives
+          </span>
+        </Card>
+
+        {/* SVC Collected */}
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-400 bg-gradient-to-br from-black via-cyan-950/15 to-black">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+              SVC Collected
             </span>
-            <Award className="w-5 h-5 text-amber-400" />
+            <Award className="w-5 h-5 text-cyan-400" />
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-orbitron font-bold text-amber-400 font-mono">
-              {collectionRate}%
-            </span>
-            <span className="text-xs text-muted-foreground">Settled</span>
-          </div>
-          <div className="w-full h-1.5 bg-black/80 rounded-full mt-2 overflow-hidden border border-red-950">
-            <div
-              className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-400 transition-all duration-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"
-              style={{ width: `${Math.min(collectionRate, 100)}%` }}
-            />
-          </div>
+          <p className="text-xl font-orbitron font-bold text-cyan-400 mt-2 font-mono flex items-center gap-1">
+            {totalSvcCollected.toLocaleString()} <span className="text-sm text-cyan-300">SVC</span>
+          </p>
+          <span className="text-xs text-muted-foreground">
+            {weekMemberRows.filter((r) => r.isPaidSvc).length} of {members.length} SVC Settled
+          </span>
         </Card>
       </div>
+
+      {/* Compliance Bar */}
+      <Card className="card-gang p-4 border-l-4 border-l-amber-500">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Cycle Compliance Rate (Cash)</span>
+          <span className="text-lg font-orbitron font-bold text-amber-400 font-mono">{collectionRate}% Settled</span>
+        </div>
+        <div className="w-full h-2 bg-black/80 rounded-full overflow-hidden border border-red-950">
+          <div
+            className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-400 transition-all duration-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+            style={{ width: `${Math.min(collectionRate, 100)}%` }}
+          />
+        </div>
+      </Card>
 
 
       {/* Week Selector & Filters Bar */}
@@ -484,7 +500,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
           {/* Status Filter Segmented Controls */}
           <div>
             <label className="text-[11px] uppercase font-bold text-muted-foreground block mb-1">
-              Filter Status
+              Filter (Cash Status)
             </label>
             <div className="flex items-center gap-1 bg-black/60 p-1 rounded-lg border border-red-900/40">
               <button
@@ -530,11 +546,18 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
               <tr>
                 <th className="py-3 px-4">Operative</th>
                 <th className="py-3 px-4">Rank</th>
-                <th className="py-3 px-4">Weekly Due</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Verification Audit</th>
+                <th className="py-3 px-4">Cash Quota</th>
+                <th className="py-3 px-4">
+                  <span className="flex items-center gap-1 text-cyan-400/80">
+                    <Coins className="w-3.5 h-3.5" /> SVC Quota
+                  </span>
+                </th>
+                <th className="py-3 px-4">Cash Status</th>
+                <th className="py-3 px-4">
+                  <span className="flex items-center gap-1 text-cyan-400/80">SVC Status</span>
+                </th>
                 <th className="py-3 px-4 text-right">
-                  {isLeader ? "Leader Verification Action" : "Verification"}
+                  {isLeader ? "Actions" : "Verification"}
                 </th>
               </tr>
             </thead>
@@ -546,7 +569,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                   </td>
                 </tr>
               ) : (
-                filteredRows.map(({ member, isPaid, paymentDate, markedBy }) => (
+                filteredRows.map(({ member, isPaidCash, isPaidSvc, paymentDate, markedBy }) => (
                   <tr
                     key={member.id}
                     className="hover:bg-red-950/20 transition-colors duration-150 group"
@@ -569,8 +592,11 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                     <td className="py-3 px-4 font-mono font-bold text-amber-400 text-sm">
                       ${(member.contribution || 0).toLocaleString()}
                     </td>
+                    <td className="py-3 px-4 font-mono font-bold text-cyan-400 text-sm">
+                      {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-300">SVC</span>
+                    </td>
                     <td className="py-3 px-4">
-                      {isPaid ? (
+                      {isPaidCash ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                           PAID
@@ -582,40 +608,67 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-xs text-muted-foreground">
-                      {isPaid ? (
-                        <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          Verified {paymentDate ? `(${paymentDate})` : ""} by {markedBy || "Leader"}
+                    <td className="py-3 px-4">
+                      {isPaidSvc ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.25)]">
+                          <Coins className="w-3.5 h-3.5 text-cyan-400" />
+                          PAID
                         </span>
                       ) : (
-                        <span className="text-neutral-500 italic">Uncollected</span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 border border-neutral-700 text-neutral-400">
+                          <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                          PENDING
+                        </span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-right">
                       {isLeader ? (
-                        <Button
-                          size="sm"
-                          onClick={() => handleTogglePayment(member)}
-                          disabled={togglingId === member.id}
-                          className={
-                            isPaid
-                              ? "bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/70 text-xs font-bold shadow-sm"
-                              : "bg-red-950/70 border border-red-500/60 text-red-200 hover:bg-red-900/70 text-xs font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
-                          }
-                        >
-                          {togglingId === member.id ? (
-                            "Updating..."
-                          ) : isPaid ? (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-amber-400" /> Mark Pending
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Mark Paid
-                            </span>
-                          )}
-                        </Button>
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                          <Button
+                            size="sm"
+                            onClick={() => handleToggleCashPayment(member)}
+                            disabled={togglingId === member.id + "_cash"}
+                            className={
+                              isPaidCash
+                                ? "bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/70 text-xs font-bold"
+                                : "bg-red-950/70 border border-red-500/60 text-red-200 hover:bg-red-900/70 text-xs font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+                            }
+                          >
+                            {togglingId === member.id + "_cash" ? (
+                              "..."
+                            ) : isPaidCash ? (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-amber-400" /> Unpay $
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="w-3 h-3 text-emerald-400" /> Mark Paid $
+                              </span>
+                            )}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleToggleSvcPayment(member)}
+                            disabled={togglingId === member.id + "_svc"}
+                            className={
+                              isPaidSvc
+                                ? "bg-cyan-950/60 border border-cyan-500/60 text-cyan-300 hover:bg-cyan-900/70 text-xs font-bold"
+                                : "bg-black/70 border border-cyan-800/60 text-cyan-300/80 hover:bg-cyan-950/60 text-xs font-bold"
+                            }
+                          >
+                            {togglingId === member.id + "_svc" ? (
+                              "..."
+                            ) : isPaidSvc ? (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3 text-neutral-400" /> Unpay SVC
+                              </span>
+                            ) : (
+                              <span className="flex items-center gap-1">
+                                <Coins className="w-3 h-3 text-cyan-400" /> Mark Paid SVC
+                              </span>
+                            )}
+                          </Button>
+                        </div>
                       ) : (
                         <span className="text-xs text-muted-foreground flex items-center justify-end gap-1">
                           <Lock className="w-3 h-3" /> Leader Only

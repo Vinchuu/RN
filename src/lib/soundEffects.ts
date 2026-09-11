@@ -208,6 +208,33 @@ class SoundEffectsManager {
       console.debug('Audio play blocked:', err);
     }
   }
+
+  // Futuristic Crypto / SVC Coin Sound
+  public playCryptoSound() {
+    if (this.muted) return;
+    try {
+      const ctx = this.initCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      // Fast high-tech 3-step cyber arpeggio
+      const notes = [587.33, 880.0, 1174.66]; // D5, A5, D6
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+        gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.05 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.18);
+      });
+    } catch (err) {
+      console.debug('Audio play blocked:', err);
+    }
+  }
 }
 
 export const soundFx = new SoundEffectsManager();

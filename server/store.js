@@ -34,6 +34,7 @@ const STARTER_ITEMS = [
     id: 'item_wpn_1',
     name: 'Heavy Pistol .45',
     price: 3500,
+    priceSvc: 35,
     quantity: 14,
     maxCapacity: 30,
     category: 'weapons',
@@ -45,6 +46,7 @@ const STARTER_ITEMS = [
     id: 'item_wpn_2',
     name: 'Micro SMG 9mm',
     price: 8500,
+    priceSvc: 85,
     quantity: 8,
     maxCapacity: 20,
     category: 'weapons',
@@ -56,6 +58,7 @@ const STARTER_ITEMS = [
     id: 'item_wpn_3',
     name: 'Special Carbine 5.56',
     price: 22000,
+    priceSvc: 220,
     quantity: 4,
     maxCapacity: 10,
     category: 'weapons',
@@ -67,6 +70,7 @@ const STARTER_ITEMS = [
     id: 'item_ammo_1',
     name: '9mm Ammunition Box (250 rnds)',
     price: 1200,
+    priceSvc: 12,
     quantity: 45,
     maxCapacity: 100,
     category: 'ammo',
@@ -78,6 +82,7 @@ const STARTER_ITEMS = [
     id: 'item_ammo_2',
     name: '5.56mm Rifle Ammo Box (200 rnds)',
     price: 2400,
+    priceSvc: 24,
     quantity: 28,
     maxCapacity: 80,
     category: 'ammo',
@@ -89,6 +94,7 @@ const STARTER_ITEMS = [
     id: 'item_armor_1',
     name: 'Tactical Heavy Body Armor',
     price: 3000,
+    priceSvc: 30,
     quantity: 22,
     maxCapacity: 50,
     category: 'armor',
@@ -100,6 +106,7 @@ const STARTER_ITEMS = [
     id: 'item_med_1',
     name: 'Military Medkit',
     price: 1500,
+    priceSvc: 15,
     quantity: 35,
     maxCapacity: 100,
     category: 'meds',
@@ -111,6 +118,7 @@ const STARTER_ITEMS = [
     id: 'item_med_2',
     name: 'Oxycodone Pills (x10)',
     price: 800,
+    priceSvc: 8,
     quantity: 60,
     maxCapacity: 150,
     category: 'meds',
@@ -122,6 +130,7 @@ const STARTER_ITEMS = [
     id: 'item_tool_1',
     name: 'Advanced Lockpick Set',
     price: 2500,
+    priceSvc: 25,
     quantity: 18,
     maxCapacity: 40,
     category: 'tools',
@@ -133,6 +142,7 @@ const STARTER_ITEMS = [
     id: 'item_tool_2',
     name: 'Thermite Breach Charge',
     price: 12500,
+    priceSvc: 125,
     quantity: 5,
     maxCapacity: 15,
     category: 'tools',
@@ -144,6 +154,7 @@ const STARTER_ITEMS = [
     id: 'item_tool_3',
     name: 'Encrypted Radio & GPS',
     price: 1800,
+    priceSvc: 18,
     quantity: 20,
     maxCapacity: 30,
     category: 'tools',
@@ -155,6 +166,7 @@ const STARTER_ITEMS = [
     id: 'item_contra_1',
     name: 'Red Kush Brick (1kg)',
     price: 15000,
+    priceSvc: 150,
     quantity: 12,
     maxCapacity: 50,
     category: 'contraband',
@@ -172,6 +184,7 @@ const STARTER_MEMBERS = [
     alias: 'Vance',
     rank: 'leader',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: true,
     status: 'in-city',
     phone: '555-0101',
@@ -185,6 +198,7 @@ const STARTER_MEMBERS = [
     alias: 'Ghost',
     rank: 'underboss',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: true,
     status: 'active',
     phone: '555-0102',
@@ -198,6 +212,7 @@ const STARTER_MEMBERS = [
     alias: 'Trigger',
     rank: 'enforcer',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: true,
     status: 'in-city',
     phone: '555-0103',
@@ -211,6 +226,7 @@ const STARTER_MEMBERS = [
     alias: 'Viper',
     rank: 'hitman',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: false,
     status: 'active',
     phone: '555-0104',
@@ -224,6 +240,7 @@ const STARTER_MEMBERS = [
     alias: 'Cortex',
     rank: 'soldier',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: true,
     status: 'active',
     phone: '555-0105',
@@ -237,6 +254,7 @@ const STARTER_MEMBERS = [
     alias: 'Rookie',
     rank: 'recruit',
     contribution: 50000,
+    contributionSvc: 100,
     hasPaid: false,
     status: 'loa',
     phone: '555-0106',
@@ -411,6 +429,7 @@ function defaultDb() {
         id: 'tx_starter_1',
         description: 'Pacific Standard Bank Take',
         amount: 320000,
+        currency: 'cash',
         type: 'income',
         category: 'heist',
         addedBy: 'Leader',
@@ -420,8 +439,29 @@ function defaultDb() {
         id: 'tx_starter_2',
         description: 'Arsenal & Body Armor Restock',
         amount: 85000,
+        currency: 'cash',
         type: 'expense',
         category: 'arsenal',
+        addedBy: 'Underboss',
+        date: nowIso().split('T')[0],
+      },
+      {
+        id: 'tx_starter_3',
+        description: 'Dark Web Crypto Laundering Pool',
+        amount: 8500,
+        currency: 'svc',
+        type: 'income',
+        category: 'crypto',
+        addedBy: 'Leader',
+        date: nowIso().split('T')[0],
+      },
+      {
+        id: 'tx_starter_4',
+        description: 'Encrypted Radio Node & Sat-Com Keys',
+        amount: 1200,
+        currency: 'svc',
+        type: 'expense',
+        category: 'tech',
         addedBy: 'Underboss',
         date: nowIso().split('T')[0],
       },
@@ -446,6 +486,7 @@ function defaultDb() {
     gangFund: {
       id: 'main',
       baseAmount: 350000,
+      baseSvcAmount: 15000,
       lastUpdated: nowIso(),
       updatedBy: 'system',
     },
@@ -464,7 +505,21 @@ function load() {
   }
   try {
     const parsed = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-    return { ...defaultDb(), ...parsed };
+    const merged = { ...defaultDb(), ...parsed };
+    if (merged.gangFund && merged.gangFund.baseSvcAmount === undefined) {
+      merged.gangFund.baseSvcAmount = 15000;
+    }
+    if (merged.members) {
+      merged.members.forEach((m) => {
+        if (m.contributionSvc === undefined) m.contributionSvc = 100;
+      });
+    }
+    if (merged.items) {
+      merged.items.forEach((i) => {
+        if (i.priceSvc === undefined) i.priceSvc = Math.round((i.price || 0) / 100);
+      });
+    }
+    return merged;
   } catch {
     const fresh = defaultDb();
     persist(fresh);
@@ -526,16 +581,29 @@ export async function seedMongoIfEmpty() {
 }
 
 function fundSnapshotLocal() {
-  const income = (db.transactions || [])
-    .filter((t) => t.type === 'income')
+  const cashIncome = (db.transactions || [])
+    .filter((t) => (!t.currency || t.currency === 'cash') && t.type === 'income')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-  const expense = (db.transactions || [])
-    .filter((t) => t.type === 'expense')
+  const cashExpense = (db.transactions || [])
+    .filter((t) => (!t.currency || t.currency === 'cash') && t.type === 'expense')
     .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  const svcIncome = (db.transactions || [])
+    .filter((t) => t.currency === 'svc' && t.type === 'income')
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+  const svcExpense = (db.transactions || [])
+    .filter((t) => t.currency === 'svc' && t.type === 'expense')
+    .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+  const baseAmount = Number(db.gangFund?.baseAmount ?? 350000);
+  const baseSvcAmount = Number(db.gangFund?.baseSvcAmount ?? 15000);
+
   return {
     id: db.gangFund?.id || 'main',
-    baseAmount: Number(db.gangFund?.baseAmount || 350000),
-    totalAmount: Number(db.gangFund?.baseAmount || 350000) + income - expense,
+    baseAmount,
+    totalAmount: baseAmount + cashIncome - cashExpense,
+    baseSvcAmount,
+    totalSvcAmount: baseSvcAmount + svcIncome - svcExpense,
     lastUpdated: db.gangFund?.lastUpdated || nowIso(),
     updatedBy: db.gangFund?.updatedBy || 'system',
   };
@@ -708,6 +776,7 @@ export const store = {
       alias: payload.alias || '',
       rank: payload.rank || 'recruit',
       contribution: Number(payload.contribution || 50000),
+      contributionSvc: Number(payload.contributionSvc !== undefined ? payload.contributionSvc : 100),
       hasPaid: !!payload.hasPaid,
       status: payload.status || 'active',
       phone: payload.phone || '',
@@ -782,6 +851,7 @@ export const store = {
       id: makeId('item'),
       name: payload.name || 'New Arsenal Asset',
       price: Number(payload.price || 0),
+      priceSvc: Number(payload.priceSvc !== undefined ? payload.priceSvc : Math.round((payload.price || 0) / 100)),
       quantity: Number(payload.quantity || 0),
       maxCapacity: Number(payload.maxCapacity || 100),
       category: payload.category || 'weapons',
@@ -919,21 +989,24 @@ export const store = {
   },
 
   async addTransaction(payload) {
+    const currency = payload.currency === 'svc' ? 'svc' : 'cash';
     const tx = {
       id: makeId('tx'),
       description: payload.description || 'Syndicate Transaction',
       amount: Number(payload.amount || 0),
+      currency,
       type: payload.type || 'expense',
       category: payload.category || 'operation',
       addedBy: payload.addedBy || 'Leader',
       date: payload.date || nowIso().split('T')[0],
     };
+    const formattedAmount = currency === 'svc' ? `${tx.amount.toLocaleString()} SVC` : `$${tx.amount.toLocaleString()}`;
     if (isMongoConnected()) {
       const created = await TransactionModel.create(tx);
       await this.addAuditLog({
         action: 'vault_transaction',
         category: 'vault',
-        description: `Vault ${tx.type.toUpperCase()}: $${tx.amount.toLocaleString()} for "${tx.description}"`,
+        description: `Vault ${tx.type.toUpperCase()}: ${formattedAmount} for "${tx.description}"`,
         performedBy: tx.addedBy,
       });
       return created.toObject();
@@ -943,7 +1016,7 @@ export const store = {
     await this.addAuditLog({
       action: 'vault_transaction',
       category: 'vault',
-      description: `Vault ${tx.type.toUpperCase()}: $${tx.amount.toLocaleString()} for "${tx.description}"`,
+      description: `Vault ${tx.type.toUpperCase()}: ${formattedAmount} for "${tx.description}"`,
       performedBy: tx.addedBy,
     });
     return tx;
@@ -964,36 +1037,59 @@ export const store = {
     if (isMongoConnected()) {
       let fund = await GangFundModel.findOne({ id: 'main' }).lean();
       if (!fund) {
-        fund = await GangFundModel.create({ id: 'main', baseAmount: 350000, updatedBy: 'system', lastUpdated: nowIso() });
+        fund = await GangFundModel.create({
+          id: 'main',
+          baseAmount: 350000,
+          baseSvcAmount: 15000,
+          updatedBy: 'system',
+          lastUpdated: nowIso(),
+        });
         fund = fund.toObject();
       }
       const txs = await TransactionModel.find({}).lean();
-      const income = txs.filter((t) => t.type === 'income').reduce((sum, t) => sum + Number(t.amount || 0), 0);
-      const expense = txs.filter((t) => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      const cashIncome = txs
+        .filter((t) => (!t.currency || t.currency === 'cash') && t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      const cashExpense = txs
+        .filter((t) => (!t.currency || t.currency === 'cash') && t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      const svcIncome = txs
+        .filter((t) => t.currency === 'svc' && t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      const svcExpense = txs
+        .filter((t) => t.currency === 'svc' && t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+      const baseAmount = Number(fund.baseAmount ?? 350000);
+      const baseSvcAmount = Number(fund.baseSvcAmount ?? 15000);
+
       return {
         ...fund,
-        totalAmount: Number(fund.baseAmount || 0) + income - expense,
+        baseAmount,
+        baseSvcAmount,
+        totalAmount: baseAmount + cashIncome - cashExpense,
+        totalSvcAmount: baseSvcAmount + svcIncome - svcExpense,
       };
     }
     return fundSnapshotLocal();
   },
 
-  async updateGangFund(baseAmount, updatedBy = 'system') {
-    const amt = Number(baseAmount || 0);
+  async updateGangFund(baseAmount, baseSvcAmount, updatedBy = 'system') {
+    const amt = Number(baseAmount !== undefined ? baseAmount : 350000);
+    const svcAmt = Number(baseSvcAmount !== undefined ? baseSvcAmount : 15000);
     if (isMongoConnected()) {
       const fund = await GangFundModel.findOneAndUpdate(
         { id: 'main' },
-        { $set: { baseAmount: amt, lastUpdated: nowIso(), updatedBy } },
+        { $set: { baseAmount: amt, baseSvcAmount: svcAmt, lastUpdated: nowIso(), updatedBy } },
         { new: true, upsert: true }
       ).lean();
-      return fund;
+      return await this.getGangFund();
     }
-    db.gangFund = {
-      id: 'main',
-      baseAmount: amt,
-      lastUpdated: nowIso(),
-      updatedBy,
-    };
+    if (!db.gangFund) db.gangFund = { id: 'main' };
+    db.gangFund.baseAmount = amt;
+    db.gangFund.baseSvcAmount = svcAmt;
+    db.gangFund.lastUpdated = nowIso();
+    db.gangFund.updatedBy = updatedBy;
     save();
     return fundSnapshotLocal();
   },
