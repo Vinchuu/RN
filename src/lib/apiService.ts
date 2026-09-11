@@ -7,7 +7,6 @@ export interface Member {
   contribution: number;
   contributionSvc?: number;
   hasPaid: boolean;
-  status?: string; // active | in-city | loa
   joinDate: string;
   order: number;
 }

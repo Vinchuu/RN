@@ -63,7 +63,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
   const [newMember, setNewMember] = useState({
     name: "",
     rank: "recruit",
-    status: "active",
     contribution: 50000,
     contributionSvc: 100,
   });
@@ -116,7 +115,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
       setNewMember({
         name: "",
         rank: "recruit",
-        status: "active",
         contribution: 50000,
         contributionSvc: 100,
       });
@@ -132,7 +130,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
       await apiService.updateMember(editingMember.id, {
         name: editingMember.name,
         rank: editingMember.rank,
-        status: editingMember.status || "active",
         contribution: Number(editingMember.contribution),
         contributionSvc: Number(editingMember.contributionSvc ?? 100),
       });
@@ -201,32 +198,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
     return (
       <span className={`px-2 py-0.5 rounded text-[11px] font-orbitron font-bold uppercase border ${r?.color || "bg-neutral-900 border-neutral-700 text-neutral-400"}`}>
         {rank === "leader" ? "👑 " : ""}{r?.label || rank}
-      </span>
-    );
-  };
-
-  const getStatusBadge = (status?: string) => {
-    const s = (status || "active").toLowerCase();
-    if (s === "in-city") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.3)]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          In-City
-        </span>
-      );
-    }
-    if (s === "loa") {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-950/80 border border-amber-500/60 text-amber-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-          On LOA
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-cyan-950/80 border border-cyan-500/60 text-cyan-300">
-        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-        Active
       </span>
     );
   };
@@ -370,7 +341,6 @@ export function MembersTab({ userMode }: MembersTabProps) {
                     </h3>
                     <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                       {getRankBadge(member.rank)}
-                      {getStatusBadge(member.status)}
                     </div>
                   </div>
                 </div>
@@ -457,34 +427,19 @@ export function MembersTab({ userMode }: MembersTabProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
-                <select
-                  value={newMember.rank}
-                  onChange={(e) => setNewMember({ ...newMember, rank: e.target.value })}
-                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
-                >
-                  {RANKS.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Status</Label>
-                <select
-                  value={newMember.status}
-                  onChange={(e) => setNewMember({ ...newMember, status: e.target.value })}
-                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
-                >
-                  <option value="active">Active</option>
-                  <option value="in-city">In-City</option>
-                  <option value="loa">On LOA</option>
-                </select>
-              </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
+              <select
+                value={newMember.rank}
+                onChange={(e) => setNewMember({ ...newMember, rank: e.target.value })}
+                className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+              >
+                {RANKS.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -544,34 +499,19 @@ export function MembersTab({ userMode }: MembersTabProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
-                  <select
-                    value={editingMember.rank || "recruit"}
-                    onChange={(e) => setEditingMember({ ...editingMember, rank: e.target.value })}
-                    className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
-                  >
-                    {RANKS.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Status</Label>
-                  <select
-                    value={editingMember.status || "active"}
-                    onChange={(e) => setEditingMember({ ...editingMember, status: e.target.value })}
-                    className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
-                  >
-                    <option value="active">Active</option>
-                    <option value="in-city">In-City</option>
-                    <option value="loa">On LOA</option>
-                  </select>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
+                <select
+                  value={editingMember.rank || "recruit"}
+                  onChange={(e) => setEditingMember({ ...editingMember, rank: e.target.value })}
+                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                >
+                  {RANKS.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

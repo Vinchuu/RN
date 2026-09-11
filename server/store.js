@@ -777,7 +777,6 @@ export const store = {
       contribution: Number(payload.contribution || 50000),
       contributionSvc: Number(payload.contributionSvc !== undefined ? payload.contributionSvc : 100),
       hasPaid: !!payload.hasPaid,
-      status: payload.status || 'active',
       joinDate: payload.joinDate || nowIso().split('T')[0],
       order: Number(payload.order || (db.members?.length || 0) + 1),
     };

@@ -7,7 +7,6 @@ const MemberSchema = new mongoose.Schema({
   contribution: { type: Number, default: 50000 },
   contributionSvc: { type: Number, default: 100 },
   hasPaid: { type: Boolean, default: false },
-  status: { type: String, default: 'active' }, // active | in-city | loa
   joinDate: { type: String, default: () => new Date().toISOString() },
   order: { type: Number, default: 0 },
 }, { timestamps: true });
