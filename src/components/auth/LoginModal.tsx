@@ -159,13 +159,13 @@ export const LoginModal = ({ isOpen, onClose, onLogin }: LoginModalProps) => {
             {selectedMode === "gangmember" && (
               <p className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-amber-400 shrink-0" />
-                <span><strong>Member Access:</strong> View roster, check your weekly dues, browse arsenal, submit live streams. Passcode: <code className="text-amber-300 font-mono font-bold">RN1</code></span>
+                <span><strong>Member Access:</strong> View roster, check your weekly dues, browse arsenal, and submit live streams.</span>
               </p>
             )}
             {selectedMode === "admin" && (
               <p className="flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-red-400 shrink-0" />
-                <span><strong>Leader Command:</strong> Full control to add/kick members, mark dues paid, reset weekly cycles, manage stash, and view all audit logs. Passcode: <code className="text-red-300 font-mono font-bold">RN</code></span>
+                <span><strong>Leader Command:</strong> Full control to add/kick members, mark dues paid, reset weekly cycles, manage stash, and view all audit logs.</span>
               </p>
             )}
           </div>
