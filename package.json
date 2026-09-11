@@ -8,6 +8,7 @@
     "dev:client": "vite",
     "server": "node server/index.js",
     "build": "vite build",
+    "postinstall": "npm run build",
     "start": "node server/index.js",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
