@@ -381,21 +381,21 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
           </div>
 
           {/* Platform Toggles */}
-          <div className="flex items-center gap-2 pl-1">
-            {/* YouTube button */}
+          <div className="flex items-center gap-1.5 pl-1">
+            {/* All button */}
             <button
               onClick={() => {
                 soundFx.playClickSound();
-                setPlatformFilter(platformFilter === "youtube" ? "all" : "youtube");
+                setPlatformFilter("all");
               }}
-              title={platformFilter === "youtube" ? "Show all platforms" : "Filter YouTube streams only"}
-              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                platformFilter === "youtube"
-                  ? "bg-[#e50914] text-white ring-2 ring-red-400 shadow-[0_0_12px_rgba(229,9,20,0.7)]"
-                  : "bg-[#e50914] hover:bg-[#ff0000] text-white"
+              title="Show all platforms (Kick & YouTube)"
+              className={`h-8 px-2.5 rounded-lg text-xs font-bold font-orbitron transition-all ${
+                platformFilter === "all"
+                  ? "bg-red-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.7)]"
+                  : "bg-black/50 border border-red-900/40 text-zinc-400 hover:text-white"
               }`}
             >
-              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+              ALL
             </button>
 
             {/* Kick button */}
@@ -404,14 +404,32 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                 soundFx.playClickSound();
                 setPlatformFilter(platformFilter === "kick" ? "all" : "kick");
               }}
-              title={platformFilter === "kick" ? "Show all platforms" : "Filter Kick streams only"}
-              className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm tracking-tighter transition-all font-sans ${
+              title={platformFilter === "kick" ? "Showing Kick only (click to reset)" : "Filter Kick streams only"}
+              className={`h-8 px-2.5 rounded-lg flex items-center gap-1.5 font-black text-xs transition-all font-sans ${
                 platformFilter === "kick"
                   ? "bg-[#53fc18] text-black ring-2 ring-white shadow-[0_0_14px_rgba(83,252,24,0.7)]"
-                  : "bg-[#53fc18] hover:brightness-110 text-black"
+                  : "bg-black/50 border border-green-900/40 text-zinc-400 hover:text-[#53fc18] hover:border-[#53fc18]/60"
               }`}
             >
-              K
+              <span className="w-4 h-4 bg-[#53fc18] text-black font-black text-[10px] rounded flex items-center justify-center">K</span>
+              <span>KICK</span>
+            </button>
+
+            {/* YouTube button */}
+            <button
+              onClick={() => {
+                soundFx.playClickSound();
+                setPlatformFilter(platformFilter === "youtube" ? "all" : "youtube");
+              }}
+              title={platformFilter === "youtube" ? "Showing YouTube only (click to reset)" : "Filter YouTube streams only"}
+              className={`h-8 px-2.5 rounded-lg flex items-center gap-1.5 font-bold text-xs transition-all font-sans ${
+                platformFilter === "youtube"
+                  ? "bg-[#ff0000] text-white ring-2 ring-red-400 shadow-[0_0_12px_rgba(255,0,0,0.7)]"
+                  : "bg-black/50 border border-red-900/40 text-zinc-400 hover:text-[#ff0000] hover:border-[#ff0000]/60"
+              }`}
+            >
+              <Play className="w-3 h-3 fill-current" />
+              <span>YOUTUBE</span>
             </button>
           </div>
         </div>
