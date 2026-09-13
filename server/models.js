@@ -58,6 +58,7 @@ const StreamSchema = new mongoose.Schema({
   memberName: { type: String, required: true },
   platform: { type: String, enum: ['kick', 'youtube', 'twitch'], required: true },
   channelSlug: { type: String, required: true },
+  videoId: { type: String, default: '' },
   title: { type: String, default: '' },
   isLive: { type: Boolean, default: true },
   thumbnailUrl: { type: String, default: '' },

@@ -116,21 +116,44 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
 
   // Parse Channel Slug from URL or text
   const extractChannelSlug = (input: string, plat: "kick" | "youtube" | "twitch"): string => {
-    let clean = input.trim().replace(/^@/, "");
-    if (clean.includes("kick.com/")) {
-      clean = clean.split("kick.com/")[1].split("/")[0].split("?")[0];
-    } else if (clean.includes("twitch.tv/")) {
-      clean = clean.split("twitch.tv/")[1].split("/")[0].split("?")[0];
-    } else if (clean.includes("youtube.com/")) {
-      if (clean.includes("/watch?v=")) {
-        clean = clean.split("/watch?v=")[1].split("&")[0];
-      } else if (clean.includes("/live/")) {
-        clean = clean.split("/live/")[1].split("?")[0];
-      } else if (clean.includes("/@")) {
-        clean = clean.split("/@")[1].split("/")[0];
+    let clean = input.trim();
+    if (plat === "kick") {
+      clean = clean.replace(/^@/, "");
+      if (clean.includes("kick.com/")) {
+        clean = clean.split("kick.com/")[1].split("/")[0].split("?")[0];
       }
-    } else if (clean.includes("youtu.be/")) {
-      clean = clean.split("youtu.be/")[1].split("?")[0];
+      return clean;
+    }
+    if (plat === "twitch") {
+      clean = clean.replace(/^@/, "");
+      if (clean.includes("twitch.tv/")) {
+        clean = clean.split("twitch.tv/")[1].split("/")[0].split("?")[0];
+      }
+      return clean;
+    }
+    if (plat === "youtube") {
+      clean = clean.replace(/^@/, "");
+      // Check watch?v= or youtu.be or embed
+      const watchMatch = clean.match(/(?:youtube\.com\/(?:watch\?.*v=|v\/)|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/i);
+      if (watchMatch) return watchMatch[1];
+
+      // Check /live/VIDEO_ID (11 chars)
+      const liveVidMatch = clean.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i);
+      if (liveVidMatch) return liveVidMatch[1];
+
+      // Check @handle in URL, e.g. youtube.com/@channel or youtube.com/@channel/live
+      const handleMatch = clean.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/i);
+      if (handleMatch) return handleMatch[1];
+
+      // Check channel/UC...
+      const channelMatch = clean.match(/youtube\.com\/channel\/(UC[a-zA-Z0-9_-]+)/i);
+      if (channelMatch) return channelMatch[1];
+
+      // Check /c/ or /user/
+      const customMatch = clean.match(/youtube\.com\/(?:c|user)\/([a-zA-Z0-9_.-]+)/i);
+      if (customMatch) return customMatch[1];
+
+      return clean.replace(/^https?:\/\/(www\.)?youtube\.com\//i, "").replace(/^\/+|\/+$/g, "");
     }
     return clean;
   };
@@ -181,6 +204,8 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
         ? `https://kick.com/${stream.channelSlug}`
         : stream.platform === "twitch"
         ? `https://twitch.tv/${stream.channelSlug}`
+        : stream.channelSlug.startsWith("UC")
+        ? `https://youtube.com/channel/${stream.channelSlug}`
         : stream.channelSlug.length === 11
         ? `https://youtube.com/watch?v=${stream.channelSlug}`
         : `https://youtube.com/@${stream.channelSlug}`
@@ -249,7 +274,10 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     if (stream.platform === "kick") return `https://kick.com/${stream.channelSlug}`;
     if (stream.platform === "twitch") return `https://twitch.tv/${stream.channelSlug}`;
     if (stream.platform === "youtube") {
-      if (stream.channelSlug.length === 11) {
+      if (stream.channelSlug.startsWith("UC") && stream.channelSlug.length === 24) {
+        return `https://www.youtube.com/channel/${stream.channelSlug}`;
+      }
+      if (stream.channelSlug.length === 11 && !stream.channelSlug.includes(" ")) {
         return `https://www.youtube.com/watch?v=${stream.channelSlug}`;
       }
       return `https://youtube.com/@${stream.channelSlug}`;
@@ -267,10 +295,11 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
       return `https://player.twitch.tv/?channel=${stream.channelSlug}&parent=${hostname}&autoplay=true&muted=false`;
     }
     if (stream.platform === "youtube") {
-      if (stream.channelSlug.length === 11) {
-        return `https://www.youtube-nocookie.com/embed/${stream.channelSlug}?autoplay=1`;
+      const vid = stream.videoId || (stream.channelSlug.length === 11 && !stream.channelSlug.includes(" ") ? stream.channelSlug : null);
+      if (vid) {
+        return `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
       }
-      return `https://www.youtube-nocookie.com/embed/live_stream?channel=${stream.channelSlug}&autoplay=1`;
+      return "";
     }
     return "";
   };
@@ -278,8 +307,11 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
   // Live Thumbnail Generator
   const getThumbnailSrc = (stream: StreamChannel) => {
     if (stream.thumbnailUrl) return stream.thumbnailUrl;
-    if (stream.platform === "youtube" && stream.channelSlug.length === 11) {
-      return `https://img.youtube.com/vi/${stream.channelSlug}/hqdefault.jpg`;
+    if (stream.platform === "youtube") {
+      const vid = stream.videoId || (stream.channelSlug.length === 11 && !stream.channelSlug.includes(" ") ? stream.channelSlug : null);
+      if (vid) {
+        return `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+      }
     }
     return "";
   };
@@ -470,6 +502,17 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
+              {selectedStream.platform === "youtube" && selectedStream.videoId && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${selectedStream.videoId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-red-300 hover:text-white flex items-center gap-1 px-2.5 py-1 rounded bg-red-950/60 border border-red-700/60 transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span className="hidden sm:inline">Watch on YouTube</span>
+                </a>
+              )}
               <a
                 href={getChannelUrl(selectedStream)}
                 target="_blank"
@@ -492,13 +535,34 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
           </div>
 
           <div className="relative aspect-video w-full bg-black">
-            <iframe
-              src={getEmbedUrl(selectedStream)}
-              title={selectedStream.title || "Live Stream"}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              allowFullScreen
-            />
+            {getEmbedUrl(selectedStream) ? (
+              <iframe
+                src={getEmbedUrl(selectedStream)}
+                title={selectedStream.title || "Live Stream"}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                allowFullScreen
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[#0d0407] p-6 text-center border border-red-900/40">
+                <Radio className="w-12 h-12 text-red-500/60 mb-2 animate-pulse" />
+                <h4 className="text-base font-orbitron text-white font-bold mb-1">
+                  BROADCAST CURRENTLY OFFLINE
+                </h4>
+                <p className="text-xs text-zinc-400 max-w-sm mb-4">
+                  {selectedStream.memberName} is not currently broadcasting live on YouTube. You can open their channel directly to view past uploads.
+                </p>
+                <a
+                  href={getChannelUrl(selectedStream)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-gang px-4 py-1.5 text-xs inline-flex items-center gap-1.5"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Open Channel on YouTube
+                </a>
+              </div>
+            )}
           </div>
         </Card>
       )}
@@ -744,14 +808,14 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                     ? "kick.com/yourhandle"
                     : platform === "twitch"
                     ? "twitch.tv/yourhandle"
-                    : "youtube.com/@channel or video ID"
+                    : "youtube.com/@channel or live stream link"
                 }
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 className="bg-black/70 border-red-900/60 focus:border-red-500"
               />
               <p className="text-[11px] text-zinc-400">
-                The stream title, real-time live thumbnail snapshot, and viewer count will automatically be fetched directly from the broadcast.
+                Supports channel handle (@name), full channel URL, or live stream link. The stream title, real-time live thumbnail snapshot, and viewer count will automatically synchronize.
               </p>
             </div>
           </div>
@@ -826,7 +890,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                 className="bg-black/70 border-red-900/60 focus:border-red-500"
               />
               <p className="text-[11px] text-zinc-400">
-                Updating channel will automatically re-fetch the live stream title, thumbnail, and viewer count directly from the stream.
+                Supports channel handle (@name), full channel URL, or live stream link.
               </p>
             </div>
           </div>

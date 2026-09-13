@@ -617,11 +617,52 @@ function fundSnapshotLocal() {
   };
 }
 
+function parseYouTubeTarget(input) {
+  let str = (input || '').trim();
+  if (!str) return { type: 'handle', value: '' };
+
+  if (str.startsWith('@')) {
+    return { type: 'handle', value: str.slice(1).split('/')[0].split('?')[0] };
+  }
+
+  const watchMatch = str.match(/(?:youtube\.com\/(?:watch\?.*v=|v\/)|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/i);
+  if (watchMatch) {
+    return { type: 'video', value: watchMatch[1] };
+  }
+
+  const liveVidMatch = str.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i);
+  if (liveVidMatch) {
+    return { type: 'video', value: liveVidMatch[1] };
+  }
+
+  const handleMatch = str.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/i);
+  if (handleMatch) {
+    return { type: 'handle', value: handleMatch[1] };
+  }
+
+  const channelMatch = str.match(/youtube\.com\/channel\/(UC[a-zA-Z0-9_-]+)/i);
+  if (channelMatch) {
+    return { type: 'channel', value: channelMatch[1] };
+  }
+
+  const customMatch = str.match(/youtube\.com\/(?:c|user)\/([a-zA-Z0-9_.-]+)/i);
+  if (customMatch) {
+    return { type: 'handle', value: customMatch[1] };
+  }
+
+  if (/^UC[a-zA-Z0-9_-]{22}$/.test(str)) {
+    return { type: 'channel', value: str };
+  }
+
+  return { type: 'handle', value: str.replace(/^https?:\/\/(www\.)?youtube\.com\//i, '').replace(/^\/+|\/+$/g, '') };
+}
+
 async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
   let title = '';
   let thumbnailUrl = '';
   let viewers = 0;
   let isLive = false;
+  let videoId = '';
 
   const cleanSlug = (channelSlug || '').trim().replace(/^@/, '');
 
@@ -629,7 +670,7 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
     try {
       const kickRes = await fetch(`https://kick.com/api/v1/channels/${encodeURIComponent(cleanSlug)}`, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         },
       });
       if (kickRes.ok) {
@@ -652,21 +693,30 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
       // Ignore network failures
     }
   } else if (platform === 'youtube' && cleanSlug) {
-    if (cleanSlug.length === 11) {
+    const target = parseYouTubeTarget(cleanSlug);
+    if (target.type === 'video') {
+      videoId = target.value;
       try {
-        const liveCheck = await fetch(`https://www.youtube.com/watch?v=${cleanSlug}`, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+        const liveCheck = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+          },
         });
         const html = await liveCheck.text();
         const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true');
         if (liveActive) {
-          const ytRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${cleanSlug}&format=json`);
-          if (ytRes.ok) {
-            const ytData = await ytRes.json();
-            title = ytData?.title || '';
-            thumbnailUrl = ytData?.thumbnail_url || `https://img.youtube.com/vi/${cleanSlug}/hqdefault.jpg`;
-            isLive = true;
-          }
+          isLive = true;
+          const viewerMatch = html.match(/"originalViewCount":"(\d+)"/) || html.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
+          if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
+          try {
+            const ytRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+            if (ytRes.ok) {
+              const ytData = await ytRes.json();
+              title = ytData?.title || '';
+              thumbnailUrl = ytData?.thumbnail_url || `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+            }
+          } catch {}
         } else {
           isLive = false;
           title = '';
@@ -675,25 +725,41 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
         }
       } catch (e) {}
     } else {
+      const liveUrl = target.type === 'channel'
+        ? `https://www.youtube.com/channel/${target.value}/live`
+        : `https://www.youtube.com/@${target.value}/live`;
+
       try {
-        const liveRes = await fetch(`https://www.youtube.com/@${cleanSlug}/live`, {
+        const liveRes = await fetch(liveUrl, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
           },
           redirect: 'follow',
         });
         const html = await liveRes.text();
-        const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true');
-        if (liveActive) {
-          const vidMatch = html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+        const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
+        const isWatch = canonical.includes('/watch?v=') || (liveRes.url && liveRes.url.includes('/watch?v='));
+        const hasLiveFlags = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true');
+
+        if (isWatch && hasLiveFlags) {
+          const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/) || html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
           if (vidMatch) {
-            const oeRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${vidMatch[1]}&format=json`);
-            if (oeRes.ok) {
-              const oe = await oeRes.json();
-              title = oe.title || '';
-              thumbnailUrl = oe.thumbnail_url || `https://img.youtube.com/vi/${vidMatch[1]}/hqdefault.jpg`;
-              isLive = true;
-            }
+            videoId = vidMatch[1];
+            isLive = true;
+            thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+            const viewerMatch = html.match(/"originalViewCount":"(\d+)"/) || html.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
+            if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
+
+            try {
+              const oeRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`);
+              if (oeRes.ok) {
+                const oe = await oeRes.json();
+                title = oe.title || '';
+                if (oe.thumbnail_url) thumbnailUrl = oe.thumbnail_url;
+              }
+            } catch {}
           }
         } else {
           // Channel is offline - do NOT show recent uploaded videos or past streams
@@ -701,6 +767,7 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
           title = '';
           thumbnailUrl = '';
           viewers = 0;
+          videoId = '';
         }
       } catch (e) {}
     }
@@ -737,7 +804,7 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
     title = `${memberName} // Live Operation`;
   }
 
-  return { title, thumbnailUrl, viewers, isLive };
+  return { title, thumbnailUrl, viewers, isLive, videoId };
 }
 
 export const store = {
@@ -1408,6 +1475,7 @@ export const store = {
             thumbnailUrl: live.isLive ? live.thumbnailUrl : '',
             viewers: live.isLive ? (live.viewers || 0) : 0,
             isLive: !!live.isLive,
+            videoId: live.isLive ? (live.videoId || s.videoId || '') : (s.videoId || ''),
           };
         } catch {
           return {
@@ -1416,6 +1484,7 @@ export const store = {
             thumbnailUrl: '',
             viewers: 0,
             isLive: false,
+            videoId: s.videoId || '',
           };
         }
       })
@@ -1426,8 +1495,13 @@ export const store = {
 
   async addStream(payload) {
     const platform = payload.platform || 'kick';
-    const channelSlug = payload.channelSlug || '';
+    let channelSlug = payload.channelSlug || '';
     const memberName = payload.memberName || 'Operative';
+
+    if (platform === 'youtube') {
+      const parsed = parseYouTubeTarget(channelSlug);
+      if (parsed.value) channelSlug = parsed.value;
+    }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
 
@@ -1436,10 +1510,11 @@ export const store = {
       memberName,
       platform,
       channelSlug,
-      title: liveMeta.title,
+      videoId: liveMeta.videoId || payload.videoId || '',
+      title: liveMeta.title || '',
       isLive: liveMeta.isLive,
       thumbnailUrl: payload.thumbnailUrl || liveMeta.thumbnailUrl,
-      viewers: Number(payload.viewers || liveMeta.viewers),
+      viewers: Number(payload.viewers || liveMeta.viewers || 0),
       addedBy: payload.addedBy || 'Operative',
       createdAt: nowIso(),
     };
@@ -1474,8 +1549,13 @@ export const store = {
     if (!existing) throw new Error('Stream feed not found');
 
     const platform = payload.platform || existing.platform;
-    const channelSlug = payload.channelSlug !== undefined ? payload.channelSlug : existing.channelSlug;
+    let channelSlug = payload.channelSlug !== undefined ? payload.channelSlug : existing.channelSlug;
     const memberName = payload.memberName || existing.memberName;
+
+    if (platform === 'youtube') {
+      const parsed = parseYouTubeTarget(channelSlug);
+      if (parsed.value) channelSlug = parsed.value;
+    }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
 
@@ -1484,10 +1564,11 @@ export const store = {
       memberName,
       platform,
       channelSlug,
-      title: liveMeta.title,
+      videoId: liveMeta.videoId || payload.videoId || existing.videoId || '',
+      title: liveMeta.title || '',
       isLive: liveMeta.isLive,
       thumbnailUrl: payload.thumbnailUrl || liveMeta.thumbnailUrl,
-      viewers: Number(payload.viewers || liveMeta.viewers),
+      viewers: Number(payload.viewers || liveMeta.viewers || 0),
       updatedAt: nowIso(),
     };
 

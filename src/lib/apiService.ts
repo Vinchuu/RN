@@ -110,6 +110,7 @@ export interface StreamChannel {
   memberName: string;
   platform: 'kick' | 'youtube' | 'twitch';
   channelSlug: string;
+  videoId?: string;
   title?: string;
   isLive?: boolean;
   addedBy: string;
