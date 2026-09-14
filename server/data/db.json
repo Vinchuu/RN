@@ -11,7 +11,8 @@
       "phone": "555-0101",
       "discordId": "",
       "joinDate": "2026-01-01",
-      "order": 1
+      "order": 1,
+      "contributionSvc": 100
     },
     {
       "id": "rn_mem_2",
@@ -24,7 +25,8 @@
       "phone": "555-0102",
       "discordId": "",
       "joinDate": "2026-01-15",
-      "order": 2
+      "order": 2,
+      "contributionSvc": 100
     },
     {
       "id": "rn_mem_3",
@@ -37,7 +39,8 @@
       "phone": "555-0103",
       "discordId": "",
       "joinDate": "2026-02-01",
-      "order": 3
+      "order": 3,
+      "contributionSvc": 100
     },
     {
       "id": "rn_mem_4",
@@ -50,7 +53,8 @@
       "phone": "555-0104",
       "discordId": "",
       "joinDate": "2026-02-10",
-      "order": 4
+      "order": 4,
+      "contributionSvc": 100
     },
     {
       "id": "rn_mem_5",
@@ -63,7 +67,8 @@
       "phone": "555-0105",
       "discordId": "",
       "joinDate": "2026-03-01",
-      "order": 5
+      "order": 5,
+      "contributionSvc": 100
     },
     {
       "id": "rn_mem_6",
@@ -76,7 +81,8 @@
       "phone": "555-0106",
       "discordId": "",
       "joinDate": "2026-03-04",
-      "order": 6
+      "order": 6,
+      "contributionSvc": 100
     }
   ],
   "transactions": [
@@ -109,7 +115,8 @@
       "category": "weapons",
       "description": "High caliber syndicate standard sidearm.",
       "lastUpdated": "2026-09-06T10:18:43.692Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 35
     },
     {
       "id": "item_wpn_2",
@@ -120,7 +127,8 @@
       "category": "weapons",
       "description": "Rapid spray compact automatic for drive-bys.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 85
     },
     {
       "id": "item_wpn_3",
@@ -131,7 +139,8 @@
       "category": "weapons",
       "description": "Heavy duty tactical assault rifle for gang wars.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 220
     },
     {
       "id": "item_ammo_1",
@@ -142,7 +151,8 @@
       "category": "ammo",
       "description": "Pistol & SMG combat rounds.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Underboss"
+      "updatedBy": "Underboss",
+      "priceSvc": 12
     },
     {
       "id": "item_ammo_2",
@@ -153,7 +163,8 @@
       "category": "ammo",
       "description": "High velocity penetration rounds.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Underboss"
+      "updatedBy": "Underboss",
+      "priceSvc": 24
     },
     {
       "id": "item_armor_1",
@@ -164,7 +175,8 @@
       "category": "armor",
       "description": "Reinforced ballistic vest with Red Network insignia.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 30
     },
     {
       "id": "item_med_1",
@@ -175,7 +187,8 @@
       "category": "meds",
       "description": "Full trauma care kit for firefight stabilization.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Underboss"
+      "updatedBy": "Underboss",
+      "priceSvc": 15
     },
     {
       "id": "item_med_2",
@@ -186,7 +199,8 @@
       "category": "meds",
       "description": "Rapid pain relief & adrenaline booster.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Enforcer"
+      "updatedBy": "Enforcer",
+      "priceSvc": 8
     },
     {
       "id": "item_tool_1",
@@ -197,7 +211,8 @@
       "category": "tools",
       "description": "High grade tension wrenches for vehicle & door entry.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Enforcer"
+      "updatedBy": "Enforcer",
+      "priceSvc": 25
     },
     {
       "id": "item_tool_2",
@@ -208,7 +223,8 @@
       "category": "tools",
       "description": "Incendiary compound for melting vault locks & security panels.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 125
     },
     {
       "id": "item_tool_3",
@@ -219,7 +235,8 @@
       "category": "tools",
       "description": "Secure frequency radio tuner for syndicate comms.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 18
     },
     {
       "id": "item_contra_1",
@@ -230,11 +247,27 @@
       "category": "contraband",
       "description": "Syndicate grown high purity grade contraband.",
       "lastUpdated": "2026-09-06T10:18:43.693Z",
-      "updatedBy": "Red Boss"
+      "updatedBy": "Red Boss",
+      "priceSvc": 150
     }
   ],
   "orders": [],
   "streams": [
+    {
+      "id": "stream_1789401746828_8gkzhg",
+      "memberName": "Shubh Sage",
+      "platform": "youtube",
+      "channelSlug": "shubhcantplay6465",
+      "videoId": "9u9SVDrIY9A",
+      "title": "Airdrop Contest + Empire War Car Goal | Shubh Sage | #lifeinsoulcity",
+      "isLive": true,
+      "thumbnailUrl": "https://img.youtube.com/vi/9u9SVDrIY9A/hqdefault.jpg",
+      "viewers": 17,
+      "likes": 118,
+      "views": 2391,
+      "addedBy": "Leader",
+      "createdAt": "2026-09-14T16:02:26.828Z"
+    },
     {
       "id": "stream_rn_1",
       "memberName": "Lawrence \"Vance\" Williams",
@@ -413,6 +446,15 @@
   ],
   "auditLogs": [
     {
+      "id": "log_1789401746831_lhukbe",
+      "action": "stream_add",
+      "category": "streams",
+      "description": "Broadcast feed linked for Shubh Sage (YOUTUBE: shubhcantplay6465)",
+      "details": {},
+      "performedBy": "Leader",
+      "timestamp": "2026-09-14T16:02:26.832Z"
+    },
+    {
       "id": "log_1788802517206_gcu4bo",
       "action": "stream_add",
       "category": "streams",
@@ -579,7 +621,8 @@
     "id": "main",
     "baseAmount": 350000,
     "lastUpdated": "2026-09-06T10:18:43.694Z",
-    "updatedBy": "system"
+    "updatedBy": "system",
+    "baseSvcAmount": 15000
   },
   "announcement": {
     "id": "main",

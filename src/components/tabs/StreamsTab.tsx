@@ -172,6 +172,14 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     return "#";
   };
 
+const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
+  "PRATEEKYT": "UC_qwc3gxud_vmh9UFMWKywQ",
+  "SHUBHCANTPLAY6465": "UCKATCv5mpp8OZY29Ty-r6Ag",
+  "SHUBH SAGE": "UCKATCv5mpp8OZY29Ty-r6Ag",
+  "SHUBHSAGE": "UCKATCv5mpp8OZY29Ty-r6Ag",
+  "SHUBH_SAGE": "UCKATCv5mpp8OZY29Ty-r6Ag",
+};
+
   // Embed URL generator for Theater Modal
   const getEmbedUrl = (stream: StreamChannel): string => {
     if (stream.platform === "kick") {
@@ -180,13 +188,16 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     if (stream.platform === "youtube") {
       const vid = stream.videoId || (stream.channelSlug.length === 11 ? stream.channelSlug : null);
       if (vid) {
-        return `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
+        return `https://www.youtube.com/embed/${vid}?autoplay=1`;
+      }
+      const slugKey = stream.channelSlug.replace(/^@/, "").toUpperCase();
+      const nameKey = (stream.memberName || "").toUpperCase().trim();
+      const mappedChannel = KNOWN_YT_CHANNEL_MAP[slugKey] || KNOWN_YT_CHANNEL_MAP[nameKey];
+      if (mappedChannel) {
+        return `https://www.youtube.com/embed/live_stream?channel=${mappedChannel}&autoplay=1`;
       }
       if (stream.channelSlug.startsWith("UC")) {
         return `https://www.youtube.com/embed/live_stream?channel=${stream.channelSlug}&autoplay=1`;
-      }
-      if (stream.channelSlug.toUpperCase() === "PRATEEKYT") {
-        return `https://www.youtube.com/embed/live_stream?channel=UC_qwc3gxud_vmh9UFMWKywQ&autoplay=1`;
       }
     }
     return "";
@@ -587,34 +598,39 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
               >
                 {/* 16:9 Thumbnail Container */}
                 <div className="relative aspect-video w-full bg-[#1e0a10] overflow-hidden">
-                  {stream.thumbnailUrl ? (
-                    <img
-                      src={stream.thumbnailUrl}
-                      alt={stream.title || stream.memberName}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (stream.platform === "youtube") {
-                          if (stream.videoId) {
-                            target.src = `https://img.youtube.com/vi/${stream.videoId}/hqdefault.jpg`;
+                  {(() => {
+                    const fallbackVid = stream.videoId || (stream.channelSlug.length === 11 ? stream.channelSlug : null);
+                    const effectiveThumb = stream.thumbnailUrl || (stream.platform === "youtube" && fallbackVid ? `https://img.youtube.com/vi/${fallbackVid}/hqdefault.jpg` : "");
+
+                    return effectiveThumb ? (
+                      <img
+                        src={effectiveThumb}
+                        alt={stream.title || stream.memberName}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (stream.platform === "youtube") {
+                            if (fallbackVid) {
+                              target.src = `https://img.youtube.com/vi/${fallbackVid}/mqdefault.jpg`;
+                            } else {
+                              target.style.display = "none";
+                            }
                           } else {
-                            target.style.display = "none";
+                            target.src = "https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp";
                           }
-                        } else {
-                          target.src = "https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp";
-                        }
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1b060d] to-[#090204] p-4 text-center">
-                      <Tv className="w-10 h-10 text-red-500/30 mb-2" />
-                      <span className="text-xs font-mono text-zinc-500 tracking-wider">
-                        {isStreamLive ? "LIVE BROADCAST" : "OFFLINE STANDBY"}
-                      </span>
-                    </div>
-                  )}
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1b060d] to-[#090204] p-4 text-center">
+                        <Tv className="w-10 h-10 text-red-500/30 mb-2" />
+                        <span className="text-xs font-mono text-zinc-500 tracking-wider">
+                          {isStreamLive ? "LIVE BROADCAST" : "OFFLINE STANDBY"}
+                        </span>
+                      </div>
+                    );
+                  })()}
 
                   {/* Top-Left: Platform Logo Badge */}
                   <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">

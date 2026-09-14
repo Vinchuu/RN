@@ -350,6 +350,21 @@ const STARTER_STREAMS = [
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
+  {
+    id: 'stream_rn_7',
+    memberName: 'Shubh Sage',
+    platform: 'youtube',
+    channelSlug: 'shubhcantplay6465',
+    videoId: '9u9SVDrIY9A',
+    title: 'Airdrop Contest + Empire War Car Goal | Shubh Sage | #lifeinsoulcity',
+    isLive: true,
+    thumbnailUrl: 'https://img.youtube.com/vi/9u9SVDrIY9A/hqdefault.jpg',
+    viewers: 18,
+    likes: 120,
+    views: 2400,
+    addedBy: 'Leader',
+    createdAt: nowIso(),
+  },
 ];
 
 const DEFAULT_ANNOUNCEMENT = {
@@ -676,6 +691,10 @@ function parseYouTubeTarget(input) {
 
 const KNOWN_YT_CHANNEL_IDS = {
   'PRATEEKYT': 'UC_qwc3gxud_vmh9UFMWKywQ',
+  'SHUBHCANTPLAY6465': 'UCKATCv5mpp8OZY29Ty-r6Ag',
+  'SHUBH SAGE': 'UCKATCv5mpp8OZY29Ty-r6Ag',
+  'SHUBHSAGE': 'UCKATCv5mpp8OZY29Ty-r6Ag',
+  'SHUBH_SAGE': 'UCKATCv5mpp8OZY29Ty-r6Ag',
 };
 
 const streamMetaCache = new Map();
@@ -814,10 +833,11 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
       } catch (e) {}
     } else {
       const slugUpper = (target.value || '').toUpperCase();
-      const channelId = KNOWN_YT_CHANNEL_IDS[slugUpper] || (target.type === 'channel' ? target.value : null);
+      const memberUpper = (memberName || '').toUpperCase().trim();
+      let channelId = KNOWN_YT_CHANNEL_IDS[slugUpper] || KNOWN_YT_CHANNEL_IDS[memberUpper] || (target.type === 'channel' ? target.value : null);
 
       if (channelId) {
-        // Fast check via channel RSS feed (responds in < 1s)
+        // Fast check via channel RSS feed (responds in < 400ms)
         try {
           const { stdout: xml } = await execFileAsync(curlBin, [
             '-4',
@@ -838,84 +858,91 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
               const latestTitle = titleMatch ? titleMatch[1] : '';
               const latestThumb = thumbMatch ? thumbMatch[1] : (latestVid ? `https://img.youtube.com/vi/${latestVid}/hqdefault.jpg` : '');
 
-              if (latestTitle.includes('LIVE') || latestTitle.includes('🔴')) {
-                // Verify if actively broadcasting
-                try {
-                  const { stdout: vHtml } = await execFileAsync(curlBin, [
-                    '-4',
-                    '-sL',
-                    '--compressed',
-                    '--max-time', '3',
-                    `https://www.youtube.com/watch?v=${latestVid}`,
-                  ], { maxBuffer: 10 * 1024 * 1024 });
-
-                  if (vHtml.includes('"isLive":true') || vHtml.includes('"isLiveBroadcast":true') || vHtml.includes('BADGE_STYLE_TYPE_LIVE_NOW')) {
-                    isLive = true;
-                    videoId = latestVid;
-                    title = latestTitle;
-                    thumbnailUrl = latestThumb;
-                    const vm = vHtml.match(/"originalViewCount":"(\d+)"/) || vHtml.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
-                    if (vm) viewers = parseInt(vm[1].replace(/,/g, ''), 10) || 0;
-                    likes = Math.max(1, Math.round(viewers * 0.18));
-                    views = Math.max(viewers, viewers * 8);
-                  }
-                } catch (e) {}
+              if (latestVid) {
+                videoId = latestVid;
+                title = latestTitle;
+                thumbnailUrl = latestThumb;
               }
             }
           }
         } catch (e) {}
       }
 
-      // Check channel live page with curl if not yet detected as live
-      if (!isLive) {
-        const liveUrl = target.type === 'channel'
+      // Check channel live page with curl
+      const liveUrl = channelId
+        ? `https://www.youtube.com/channel/${channelId}/live`
+        : (target.type === 'channel'
           ? `https://www.youtube.com/channel/${target.value}/live`
-          : `https://www.youtube.com/@${target.value}/live`;
+          : `https://www.youtube.com/@${cleanSlug}/live`);
 
-        try {
-          const { stdout } = await execFileAsync(curlBin, [
-            '-4',
-            '-sL',
-            '--compressed',
-            '--max-time', '4',
-            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            liveUrl,
-          ], { maxBuffer: 10 * 1024 * 1024 });
+      try {
+        const { stdout } = await execFileAsync(curlBin, [
+          '-4',
+          '-sL',
+          '--compressed',
+          '--max-time', '5',
+          '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          liveUrl,
+        ], { maxBuffer: 10 * 1024 * 1024 });
 
-          if (stdout && stdout.length > 500) {
-            ytChecked = true;
-            const canonical = (stdout.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
-            const isWatch = canonical.includes('/watch?v=');
-            const hasLiveFlags = stdout.includes('"isLive":true') || stdout.includes('"isLiveBroadcast":true') || stdout.includes('BADGE_STYLE_TYPE_LIVE_NOW');
+        if (stdout && stdout.length > 500) {
+          ytChecked = true;
+          const canonical = (stdout.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
+          const isWatch = canonical.includes('/watch?v=') || stdout.includes('/watch?v=');
+          const hasLiveFlags = stdout.includes('"isLive":true') || stdout.includes('"isLiveBroadcast":true') || stdout.includes('BADGE_STYLE_TYPE_LIVE_NOW');
 
-            if (isWatch && hasLiveFlags) {
-              const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/) || stdout.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
-              if (vidMatch) {
-                videoId = vidMatch[1];
-                isLive = true;
-                thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+          const cidMatch = stdout.match(/\/channel\/(UC[a-zA-Z0-9_-]{22})/) || stdout.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
+          if (cidMatch && !channelId) {
+            channelId = cidMatch[1];
+            KNOWN_YT_CHANNEL_IDS[slugUpper] = channelId;
+          }
 
-                const viewerMatch = stdout.match(/"originalViewCount":"(\d+)"/) || stdout.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
-                if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
+          if (isWatch && hasLiveFlags) {
+            const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/) || stdout.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+            if (vidMatch) {
+              videoId = vidMatch[1];
+              isLive = true;
+              thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-                const likeMatch = stdout.match(/"label":"([0-9,]+) likes"/) || stdout.match(/"likeCount":"(\d+)"/);
-                if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || 0;
+              const viewerMatch = stdout.match(/"originalViewCount":"(\d+)"/) || stdout.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
+              if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
 
-                const viewMatch = stdout.match(/"viewCount":"(\d+)"/) || stdout.match(/"viewCountText":\{"simpleText":"([0-9,]+) views"\}/);
-                if (viewMatch) views = parseInt(viewMatch[1].replace(/,/g, ''), 10) || 0;
+              const likeMatch = stdout.match(/"label":"([0-9,]+) likes"/) || stdout.match(/"likeCount":"(\d+)"/);
+              if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || 0;
 
-                const titleMatch = stdout.match(/<meta name="title" content="([^"]+)"/) || stdout.match(/"title":"([^"]+)"/);
-                if (titleMatch) title = titleMatch[1].replace(/ - YouTube$/, '');
-              }
+              const viewMatch = stdout.match(/"viewCount":"(\d+)"/) || stdout.match(/"viewCountText":\{"simpleText":"([0-9,]+) views"\}/);
+              if (viewMatch) views = parseInt(viewMatch[1].replace(/,/g, ''), 10) || 0;
+
+              const titleMatch = stdout.match(/<meta name="title" content="([^"]+)"/) || stdout.match(/"title":"([^"]+)"/);
+              if (titleMatch) title = titleMatch[1].replace(/ - YouTube$/, '');
             }
+          }
+        }
+      } catch (e) {}
+
+      // Fast oEmbed check if videoId is known and title/thumbnail needs confirmation
+      if (videoId && (!title || !thumbnailUrl)) {
+        try {
+          const { stdout: oeOut } = await execFileAsync(curlBin, [
+            '-4',
+            '-s',
+            '--max-time', '3',
+            `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
+          ]);
+          if (oeOut && oeOut.trim().startsWith('{')) {
+            const oe = JSON.parse(oeOut);
+            if (!title) title = oe.title || '';
+            if (!thumbnailUrl && oe.thumbnail_url) thumbnailUrl = oe.thumbnail_url;
           }
         } catch (e) {}
       }
     }
 
+    if (!thumbnailUrl && videoId) {
+      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+
     if (!isLive) {
-      title = '';
-      thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
       viewers = 0;
       likes = 0;
       views = 0;
@@ -1634,62 +1661,67 @@ export const store = {
         try {
           const live = await fetchLiveStreamMetadata(s.platform, s.channelSlug, s.memberName);
 
+          const effectiveVid = live.videoId || s.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : '');
+          const effectiveThumb = live.thumbnailUrl || s.thumbnailUrl || (s.platform === 'youtube' && effectiveVid ? `https://img.youtube.com/vi/${effectiveVid}/hqdefault.jpg` : '');
+
           if (live.isLive) {
             return {
               ...s,
               title: live.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : (s.title || `${s.memberName} // Live Stream`)),
-              thumbnailUrl: live.thumbnailUrl || (s.platform === 'youtube' && (live.videoId || s.videoId) ? `https://img.youtube.com/vi/${live.videoId || s.videoId}/hqdefault.jpg` : (s.thumbnailUrl || '')),
+              thumbnailUrl: effectiveThumb,
               viewers: Number(live.viewers || 0),
               likes: Number(live.likes || Math.round((live.viewers || 0) * 0.18)),
               views: Number(live.views || ((live.viewers || 0) * 8)),
               isLive: true,
-              videoId: live.videoId || s.videoId || '',
+              videoId: effectiveVid,
             };
           } else if (s.isLive) {
             return {
               ...s,
-              title: s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
-              thumbnailUrl: s.thumbnailUrl || (s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
-              viewers: Number(s.viewers || 342),
-              likes: Number(s.likes || Math.round((s.viewers || 342) * 0.18)),
-              views: Number(s.views || ((s.viewers || 342) * 8)),
+              title: live.title || s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
+              thumbnailUrl: effectiveThumb,
+              viewers: Number(live.viewers || s.viewers || 342),
+              likes: Number(live.likes || s.likes || Math.round((s.viewers || 342) * 0.18)),
+              views: Number(live.views || s.views || ((s.viewers || 342) * 8)),
               isLive: true,
-              videoId: s.videoId || '',
+              videoId: effectiveVid,
             };
           } else {
             return {
               ...s,
               title: '',
-              thumbnailUrl: s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : '',
+              thumbnailUrl: effectiveThumb,
               viewers: 0,
               likes: 0,
               views: 0,
               isLive: false,
-              videoId: s.videoId || '',
+              videoId: effectiveVid,
             };
           }
         } catch {
+          const fallbackVid = s.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : '');
+          const fallbackThumb = s.thumbnailUrl || (s.platform === 'youtube' && fallbackVid ? `https://img.youtube.com/vi/${fallbackVid}/hqdefault.jpg` : '');
           if (s.isLive) {
             return {
               ...s,
               title: s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
-              thumbnailUrl: s.thumbnailUrl || (s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
+              thumbnailUrl: fallbackThumb,
               viewers: Number(s.viewers || 342),
               likes: Number(s.likes || Math.round((s.viewers || 342) * 0.18)),
               views: Number(s.views || ((s.viewers || 342) * 8)),
               isLive: true,
-              videoId: s.videoId || '',
+              videoId: fallbackVid,
             };
           }
           return {
             ...s,
             title: '',
-            thumbnailUrl: s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : '',
+            thumbnailUrl: fallbackThumb,
             viewers: 0,
             likes: 0,
             views: 0,
             isLive: false,
-            videoId: s.videoId || '',
+            videoId: fallbackVid,
           };
         }
       })
