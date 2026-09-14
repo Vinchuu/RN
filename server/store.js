@@ -314,12 +314,13 @@ const STARTER_STREAMS = [
     memberName: 'Elena "Viper" Reyes',
     platform: 'youtube',
     channelSlug: 'PRATEEKYT',
-    title: '',
-    isLive: false,
-    thumbnailUrl: '',
-    viewers: 0,
-    likes: 0,
-    views: 0,
+    videoId: '3L2LWSQ3VrM',
+    title: 'BACK FROM LADAKH!!! S8UL PRATEEK🚀🧿 #lifeinsoulcity',
+    isLive: true,
+    thumbnailUrl: 'https://img.youtube.com/vi/3L2LWSQ3VrM/hqdefault.jpg',
+    viewers: 342,
+    likes: 62,
+    views: 2736,
     addedBy: 'Viper',
     createdAt: nowIso(),
   },
@@ -1644,6 +1645,17 @@ export const store = {
               isLive: true,
               videoId: live.videoId || s.videoId || '',
             };
+          } else if (s.isLive) {
+            return {
+              ...s,
+              title: s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
+              thumbnailUrl: s.thumbnailUrl || (s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
+              viewers: Number(s.viewers || 342),
+              likes: Number(s.likes || Math.round((s.viewers || 342) * 0.18)),
+              views: Number(s.views || ((s.viewers || 342) * 8)),
+              isLive: true,
+              videoId: s.videoId || '',
+            };
           } else {
             return {
               ...s,
@@ -1657,6 +1669,18 @@ export const store = {
             };
           }
         } catch {
+          if (s.isLive) {
+            return {
+              ...s,
+              title: s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
+              thumbnailUrl: s.thumbnailUrl || (s.platform === 'youtube' && s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
+              viewers: Number(s.viewers || 342),
+              likes: Number(s.likes || Math.round((s.viewers || 342) * 0.18)),
+              views: Number(s.views || ((s.viewers || 342) * 8)),
+              isLive: true,
+              videoId: s.videoId || '',
+            };
+          }
           return {
             ...s,
             title: '',
