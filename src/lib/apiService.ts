@@ -117,6 +117,8 @@ export interface StreamChannel {
   createdAt: string;
   thumbnailUrl?: string;
   viewers?: number;
+  likes?: number;
+  views?: number;
 }
 
 export interface WarPov {

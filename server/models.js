@@ -63,6 +63,8 @@ const StreamSchema = new mongoose.Schema({
   isLive: { type: Boolean, default: true },
   thumbnailUrl: { type: String, default: '' },
   viewers: { type: Number, default: 0 },
+  likes: { type: Number, default: 0 },
+  views: { type: Number, default: 0 },
   addedBy: { type: String, default: 'system' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { timestamps: true });
