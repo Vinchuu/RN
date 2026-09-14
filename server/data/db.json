@@ -247,7 +247,7 @@
       "likes": 31,
       "views": 1376,
       "addedBy": "Leader",
-      "createdAt": "2026-09-14T10:25:57.683Z"
+      "createdAt": "2026-09-14T11:06:27.117Z"
     },
     {
       "id": "stream_rn_2",
@@ -261,52 +261,45 @@
       "likes": 154,
       "views": 6832,
       "addedBy": "Leader",
-      "createdAt": "2026-09-14T10:25:57.684Z"
+      "createdAt": "2026-09-14T11:06:27.118Z"
     },
     {
       "id": "stream_rn_3",
       "memberName": "Jax \"Trigger\" Thorne",
-      "platform": "youtube",
-      "channelSlug": "DynamoGaming",
-      "videoId": "jfKfPfyJRdk",
-      "title": "🔴 GTA V ROLEPLAY // RED NETWORK DOMINATION & POLICE CHASE",
-      "isLive": true,
-      "thumbnailUrl": "https://img.youtube.com/vi/jfKfPfyJRdk/hqdefault.jpg",
-      "viewers": 1890,
-      "likes": 450,
-      "views": 16800,
+      "platform": "kick",
+      "channelSlug": "8bitheadflicker",
+      "title": "",
+      "isLive": false,
+      "thumbnailUrl": "",
+      "viewers": 0,
       "addedBy": "Trigger",
-      "createdAt": "2026-09-14T10:25:57.684Z"
+      "createdAt": "2026-09-14T11:06:27.118Z"
     },
     {
       "id": "stream_rn_4",
       "memberName": "Elena \"Viper\" Reyes",
       "platform": "youtube",
       "channelSlug": "PRATEEKYT",
-      "videoId": "rFZHOHl-L8A",
-      "title": "🔴 RED NETWORK RP // LOS SANTOS VAULT HEIST & ALLIANCE DRIFT",
+      "title": "🔴 Soulcity Roleplay // Red Network Operations",
       "isLive": true,
-      "thumbnailUrl": "https://img.youtube.com/vi/rFZHOHl-L8A/hqdefault.jpg",
-      "viewers": 740,
-      "likes": 185,
-      "views": 5920,
+      "thumbnailUrl": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80",
+      "viewers": 420,
+      "likes": 85,
+      "views": 3400,
       "addedBy": "Viper",
-      "createdAt": "2026-09-14T10:25:57.684Z"
+      "createdAt": "2026-09-14T11:06:27.118Z"
     },
     {
       "id": "stream_rn_5",
       "memberName": "Leo \"Cortex\" Morales",
-      "platform": "youtube",
-      "channelSlug": "Mortal",
-      "videoId": "M7lc1UVf-VE",
-      "title": "🔴 SOULCITY S4 // RED SYNDICATE COMPOUND LOCKDOWN",
-      "isLive": true,
-      "thumbnailUrl": "https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg",
-      "viewers": 960,
-      "likes": 210,
-      "views": 8200,
+      "platform": "kick",
+      "channelSlug": "8bit_rusherwow",
+      "title": "",
+      "isLive": false,
+      "thumbnailUrl": "",
+      "viewers": 0,
       "addedBy": "Leader",
-      "createdAt": "2026-09-14T10:25:57.684Z"
+      "createdAt": "2026-09-14T11:06:27.118Z"
     },
     {
       "id": "stream_rn_6",
@@ -320,7 +313,7 @@
       "likes": 39,
       "views": 1744,
       "addedBy": "Leader",
-      "createdAt": "2026-09-14T10:25:57.684Z"
+      "createdAt": "2026-09-14T11:06:27.118Z"
     }
   ],
   "wars": [

@@ -300,15 +300,12 @@ const STARTER_STREAMS = [
   {
     id: 'stream_rn_3',
     memberName: 'Jax "Trigger" Thorne',
-    platform: 'youtube',
-    channelSlug: 'DynamoGaming',
-    videoId: 'jfKfPfyJRdk',
-    title: '🔴 GTA V ROLEPLAY // RED NETWORK DOMINATION & POLICE CHASE',
-    isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/jfKfPfyJRdk/hqdefault.jpg',
-    viewers: 1890,
-    likes: 450,
-    views: 16800,
+    platform: 'kick',
+    channelSlug: '8bitheadflicker',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Trigger',
     createdAt: nowIso(),
   },
@@ -317,28 +314,24 @@ const STARTER_STREAMS = [
     memberName: 'Elena "Viper" Reyes',
     platform: 'youtube',
     channelSlug: 'PRATEEKYT',
-    videoId: 'rFZHOHl-L8A',
-    title: '🔴 RED NETWORK RP // LOS SANTOS VAULT HEIST & ALLIANCE DRIFT',
+    title: '🔴 Soulcity Roleplay // Red Network Operations',
     isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/rFZHOHl-L8A/hqdefault.jpg',
-    viewers: 740,
-    likes: 185,
-    views: 5920,
+    thumbnailUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80',
+    viewers: 420,
+    likes: 85,
+    views: 3400,
     addedBy: 'Viper',
     createdAt: nowIso(),
   },
   {
     id: 'stream_rn_5',
     memberName: 'Leo "Cortex" Morales',
-    platform: 'youtube',
-    channelSlug: 'Mortal',
-    videoId: 'M7lc1UVf-VE',
-    title: '🔴 SOULCITY S4 // RED SYNDICATE COMPOUND LOCKDOWN',
-    isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg',
-    viewers: 960,
-    likes: 210,
-    views: 8200,
+    platform: 'kick',
+    channelSlug: '8bit_rusherwow',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -1566,9 +1559,9 @@ export const store = {
     for (const s of list) {
       try {
         const live = await fetchLiveStreamMetadata(s.platform, s.channelSlug, s.memberName);
-        const isLiveFeed = s.isLive !== false;
 
         if (live.isLive) {
+          // Stream is currently actively broadcasting live on platform
           refreshed.push({
             ...s,
             title: live.title || s.title || `${s.memberName} // Live Stream`,
@@ -1579,56 +1572,55 @@ export const store = {
             isLive: true,
             videoId: live.videoId || s.videoId || '',
           });
-        } else if (s.platform === 'kick') {
-          // Kick: preserve registered feed if API blocked or offline
+        } else if (s.isLive) {
+          // Stream is registered / set as live in database - preserve the submitted stream's details
           refreshed.push({
             ...s,
-            title: s.title || (isLiveFeed ? `${s.memberName} // Kick Live Stream` : ''),
-            thumbnailUrl: s.thumbnailUrl || (isLiveFeed ? 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp' : ''),
-            viewers: isLiveFeed ? Number(s.viewers || 220) : 0,
-            likes: isLiveFeed ? Number(s.likes || Math.round((s.viewers || 220) * 0.18)) : 0,
-            views: isLiveFeed ? Number(s.views || (s.viewers || 220) * 8) : 0,
-            isLive: isLiveFeed,
-            videoId: '',
+            title: s.title || `${s.memberName} // ${s.platform.toUpperCase()} Live`,
+            thumbnailUrl: s.thumbnailUrl || (s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
+            viewers: Number(s.viewers || 0),
+            likes: Number(s.likes || 0),
+            views: Number(s.views || 0),
+            isLive: true,
+            videoId: s.videoId || '',
           });
-        } else if (s.platform === 'youtube') {
-          // YouTube: preserve registered feed with videoId and thumbnail
-          const ytVid = live.videoId || s.videoId || 'rFZHOHl-L8A';
+        } else {
+          // Stream is offline
           refreshed.push({
             ...s,
-            title: live.title || s.title || (isLiveFeed ? `${s.memberName} // YouTube Live Broadcast` : ''),
-            thumbnailUrl: live.thumbnailUrl || s.thumbnailUrl || `https://img.youtube.com/vi/${ytVid}/hqdefault.jpg`,
-            viewers: isLiveFeed ? Number(s.viewers || 740) : 0,
-            likes: isLiveFeed ? Number(s.likes || Math.round((s.viewers || 740) * 0.18)) : 0,
-            views: isLiveFeed ? Number(s.views || (s.viewers || 740) * 8) : 0,
-            isLive: isLiveFeed,
-            videoId: ytVid,
+            title: s.title || '',
+            thumbnailUrl: s.thumbnailUrl || (s.videoId ? `https://img.youtube.com/vi/${s.videoId}/hqdefault.jpg` : ''),
+            viewers: 0,
+            likes: 0,
+            views: 0,
+            isLive: false,
+            videoId: s.videoId || '',
+          });
+        }
+      } catch {
+        if (s.isLive) {
+          refreshed.push({
+            ...s,
+            title: s.title || `${s.memberName} // Live Stream`,
+            thumbnailUrl: s.thumbnailUrl || '',
+            viewers: Number(s.viewers || 0),
+            likes: Number(s.likes || 0),
+            views: Number(s.views || 0),
+            isLive: true,
+            videoId: s.videoId || '',
           });
         } else {
           refreshed.push({
             ...s,
             title: s.title || '',
             thumbnailUrl: s.thumbnailUrl || '',
-            viewers: isLiveFeed ? Number(s.viewers || 150) : 0,
-            likes: isLiveFeed ? Number(s.likes || 25) : 0,
-            views: isLiveFeed ? Number(s.views || 900) : 0,
-            isLive: isLiveFeed,
+            viewers: 0,
+            likes: 0,
+            views: 0,
+            isLive: false,
             videoId: s.videoId || '',
           });
         }
-      } catch {
-        const isLiveFeed = s.isLive !== false;
-        const ytVid = s.videoId || 'rFZHOHl-L8A';
-        refreshed.push({
-          ...s,
-          title: s.title || (isLiveFeed ? `${s.memberName} // Live Stream` : ''),
-          thumbnailUrl: s.thumbnailUrl || (s.platform === 'youtube' ? `https://img.youtube.com/vi/${ytVid}/hqdefault.jpg` : 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp'),
-          viewers: isLiveFeed ? Number(s.viewers || 220) : 0,
-          likes: isLiveFeed ? Number(s.likes || 35) : 0,
-          views: isLiveFeed ? Number(s.views || 1800) : 0,
-          isLive: isLiveFeed,
-          videoId: s.videoId || (s.platform === 'youtube' ? ytVid : ''),
-        });
       }
     }
 
@@ -1646,11 +1638,11 @@ export const store = {
     }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
-    const isLive = payload.isLive !== undefined ? !!payload.isLive : (liveMeta.isLive || true);
+    const isLive = payload.isLive !== undefined ? !!payload.isLive : !!liveMeta.isLive;
     const videoId = liveMeta.videoId || payload.videoId || (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : '');
     const defaultThumbnail = platform === 'youtube'
-      ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://img.youtube.com/vi/rFZHOHl-L8A/hqdefault.jpg')
-      : 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp';
+      ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '')
+      : (liveMeta.thumbnailUrl || '');
 
     const stream = {
       id: makeId('stream'),
@@ -1658,12 +1650,12 @@ export const store = {
       platform,
       channelSlug,
       videoId,
-      title: liveMeta.title || payload.title || `${memberName} // ${platform.toUpperCase()} Live Broadcast`,
+      title: liveMeta.title || payload.title || (isLive ? `${memberName} // ${platform.toUpperCase()} Live` : ''),
       isLive,
       thumbnailUrl: liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail,
-      viewers: isLive ? Number(liveMeta.viewers || payload.viewers || 420) : 0,
-      likes: isLive ? Number(liveMeta.likes || payload.likes || 85) : 0,
-      views: isLive ? Number(liveMeta.views || payload.views || 3400) : 0,
+      viewers: isLive ? Number(liveMeta.viewers || payload.viewers || 0) : 0,
+      likes: isLive ? Number(liveMeta.likes || payload.likes || 0) : 0,
+      views: isLive ? Number(liveMeta.views || payload.views || 0) : 0,
       addedBy: payload.addedBy || 'Operative',
       createdAt: nowIso(),
     };
@@ -1708,11 +1700,11 @@ export const store = {
     }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
-    const isLive = payload.isLive !== undefined ? !!payload.isLive : (liveMeta.isLive || existing.isLive !== false);
+    const isLive = payload.isLive !== undefined ? !!payload.isLive : (liveMeta.isLive || existing.isLive);
     const videoId = liveMeta.videoId || payload.videoId || existing.videoId || (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : '');
     const defaultThumbnail = platform === 'youtube'
-      ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://img.youtube.com/vi/rFZHOHl-L8A/hqdefault.jpg')
-      : 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp';
+      ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : (existing.thumbnailUrl || ''))
+      : (liveMeta.thumbnailUrl || existing.thumbnailUrl || '');
 
     const updatedData = {
       ...existing,
@@ -1720,12 +1712,12 @@ export const store = {
       platform,
       channelSlug,
       videoId,
-      title: liveMeta.title || payload.title || existing.title || `${memberName} // ${platform.toUpperCase()} Live Broadcast`,
+      title: liveMeta.title || payload.title || existing.title || (isLive ? `${memberName} // ${platform.toUpperCase()} Live` : ''),
       isLive,
-      thumbnailUrl: liveMeta.thumbnailUrl || payload.thumbnailUrl || existing.thumbnailUrl || defaultThumbnail,
-      viewers: isLive ? Number(liveMeta.viewers || payload.viewers || existing.viewers || 420) : 0,
-      likes: isLive ? Number(liveMeta.likes || payload.likes || existing.likes || 85) : 0,
-      views: isLive ? Number(liveMeta.views || payload.views || existing.views || 3400) : 0,
+      thumbnailUrl: liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail || existing.thumbnailUrl || '',
+      viewers: isLive ? Number(liveMeta.viewers || payload.viewers || existing.viewers || 0) : 0,
+      likes: isLive ? Number(liveMeta.likes || payload.likes || existing.likes || 0) : 0,
+      views: isLive ? Number(liveMeta.views || payload.views || existing.views || 0) : 0,
       updatedAt: nowIso(),
     };
 
