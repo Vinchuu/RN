@@ -13,7 +13,6 @@ import {
   Edit,
   Save,
   X,
-  Flame,
   Globe,
   RotateCcw,
   Sparkles,
@@ -284,8 +283,12 @@ export function App() {
           {/* Logo & Title */}
           <div className="flex items-center gap-3.5">
             <div className="relative group cursor-pointer" onClick={() => setActiveTab("members")}>
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-800 via-red-600 to-rose-950 flex items-center justify-center border border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.55)] group-hover:scale-105 transition-transform duration-200">
-                <Flame className="w-7 h-7 text-white animate-pulse" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-800 via-red-600 to-rose-950 flex items-center justify-center border border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.55)] group-hover:scale-105 transition-transform duration-200 overflow-hidden p-1">
+                <img
+                  src="/favicon.png"
+                  alt="Red Network Logo"
+                  className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform duration-200"
+                />
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>

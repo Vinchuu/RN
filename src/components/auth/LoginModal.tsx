@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Eye, EyeOff, Shield, Users, Globe, Lock, Flame } from "lucide-react";
+import { Eye, EyeOff, Shield, Users, Globe, Lock } from "lucide-react";
 import { apiService } from "@/lib/apiService";
 import { soundFx } from "@/lib/soundEffects";
 
@@ -76,8 +76,12 @@ export const LoginModal = ({ isOpen, onClose, onLogin }: LoginModalProps) => {
         <DialogHeader>
           <div className="flex flex-col items-center justify-center space-y-2 pt-2">
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-900 via-red-600 to-rose-500 flex items-center justify-center shadow-lg shadow-red-950 border border-red-400/30">
-                <Flame className="w-9 h-9 text-white animate-pulse" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-900 via-red-600 to-rose-500 flex items-center justify-center shadow-lg shadow-red-950 border border-red-400/30 overflow-hidden p-1.5">
+                <img
+                  src="/favicon.png"
+                  alt="Red Network Logo"
+                  className="w-11 h-11 object-contain drop-shadow-[0_0_12px_rgba(239,68,68,0.8)]"
+                />
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-4 w-4">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
