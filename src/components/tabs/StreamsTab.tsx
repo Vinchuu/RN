@@ -182,6 +182,12 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
       if (vid) {
         return `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1`;
       }
+      if (stream.channelSlug.startsWith("UC")) {
+        return `https://www.youtube.com/embed/live_stream?channel=${stream.channelSlug}&autoplay=1`;
+      }
+      if (stream.channelSlug.toUpperCase() === "PRATEEKYT") {
+        return `https://www.youtube.com/embed/live_stream?channel=UC_qwc3gxud_vmh9UFMWKywQ&autoplay=1`;
+      }
     }
     return "";
   };
@@ -590,8 +596,12 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                       referrerPolicy="no-referrer"
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (stream.platform === "youtube" && stream.videoId) {
-                          target.src = `https://img.youtube.com/vi/${stream.videoId}/hqdefault.jpg`;
+                        if (stream.platform === "youtube") {
+                          if (stream.videoId) {
+                            target.src = `https://img.youtube.com/vi/${stream.videoId}/hqdefault.jpg`;
+                          } else {
+                            target.style.display = "none";
+                          }
                         } else {
                           target.src = "https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp";
                         }
@@ -664,9 +674,9 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                     {/* Stream Title (2 lines clamp) */}
                     <h4
                       className="text-white text-sm font-bold line-clamp-2 leading-snug mb-1 group-hover:text-red-400 transition-colors"
-                      title={stream.title || `${stream.memberName} // Live Stream`}
+                      title={stream.title || (isStreamLive ? `${stream.memberName} // Live Stream` : `${stream.memberName} // Offline Standby`)}
                     >
-                      {stream.title || `${stream.memberName} // Live Stream`}
+                      {stream.title || (isStreamLive ? `${stream.memberName} // Live Stream` : `${stream.memberName} // Offline Standby`)}
                     </h4>
 
                     {/* Streamer Username / Handle */}
