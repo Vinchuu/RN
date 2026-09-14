@@ -510,22 +510,42 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
         /* Empty State */
         <Card className="bg-[#120609]/80 border-red-900/40 p-12 text-center shadow-xl">
           <Radio className="w-12 h-12 text-red-500/50 mx-auto mb-3 animate-pulse" />
-          <h3 className="text-lg font-orbitron font-bold text-white mb-2 tracking-wider">
+          <h3 className="text-lg font-orbitron font-bold text-white mb-2 tracking-wider uppercase">
             {showFilter === "live"
-              ? "ALL CHANNELS STANDBY // NO OPERATIVES CURRENTLY LIVE"
-              : "NO BROADCAST FEEDS MATCHING CRITERIA"}
+              ? platformFilter !== "all"
+                ? `NO ${platformFilter.toUpperCase()} STREAMS CURRENTLY LIVE`
+                : "ALL CHANNELS STANDBY // NO OPERATIVES CURRENTLY LIVE"
+              : `NO ${platformFilter.toUpperCase()} FEEDS FOUND`}
           </h3>
           <p className="text-zinc-400 text-sm max-w-md mx-auto mb-6">
-            {showFilter === "live"
+            {platformFilter !== "all"
+              ? `There are currently no active ${platformFilter.toUpperCase()} broadcast feeds matching your filter. Switch platforms or view all registered feeds.`
+              : showFilter === "live"
               ? "None of the registered gang feeds are currently live broadcasting. Check back shortly or view all registered channels."
               : "Try clearing your search query or switching platform filters to view registered feeds."}
           </p>
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            {platformFilter !== "all" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  soundFx.playClickSound();
+                  setPlatformFilter("all");
+                }}
+                className="border-red-900/60 hover:border-red-500 text-zinc-200 hover:text-white"
+              >
+                View All Platforms
+              </Button>
+            )}
             {showFilter === "live" && (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowFilter("all")}
+                onClick={() => {
+                  soundFx.playClickSound();
+                  setShowFilter("all");
+                }}
                 className="border-red-900/60 hover:border-red-500 text-zinc-200 hover:text-white"
               >
                 View All Registered Feeds ({streams.length})
@@ -568,6 +588,14 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (stream.platform === "youtube" && stream.videoId) {
+                          target.src = `https://img.youtube.com/vi/${stream.videoId}/hqdefault.jpg`;
+                        } else {
+                          target.src = "https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp";
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1b060d] to-[#090204] p-4 text-center">
