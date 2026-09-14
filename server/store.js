@@ -277,9 +277,9 @@ const STARTER_STREAMS = [
     title: 'Buying Mansions , X Class Vin & Airdrop ! | Lawrence | Soulcity',
     isLive: true,
     thumbnailUrl: 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp',
-    viewers: 172,
-    likes: 31,
-    views: 1376,
+    viewers: 82,
+    likes: 15,
+    views: 650,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -288,12 +288,12 @@ const STARTER_STREAMS = [
     memberName: 'Damian "Ghost" Cross',
     platform: 'kick',
     channelSlug: '8bit_goldy',
-    title: 'Sangram singh roleplay in souclity ! #lifeinsoulcity',
-    isLive: true,
-    thumbnailUrl: 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp',
-    viewers: 854,
-    likes: 154,
-    views: 6832,
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
+    likes: 0,
+    views: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -306,6 +306,8 @@ const STARTER_STREAMS = [
     isLive: false,
     thumbnailUrl: '',
     viewers: 0,
+    likes: 0,
+    views: 0,
     addedBy: 'Trigger',
     createdAt: nowIso(),
   },
@@ -314,13 +316,13 @@ const STARTER_STREAMS = [
     memberName: 'Elena "Viper" Reyes',
     platform: 'youtube',
     channelSlug: 'PRATEEKYT',
-    videoId: '3L2LWSQ3VrM',
-    title: 'BACK FROM LADAKH!!! S8UL PRATEEK🚀🧿 #lifeinsoulcity',
-    isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/3L2LWSQ3VrM/hqdefault.jpg',
-    viewers: 342,
-    likes: 62,
-    views: 2736,
+    videoId: '',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
+    likes: 0,
+    views: 0,
     addedBy: 'Viper',
     createdAt: nowIso(),
   },
@@ -333,6 +335,8 @@ const STARTER_STREAMS = [
     isLive: false,
     thumbnailUrl: '',
     viewers: 0,
+    likes: 0,
+    views: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -344,9 +348,9 @@ const STARTER_STREAMS = [
     title: 'Happy Ganesh Chaturthi #8bit #lifeinsoulcity',
     isLive: true,
     thumbnailUrl: 'https://images.kick.com/video_thumbnails/jLWUz3tNeo2f/PiIQm9wQkeCr/720.webp',
-    viewers: 218,
-    likes: 39,
-    views: 1744,
+    viewers: 91,
+    likes: 16,
+    views: 720,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -888,8 +892,8 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
         if (stdout && stdout.length > 500) {
           ytChecked = true;
           const canonical = (stdout.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
-          const isWatch = canonical.includes('/watch?v=') || stdout.includes('/watch?v=');
-          const hasLiveFlags = stdout.includes('"isLive":true') || stdout.includes('"isLiveBroadcast":true') || stdout.includes('BADGE_STYLE_TYPE_LIVE_NOW');
+          const isWatch = canonical.startsWith('https://www.youtube.com/watch?v=') || canonical.includes('/watch?v=');
+          const hasLiveFlags = stdout.includes('"isLive":true') || stdout.includes('"isLiveBroadcast":true') || stdout.includes('BADGE_STYLE_TYPE_LIVE_NOW') || stdout.includes('"status":"LIVE"');
 
           const cidMatch = stdout.match(/\/channel\/(UC[a-zA-Z0-9_-]{22})/) || stdout.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
           if (cidMatch && !channelId) {
@@ -898,7 +902,7 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
           }
 
           if (isWatch && hasLiveFlags) {
-            const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/) || stdout.match(/"videoId":"([a-zA-Z0-9_-]{11})"/);
+            const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/);
             if (vidMatch) {
               videoId = vidMatch[1];
               isLive = true;
@@ -920,8 +924,8 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
         }
       } catch (e) {}
 
-      // Fast oEmbed check if videoId is known and title/thumbnail needs confirmation
-      if (videoId && (!title || !thumbnailUrl)) {
+      // Fast oEmbed check ONLY IF videoId is verified and title/thumbnail needs confirmation
+      if (isLive && videoId && (!title || !thumbnailUrl)) {
         try {
           const { stdout: oeOut } = await execFileAsync(curlBin, [
             '-4',
@@ -938,14 +942,14 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
       }
     }
 
-    if (!thumbnailUrl && videoId) {
-      thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    }
-
     if (!isLive) {
       viewers = 0;
       likes = 0;
       views = 0;
+      if (!videoId) {
+        title = '';
+        thumbnailUrl = '';
+      }
     }
 
     const result = { title, thumbnailUrl, viewers, likes, views, isLive, videoId, checked: ytChecked };
@@ -1675,17 +1679,6 @@ export const store = {
               isLive: true,
               videoId: effectiveVid,
             };
-          } else if (s.isLive) {
-            return {
-              ...s,
-              title: live.title || s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
-              thumbnailUrl: effectiveThumb,
-              viewers: Number(live.viewers || s.viewers || 342),
-              likes: Number(live.likes || s.likes || Math.round((s.viewers || 342) * 0.18)),
-              views: Number(live.views || s.views || ((s.viewers || 342) * 8)),
-              isLive: true,
-              videoId: effectiveVid,
-            };
           } else {
             return {
               ...s,
@@ -1701,18 +1694,6 @@ export const store = {
         } catch {
           const fallbackVid = s.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : '');
           const fallbackThumb = s.thumbnailUrl || (s.platform === 'youtube' && fallbackVid ? `https://img.youtube.com/vi/${fallbackVid}/hqdefault.jpg` : '');
-          if (s.isLive) {
-            return {
-              ...s,
-              title: s.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : `${s.memberName} // Live Stream`),
-              thumbnailUrl: fallbackThumb,
-              viewers: Number(s.viewers || 342),
-              likes: Number(s.likes || Math.round((s.viewers || 342) * 0.18)),
-              views: Number(s.views || ((s.viewers || 342) * 8)),
-              isLive: true,
-              videoId: fallbackVid,
-            };
-          }
           return {
             ...s,
             title: '',
