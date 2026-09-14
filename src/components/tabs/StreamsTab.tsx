@@ -65,6 +65,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
   const [editMemberName, setEditMemberName] = useState("");
   const [editPlatform, setEditPlatform] = useState<"kick" | "youtube">("kick");
   const [editUrlInput, setEditUrlInput] = useState("");
+  const [editIsLive, setEditIsLive] = useState(false);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Permissions
@@ -230,6 +231,7 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
     setEditMemberName(stream.memberName);
     setEditPlatform(stream.platform === "youtube" ? "youtube" : "kick");
     setEditUrlInput(stream.channelSlug);
+    setEditIsLive(!!stream.isLive);
   };
 
   const handleSaveEdit = async (e: React.FormEvent) => {
@@ -247,6 +249,9 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
           memberName: editMemberName || editingStream.memberName,
           platform: editPlatform,
           channelSlug: cleanSlug,
+          isLive: editIsLive,
+          viewers: editIsLive ? (editingStream.viewers || 220) : 0,
+          likes: editIsLive ? (editingStream.likes || 40) : 0,
         },
         userMode === "admin" ? "Red Leader" : "Red Operative"
       );
@@ -257,6 +262,27 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
       console.error("Failed to update stream feed:", err);
     } finally {
       setIsSavingEdit(false);
+    }
+  };
+
+  // Quick toggle stream live status
+  const handleQuickToggleLive = async (e: React.MouseEvent, stream: StreamChannel) => {
+    e.stopPropagation();
+    soundFx.playClickSound();
+    try {
+      const nextLive = !stream.isLive;
+      await apiService.updateStream(
+        stream.id,
+        {
+          isLive: nextLive,
+          viewers: nextLive ? (stream.viewers || 220) : 0,
+          likes: nextLive ? (stream.likes || 40) : 0,
+        },
+        userMode === "admin" ? "Red Leader" : "Red Operative"
+      );
+      await fetchStreamFeeds(false);
+    } catch (err) {
+      console.error("Failed to toggle stream live status:", err);
     }
   };
 
@@ -282,8 +308,8 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
       // User requirement: only live streams by default
       if (showFilter === "live" && !s.isLive) return false;
 
-      // Platform filter
-      if (platformFilter !== "all" && s.platform !== platformFilter) return false;
+      // Platform filter (case insensitive)
+      if (platformFilter !== "all" && s.platform?.toLowerCase() !== platformFilter.toLowerCase()) return false;
 
       // Search query
       if (searchQuery.trim()) {
@@ -669,6 +695,21 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                       {canEdit && (
                         <button
                           type="button"
+                          onClick={(e) => handleQuickToggleLive(e, stream)}
+                          className={`p-1 rounded transition-colors ${
+                            stream.isLive
+                              ? "text-red-400 hover:text-zinc-400 hover:bg-red-950/40"
+                              : "text-zinc-500 hover:text-green-400 hover:bg-green-950/40"
+                          }`}
+                          title={stream.isLive ? "Mark Standby (Offline)" : "Mark Live"}
+                        >
+                          <Radio className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+
+                      {canEdit && (
+                        <button
+                          type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenEdit(stream);
@@ -934,6 +975,34 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
                 required
                 className="mt-1 bg-[#1a080d] border-red-900/60 text-white"
               />
+            </div>
+
+            <div>
+              <Label className="text-zinc-300 text-xs">Broadcast Status</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={() => setEditIsLive(true)}
+                  className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
+                    editIsLive
+                      ? "bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]"
+                      : "bg-black/40 border-red-900/40 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  🔴 LIVE NOW
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditIsLive(false)}
+                  className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
+                    !editIsLive
+                      ? "bg-zinc-800 text-zinc-200 border-zinc-600"
+                      : "bg-black/40 border-red-900/40 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  ⚪ STANDBY (OFFLINE)
+                </button>
+              </div>
             </div>
 
             <DialogFooter className="mt-6">
