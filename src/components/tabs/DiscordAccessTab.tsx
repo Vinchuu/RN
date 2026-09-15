@@ -11,6 +11,8 @@ import {
   Trash2,
   Copy,
   Check,
+  Edit2,
+  X,
   AlertCircle,
   HelpCircle,
   Lock,
@@ -38,6 +40,11 @@ export function DiscordAccessTab({ currentUsername }: DiscordAccessTabProps) {
   const [openMemberAccess, setOpenMemberAccess] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Inline Rename State
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingLabel, setEditingLabel] = useState<string>("");
+  const [isSavingLabel, setIsSavingLabel] = useState(false);
 
   // New Admin Form State
   const [adminIdInput, setAdminIdInput] = useState("");
@@ -72,6 +79,41 @@ export function DiscordAccessTab({ currentUsername }: DiscordAccessTabProps) {
     setCopiedId(id);
     soundFx.playClickSound();
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleStartEdit = (entry: DiscordAccessEntry) => {
+    setEditingId(entry.discordId);
+    setEditingLabel(entry.label || "");
+    soundFx.playClickSound();
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditingLabel("");
+  };
+
+  const handleSaveLabel = async (type: "admin" | "member", discordId: string) => {
+    const cleanLabel = editingLabel.trim();
+    if (!cleanLabel) return;
+    setIsSavingLabel(true);
+    try {
+      const res = await apiService.updateDiscordAccessLabel(type, discordId, cleanLabel, currentUsername);
+      if (res.success && res.access) {
+        if (type === "admin") {
+          setAdminList(res.access.adminDiscordIds || []);
+        } else {
+          setMemberList(res.access.memberDiscordIds || []);
+        }
+        setEditingId(null);
+        setEditingLabel("");
+        soundFx.playSuccessSound();
+      }
+    } catch (err: any) {
+      soundFx.playErrorSound();
+      alert(err.message || "Failed to update label.");
+    } finally {
+      setIsSavingLabel(false);
+    }
   };
 
   const handleAddAdmin = async (e: React.FormEvent) => {
@@ -251,15 +293,57 @@ export function DiscordAccessTab({ currentUsername }: DiscordAccessTabProps) {
                     key={entry.discordId}
                     className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-3 hover:border-red-300 transition-colors group"
                   >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold font-rajdhani text-slate-800 truncate">
-                          {entry.label || "Red Leader"}
-                        </span>
-                        <Badge variant="outline" className="text-[10px] font-mono border-red-200 text-red-700 bg-red-50">
-                          LEADER
-                        </Badge>
-                      </div>
+                    <div className="min-w-0 flex-1">
+                      {editingId === entry.discordId ? (
+                        <div className="flex items-center gap-1.5 my-0.5">
+                          <Input
+                            value={editingLabel}
+                            onChange={(e) => setEditingLabel(e.target.value)}
+                            className="h-7 text-xs font-rajdhani font-bold bg-white border-red-300 max-w-[180px]"
+                            placeholder="Call-sign / Alias"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleSaveLabel("admin", entry.discordId);
+                              if (e.key === "Escape") handleCancelEdit();
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            disabled={isSavingLabel}
+                            onClick={() => handleSaveLabel("admin", entry.discordId)}
+                            className="h-7 px-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            title="Save Name"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleCancelEdit}
+                            className="h-7 px-2 text-slate-500 hover:bg-slate-200"
+                            title="Cancel"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold font-rajdhani text-slate-800 truncate">
+                            {entry.label || "Red Leader"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(entry)}
+                            className="text-slate-400 hover:text-red-600 transition-colors p-0.5 rounded hover:bg-red-50"
+                            title="Rename Leader Alias"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                          <Badge variant="outline" className="text-[10px] font-mono border-red-200 text-red-700 bg-red-50">
+                            LEADER
+                          </Badge>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[11px] font-mono text-slate-600 font-semibold select-all">
                           {entry.discordId}
@@ -404,15 +488,57 @@ export function DiscordAccessTab({ currentUsername }: DiscordAccessTabProps) {
                     key={entry.discordId}
                     className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between gap-3 hover:border-amber-300 transition-colors group"
                   >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold font-rajdhani text-slate-800 truncate">
-                          {entry.label || "Operative"}
-                        </span>
-                        <Badge variant="outline" className="text-[10px] font-mono border-amber-200 text-amber-700 bg-amber-50">
-                          MEMBER
-                        </Badge>
-                      </div>
+                    <div className="min-w-0 flex-1">
+                      {editingId === entry.discordId ? (
+                        <div className="flex items-center gap-1.5 my-0.5">
+                          <Input
+                            value={editingLabel}
+                            onChange={(e) => setEditingLabel(e.target.value)}
+                            className="h-7 text-xs font-rajdhani font-bold bg-white border-amber-300 max-w-[180px]"
+                            placeholder="Call-sign / Alias"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleSaveLabel("member", entry.discordId);
+                              if (e.key === "Escape") handleCancelEdit();
+                            }}
+                          />
+                          <Button
+                            size="sm"
+                            disabled={isSavingLabel}
+                            onClick={() => handleSaveLabel("member", entry.discordId)}
+                            className="h-7 px-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            title="Save Name"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleCancelEdit}
+                            className="h-7 px-2 text-slate-500 hover:bg-slate-200"
+                            title="Cancel"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold font-rajdhani text-slate-800 truncate">
+                            {entry.label || "Operative"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(entry)}
+                            className="text-slate-400 hover:text-amber-600 transition-colors p-0.5 rounded hover:bg-amber-50"
+                            title="Rename Operative Alias"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                          <Badge variant="outline" className="text-[10px] font-mono border-amber-200 text-amber-700 bg-amber-50">
+                            MEMBER
+                          </Badge>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[11px] font-mono text-slate-600 font-semibold select-all">
                           {entry.discordId}

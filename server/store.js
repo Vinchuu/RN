@@ -2087,6 +2087,37 @@ export const store = {
     return await this.getDiscordAccess();
   },
 
+  async updateDiscordAccessLabel(type, discordId, newLabel, performedBy = 'Red Leader') {
+    const cleanId = String(discordId || '').trim();
+    const cleanLabel = String(newLabel || '').trim();
+    if (!cleanId) throw new Error('Discord ID is required');
+
+    if (isMongoConnected()) {
+      const field = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      await DiscordAccessModel.updateOne(
+        { id: 'main', [`${field}.discordId`]: cleanId },
+        { $set: { [`${field}.$.label`]: cleanLabel } }
+      );
+    } else {
+      if (!db.discordAccess) await this.getDiscordAccess();
+      const listKey = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      const item = (db.discordAccess[listKey] || []).find((e) => e.discordId === cleanId);
+      if (item) {
+        item.label = cleanLabel;
+        save();
+      }
+    }
+
+    await this.addAuditLog({
+      action: 'discord_access_renamed',
+      category: 'security',
+      description: `Renamed ${type === 'admin' ? 'Leader' : 'Member'} Discord ID ${cleanId} to "${cleanLabel}"`,
+      performedBy,
+    });
+
+    return await this.getDiscordAccess();
+  },
+
   async toggleOpenMemberAccess(enabled, performedBy = 'Red Leader') {
     const openMemberAccess = Boolean(enabled);
     if (isMongoConnected()) {

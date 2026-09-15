@@ -270,6 +270,19 @@ app.post('/api/access/discord/remove', async (req, res) => {
   }
 });
 
+app.post('/api/access/discord/update-label', async (req, res) => {
+  try {
+    const { type, discordId, label, performedBy } = req.body || {};
+    if (!type || !discordId) {
+      return res.status(400).json({ success: false, message: 'type and discordId are required' });
+    }
+    const updated = await store.updateDiscordAccessLabel(type, discordId, label, performedBy || 'Red Leader');
+    res.json({ success: true, access: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 app.post('/api/access/discord/toggle-open-member', async (req, res) => {
   try {
     const { openMemberAccess, performedBy } = req.body || {};

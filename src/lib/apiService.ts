@@ -471,6 +471,18 @@ export const apiService = {
     });
   },
 
+  async updateDiscordAccessLabel(
+    type: 'admin' | 'member',
+    discordId: string,
+    label: string,
+    performedBy?: string
+  ): Promise<{ success: boolean; access: any }> {
+    return request('/api/access/discord/update-label', {
+      method: 'POST',
+      body: JSON.stringify({ type, discordId, label, performedBy }),
+    });
+  },
+
   async toggleOpenMemberAccess(
     openMemberAccess: boolean,
     performedBy?: string
