@@ -278,7 +278,7 @@ export function App() {
       </div>
 
       {/* Main Header & Branding */}
-      <header className="border-b border-red-100 bg-white/95 backdrop-blur-xl shadow-sm sticky top-[37px] z-40">
+      <header className="border-b border-slate-300/80 bg-[#f1f5f9]/95 backdrop-blur-xl shadow-sm sticky top-[37px] z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Logo & Title */}
           <div className="flex items-center gap-3.5">
@@ -300,7 +300,7 @@ export function App() {
               <h1 className="text-xl sm:text-2xl font-orbitron font-black tracking-wider text-gang-glow flex items-center gap-2">
                 RED NETWORK
               </h1>
-              <span className="text-xs font-rajdhani text-slate-500 font-semibold block -mt-0.5">
+              <span className="text-xs font-rajdhani text-slate-600 font-semibold block -mt-0.5">
                 StorymodebyChoice
               </span>
             </div>
@@ -309,12 +309,12 @@ export function App() {
           {/* Quick HUD Metrics & Role Auth Panel */}
           <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-end">
             {/* Total Funds HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-500/60 transition-colors shadow-sm">
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#e2e8f0]/90 border border-slate-300 hover:border-emerald-500/60 transition-colors shadow-sm">
               <div className="w-7 h-7 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center">
                 <DollarSign className="w-4 h-4 text-emerald-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">Total Cash</span>
+                <span className="text-[10px] text-slate-600 uppercase block leading-none font-bold">Total Cash</span>
                 <span className="text-sm font-mono font-extrabold text-emerald-700 leading-tight">
                   ${fundBalance.toLocaleString()}
                 </span>
@@ -322,12 +322,12 @@ export function App() {
             </div>
 
             {/* SVC Crypto HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-cyan-500/60 transition-colors shadow-sm">
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#e2e8f0]/90 border border-slate-300 hover:border-cyan-500/60 transition-colors shadow-sm">
               <div className="w-7 h-7 rounded-lg bg-cyan-100 border border-cyan-300 flex items-center justify-center">
                 <Coins className="w-4 h-4 text-cyan-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">SVC Vault</span>
+                <span className="text-[10px] text-slate-600 uppercase block leading-none font-bold">SVC Vault</span>
                 <span className="text-sm font-mono font-extrabold text-cyan-700 leading-tight flex items-center gap-1">
                   {svcBalance.toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-600">SVC</span>
                 </span>
@@ -335,12 +335,12 @@ export function App() {
             </div>
 
             {/* Week HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber-500/60 transition-colors shadow-sm">
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#e2e8f0]/90 border border-slate-300 hover:border-amber-500/60 transition-colors shadow-sm">
               <div className="w-7 h-7 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center">
                 <RotateCcw className="w-4 h-4 text-amber-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">Dues Cycle</span>
+                <span className="text-[10px] text-slate-600 uppercase block leading-none font-bold">Dues Cycle</span>
                 <span className="text-sm font-mono font-extrabold text-amber-700 leading-tight">
                   Week #{cycle.currentWeekNumber}
                 </span>
@@ -349,12 +349,12 @@ export function App() {
 
             {/* Current Role Badge & Switcher */}
             <div className="flex items-center gap-2">
-              <div className={`px-3 py-1.5 rounded-xl bg-slate-50 border flex items-center gap-2.5 shadow-sm ${
+              <div className={`px-3 py-1.5 rounded-xl bg-[#e2e8f0]/90 border flex items-center gap-2.5 shadow-sm ${
                 isLeader 
-                  ? "border-red-400 bg-red-50/60 text-red-700" 
+                  ? "border-red-400 bg-red-50/80 text-red-700" 
                   : isMember 
-                  ? "border-amber-400 bg-amber-50/60 text-amber-800" 
-                  : "border-blue-300 bg-blue-50/60 text-blue-800"
+                  ? "border-amber-400 bg-amber-50/80 text-amber-800" 
+                  : "border-blue-300 bg-blue-50/80 text-blue-800"
               }`}>
                 {isLeader ? (
                   <Shield className="w-4 h-4 text-red-600" />
@@ -364,7 +364,7 @@ export function App() {
                   <Globe className="w-4 h-4 text-blue-600" />
                 )}
                 <div className="text-left font-rajdhani">
-                  <span className="text-[9px] text-slate-500 uppercase block leading-none font-semibold">
+                  <span className="text-[9px] text-slate-600 uppercase block leading-none font-semibold">
                     {isLeader ? "Full Authority" : isMember ? "Gang Member" : "Public View"}
                   </span>
                   <span className={`text-xs font-bold font-orbitron leading-tight ${
@@ -390,7 +390,7 @@ export function App() {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="h-9 px-3 text-xs bg-white border-red-200 text-slate-600 hover:text-red-700 hover:bg-red-50 font-rajdhani hover:border-red-400 transition-colors shadow-sm"
+                  className="h-9 px-3 text-xs bg-[#f8fafc] border-slate-300 text-slate-700 hover:text-red-700 hover:bg-red-50 font-rajdhani hover:border-red-400 transition-colors shadow-sm"
                 >
                   Exit Role
                 </Button>
@@ -400,7 +400,7 @@ export function App() {
         </div>
 
         {/* Navigation Tabs Bar */}
-        <div className="border-t border-slate-200/80 bg-slate-50/90 backdrop-blur-md">
+        <div className="border-t border-slate-300 bg-[#e2e8f0]/90 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1.5 overflow-x-auto py-1.5">
             {[
               { id: "members", label: "Gang Members", icon: Users, badge: `${membersCount}` },
@@ -423,7 +423,7 @@ export function App() {
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-rajdhani font-bold transition-all duration-200 whitespace-nowrap group ${
                     isActive
                       ? "bg-gradient-to-r from-red-600 via-red-600 to-rose-600 text-white shadow-md shadow-red-500/25 border border-red-500"
-                      : "text-slate-600 hover:text-red-700 hover:bg-white border border-transparent hover:border-red-200 shadow-none hover:shadow-sm"
+                      : "text-slate-700 hover:text-red-700 hover:bg-[#f8fafc] border border-transparent hover:border-slate-300 shadow-none hover:shadow-sm"
                   }`}
                 >
                   <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? "text-white" : "text-red-600"}`} />
@@ -432,7 +432,7 @@ export function App() {
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-orbitron font-semibold border ${
                       isActive 
                         ? "bg-white/20 border-white/40 text-white" 
-                        : tab.badgeColor || "bg-white border-slate-200 text-slate-600"
+                        : tab.badgeColor || "bg-[#f8fafc] border-slate-300 text-slate-700"
                     }`}>
                       {tab.badge}
                     </span>
@@ -456,7 +456,7 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-xs font-rajdhani text-slate-500 shadow-inner">
+      <footer className="border-t border-slate-300 bg-[#f1f5f9] py-4 px-4 text-xs font-rajdhani text-slate-600 shadow-inner">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>

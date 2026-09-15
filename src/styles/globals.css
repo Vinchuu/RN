@@ -6,41 +6,41 @@
 
 @layer base {
   :root {
-    --background: 210 30% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --background: 215 20% 90%;
+    --foreground: 220 25% 18%;
+    --card: 215 25% 96%;
+    --card-foreground: 220 25% 18%;
+    --popover: 215 25% 96%;
+    --popover-foreground: 220 25% 18%;
     --primary: 0 84% 56%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 0 95% 65%;
-    --secondary: 0 20% 96%;
+    --secondary: 215 20% 88%;
     --secondary-foreground: 0 80% 35%;
-    --muted: 210 25% 94%;
-    --muted-foreground: 215 16% 40%;
-    --accent: 0 80% 96%;
-    --accent-foreground: 0 85% 45%;
+    --muted: 215 20% 85%;
+    --muted-foreground: 215 15% 42%;
+    --accent: 0 80% 92%;
+    --accent-foreground: 0 85% 40%;
     --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 30% 88%;
-    --input: 0 25% 90%;
+    --border: 215 20% 82%;
+    --input: 215 25% 93%;
     --ring: 0 84% 60%;
     --radius: 0.85rem;
     
-    /* Gang-specific Crimson Red & Modern Light Palette */
-    --gang-red: 0 85% 58%;
+    /* Gang-specific Crimson Red & Soft Neutral Palette */
+    --gang-red: 0 85% 56%;
     --gang-red-dark: 0 90% 40%;
     --gang-neon: 0 100% 60%;
-    --gang-dark: 210 30% 98%;
-    --gang-card: 0 0% 100%;
+    --gang-dark: 215 20% 90%;
+    --gang-card: 215 25% 96%;
     --success: 142.1 76.2% 36.3%;
     --warning: 38 92% 50%;
     
     /* Studio Glows & Shadows */
-    --shadow-gang: 0 10px 25px -4px rgba(220, 38, 38, 0.15);
-    --shadow-neon: 0 0 20px rgba(239, 68, 68, 0.25);
-    --glow-red: 0 0 25px rgba(220, 38, 38, 0.2);
+    --shadow-gang: 0 8px 20px -4px rgba(220, 38, 38, 0.16);
+    --shadow-neon: 0 0 16px rgba(239, 68, 68, 0.22);
+    --glow-red: 0 0 20px rgba(220, 38, 38, 0.18);
   }
 }
 
@@ -51,42 +51,42 @@
   body {
     @apply bg-background text-foreground selection:bg-red-600 selection:text-white;
     font-family: 'Rajdhani', 'Outfit', sans-serif;
-    background-color: #f8fafc;
+    background-color: #e2e8f0;
     background-image: 
       radial-gradient(ellipse at 50% 0%, rgba(220, 38, 38, 0.08) 0%, transparent 60%),
-      radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.04) 0%, transparent 50%),
-      linear-gradient(to right, rgba(220, 38, 38, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(220, 38, 38, 0.03) 1px, transparent 1px);
+      radial-gradient(circle at 85% 85%, rgba(239, 68, 68, 0.04) 0%, transparent 50%),
+      linear-gradient(to right, rgba(148, 163, 184, 0.22) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.22) 1px, transparent 1px);
     background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
     background-attachment: fixed;
   }
 }
 
-/* Custom Scrollbar (Light theme with crimson thumb) */
+/* Custom Scrollbar (Slate silver with crimson thumb) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #cbd5e1;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(220, 38, 38, 0.4);
+  background: rgba(220, 38, 38, 0.5);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 38, 38, 0.7);
+  background: rgba(220, 38, 38, 0.8);
 }
 
 @layer components {
-  /* Premium Light Glassmorphic Cards */
+  /* Soft Neutral Glassmorphic Cards */
   .card-gang {
-    @apply bg-white/95 backdrop-blur-xl border border-red-100 rounded-xl shadow-sm transition-all duration-300 relative overflow-hidden;
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(220, 38, 38, 0.08);
+    @apply bg-[#f1f5f9]/95 backdrop-blur-xl border border-slate-300/90 rounded-xl shadow-sm transition-all duration-300 relative overflow-hidden;
+    box-shadow: 0 3px 14px -2px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(220, 38, 38, 0.1);
   }
   
   .card-gang:hover {
-    box-shadow: 0 12px 30px -4px rgba(220, 38, 38, 0.15), 0 0 0 1px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.16), 0 0 0 1px rgba(220, 38, 38, 0.3);
   }
 
   /* Interactive Studio Action Buttons */
@@ -95,7 +95,7 @@
   }
   
   .btn-gang-outline {
-    @apply bg-white border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-700 font-rajdhani font-bold px-4 py-2 rounded-lg transition-all duration-200 text-sm flex items-center justify-center shadow-sm;
+    @apply bg-[#f8fafc] border border-red-300 text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-700 font-rajdhani font-bold px-4 py-2 rounded-lg transition-all duration-200 text-sm flex items-center justify-center shadow-sm;
   }
   
   /* Text Gradients */
@@ -117,53 +117,53 @@
     @apply px-3 py-1 rounded-full text-xs font-bold font-orbitron uppercase tracking-wider border shadow-sm;
   }
 
-  /* Rank Dynamic Cards for Light Theme */
+  /* Rank Dynamic Cards for Soft Neutral Theme */
   .card-rank-leader {
-    @apply border-amber-300/80 bg-gradient-to-br from-amber-50/90 via-white to-red-50/50 text-slate-900;
-    box-shadow: 0 4px 20px -3px rgba(245, 158, 11, 0.18);
+    @apply border-amber-300/80 bg-gradient-to-br from-amber-100/70 via-[#f8fafc] to-red-100/50 text-slate-900;
+    box-shadow: 0 4px 18px -3px rgba(245, 158, 11, 0.16);
   }
   .card-rank-leader:hover {
-    box-shadow: 0 8px 25px -3px rgba(245, 158, 11, 0.28);
+    box-shadow: 0 8px 24px -3px rgba(245, 158, 11, 0.25);
   }
 
   .card-rank-underboss {
-    @apply border-purple-300/80 bg-gradient-to-br from-purple-50/90 via-white to-red-50/40 text-slate-900;
-    box-shadow: 0 4px 20px -3px rgba(168, 85, 247, 0.15);
+    @apply border-purple-300/80 bg-gradient-to-br from-purple-100/70 via-[#f8fafc] to-red-100/40 text-slate-900;
+    box-shadow: 0 4px 18px -3px rgba(168, 85, 247, 0.15);
   }
   .card-rank-underboss:hover {
-    box-shadow: 0 8px 25px -3px rgba(168, 85, 247, 0.25);
+    box-shadow: 0 8px 24px -3px rgba(168, 85, 247, 0.25);
   }
 
   .card-rank-enforcer {
-    @apply border-orange-300/80 bg-gradient-to-br from-orange-50/90 via-white to-red-50/40 text-slate-900;
-    box-shadow: 0 4px 20px -3px rgba(249, 115, 22, 0.15);
+    @apply border-orange-300/80 bg-gradient-to-br from-orange-100/70 via-[#f8fafc] to-red-100/40 text-slate-900;
+    box-shadow: 0 4px 18px -3px rgba(249, 115, 22, 0.15);
   }
   .card-rank-enforcer:hover {
-    box-shadow: 0 8px 25px -3px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 8px 24px -3px rgba(249, 115, 22, 0.25);
   }
 
   .card-rank-hitman {
-    @apply border-red-300/80 bg-gradient-to-br from-red-50/90 via-white to-rose-50/50 text-slate-900;
-    box-shadow: 0 4px 20px -3px rgba(220, 38, 38, 0.15);
+    @apply border-red-300/80 bg-gradient-to-br from-red-100/70 via-[#f8fafc] to-rose-100/50 text-slate-900;
+    box-shadow: 0 4px 18px -3px rgba(220, 38, 38, 0.15);
   }
   .card-rank-hitman:hover {
-    box-shadow: 0 8px 25px -3px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 8px 24px -3px rgba(220, 38, 38, 0.25);
   }
 
   .card-rank-soldier {
-    @apply border-cyan-300/80 bg-gradient-to-br from-cyan-50/90 via-white to-slate-50 text-slate-900;
-    box-shadow: 0 4px 20px -3px rgba(6, 182, 212, 0.12);
+    @apply border-cyan-300/80 bg-gradient-to-br from-cyan-100/70 via-[#f8fafc] to-slate-100 text-slate-900;
+    box-shadow: 0 4px 18px -3px rgba(6, 182, 212, 0.12);
   }
   .card-rank-soldier:hover {
-    box-shadow: 0 8px 25px -3px rgba(6, 182, 212, 0.22);
+    box-shadow: 0 8px 24px -3px rgba(6, 182, 212, 0.22);
   }
 
   .card-rank-recruit {
-    @apply border-slate-200 bg-white text-slate-900;
+    @apply border-slate-300 bg-[#f8fafc] text-slate-900;
   }
   .card-rank-recruit:hover {
-    @apply border-red-200;
-    box-shadow: 0 4px 20px -3px rgba(220, 38, 38, 0.1);
+    @apply border-red-300;
+    box-shadow: 0 4px 18px -3px rgba(220, 38, 38, 0.1);
   }
 
   /* Inventory Category Tactical Borders */
