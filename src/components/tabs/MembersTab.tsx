@@ -42,12 +42,12 @@ interface MembersTabProps {
 }
 
 const RANKS = [
-  { id: "leader", label: "Boss / Leader", color: "bg-red-950/80 border-red-500 text-red-300" },
-  { id: "underboss", label: "Underboss", color: "bg-rose-950/80 border-rose-500 text-rose-300" },
-  { id: "enforcer", label: "Enforcer", color: "bg-amber-950/80 border-amber-500 text-amber-300" },
-  { id: "hitman", label: "Hitman", color: "bg-purple-950/80 border-purple-500 text-purple-300" },
-  { id: "soldier", label: "Soldier", color: "bg-slate-900 border-slate-600 text-slate-300" },
-  { id: "recruit", label: "Recruit", color: "bg-neutral-900 border-neutral-700 text-neutral-400" },
+  { id: "leader", label: "Boss / Leader", color: "bg-red-100 border-red-500 text-red-700 font-bold" },
+  { id: "underboss", label: "Underboss", color: "bg-rose-100 border-rose-400 text-rose-700 font-bold" },
+  { id: "enforcer", label: "Enforcer", color: "bg-amber-100 border-amber-400 text-amber-800 font-bold" },
+  { id: "hitman", label: "Hitman", color: "bg-purple-100 border-purple-400 text-purple-700 font-bold" },
+  { id: "soldier", label: "Soldier", color: "bg-slate-100 border-slate-400 text-slate-700 font-bold" },
+  { id: "recruit", label: "Recruit", color: "bg-slate-50 border-slate-300 text-slate-600 font-bold" },
 ];
 
 export function MembersTab({ userMode }: MembersTabProps) {
@@ -196,20 +196,10 @@ export function MembersTab({ userMode }: MembersTabProps) {
   const getRankBadge = (rank?: string) => {
     const r = RANKS.find((x) => x.id === (rank || "recruit").toLowerCase());
     return (
-      <span className={`px-2 py-0.5 rounded text-[11px] font-orbitron font-bold uppercase border ${r?.color || "bg-neutral-900 border-neutral-700 text-neutral-400"}`}>
+      <span className={`px-2 py-0.5 rounded text-[11px] font-orbitron font-bold uppercase border ${r?.color || "bg-slate-100 border-slate-300 text-slate-700"}`}>
         {rank === "leader" ? "👑 " : ""}{r?.label || rank}
       </span>
     );
-  };
-
-  const getRankCardClass = (rank?: string) => {
-    const r = (rank || "recruit").toLowerCase();
-    if (r === "leader") return "card-rank-leader";
-    if (r === "underboss") return "card-rank-underboss";
-    if (r === "enforcer") return "card-rank-enforcer";
-    if (r === "hitman") return "card-rank-hitman";
-    if (r === "soldier") return "card-rank-soldier";
-    return "card-rank-recruit";
   };
 
   return (
@@ -218,14 +208,14 @@ export function MembersTab({ userMode }: MembersTabProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-red-600">
               GANG MEMBERS
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950/90 border border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
               {members.length} Members
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5 font-medium">
             Red Network verified syndicate personnel hierarchy, quotas & live dues status.
           </p>
         </div>
@@ -251,33 +241,33 @@ export function MembersTab({ userMode }: MembersTabProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="card-gang p-4 border-l-4 border-l-red-600">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Quota Target
             </span>
-            <Flame className="w-5 h-5 text-red-400" />
+            <Flame className="w-5 h-5 text-red-500" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-foreground mt-2 font-mono">
+          <p className="text-2xl font-orbitron font-bold text-slate-900 mt-2 font-mono">
             ${totalQuotaExpected.toLocaleString()}
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             Weekly commitment across all ranks
           </span>
         </Card>
 
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Dues Paid Compliance
             </span>
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
+          <p className="text-2xl font-orbitron font-bold text-emerald-600 mt-2 font-mono">
             {paidCount} / {members.length} Paid
           </p>
           {/* Mini progress */}
-          <div className="w-full h-1.5 bg-black/60 rounded-full mt-2 overflow-hidden border border-emerald-950">
+          <div className="w-full h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden border border-slate-200">
             <div
-              className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500 rounded-full"
+              className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-500 rounded-full"
               style={{ width: `${complianceRate}%` }}
             />
           </div>
@@ -285,15 +275,15 @@ export function MembersTab({ userMode }: MembersTabProps) {
 
         <Card className="card-gang p-4 border-l-4 border-l-amber-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Syndicate Strength
             </span>
-            <Users className="w-5 h-5 text-amber-400" />
+            <Users className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-amber-300 mt-2 font-mono">
-            {complianceRate}% <span className="text-xs text-muted-foreground font-normal">Fulfilled</span>
+          <p className="text-2xl font-orbitron font-bold text-amber-700 mt-2 font-mono">
+            {complianceRate}% <span className="text-xs text-slate-500 font-normal">Fulfilled</span>
           </p>
-          <span className="text-xs text-amber-300/80">
+          <span className="text-xs text-amber-700 font-medium">
             {members.length - paidCount} operatives pending payment
           </span>
         </Card>
@@ -302,23 +292,23 @@ export function MembersTab({ userMode }: MembersTabProps) {
       {/* Search Bar */}
       <Card className="card-gang p-3">
         <div className="relative w-full">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search member by name or rank..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
+            className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm font-rajdhani focus:border-red-500"
           />
         </div>
       </Card>
 
       {/* Members Grid */}
       {loading ? (
-        <div className="py-16 text-center text-red-400 font-orbitron animate-pulse">
+        <div className="py-16 text-center text-red-600 font-orbitron animate-pulse font-bold">
           Querying Red Network encrypted database...
         </div>
       ) : filteredMembers.length === 0 ? (
-        <Card className="card-gang p-12 text-center text-muted-foreground font-rajdhani">
+        <Card className="card-gang p-12 text-center text-slate-500 font-rajdhani">
           <Users className="w-12 h-12 mx-auto text-red-500/40 mb-3" />
           <p className="text-lg">No operatives found matching current filters.</p>
         </Card>
@@ -327,16 +317,16 @@ export function MembersTab({ userMode }: MembersTabProps) {
           {filteredMembers.map((member) => (
             <Card
               key={member.id}
-              className="card-gang p-4 transition-all duration-200 hover:border-red-600/50 relative group"
+              className="card-gang p-4 transition-all duration-200 hover:border-red-400 relative group"
             >
               {/* Header Info */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-900 to-black border border-red-600/40 flex items-center justify-center font-orbitron font-extrabold text-red-300 text-lg shadow-md shrink-0">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-600 to-rose-500 border border-red-200 flex items-center justify-center font-orbitron font-extrabold text-white text-lg shadow-sm shrink-0">
                     {member.name[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
+                    <h3 className="font-rajdhani font-bold text-base text-slate-900 group-hover:text-red-600 transition-colors">
                       {member.name}
                     </h3>
                     <div className="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -355,7 +345,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
                         setEditingMember(member);
                         setIsEditOpen(true);
                       }}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-white hover:bg-red-950/60"
+                      className="h-8 w-8 p-0 text-slate-400 hover:text-slate-800 hover:bg-slate-100"
                       title="Edit Member"
                     >
                       <Edit className="w-3.5 h-3.5" />
@@ -364,7 +354,7 @@ export function MembersTab({ userMode }: MembersTabProps) {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDeleteMember(member.id, member.name)}
-                      className="h-8 w-8 p-0 text-muted-foreground hover:text-red-400 hover:bg-red-950/60"
+                      className="h-8 w-8 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
                       title="Remove Member"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -374,29 +364,29 @@ export function MembersTab({ userMode }: MembersTabProps) {
               </div>
 
               {/* Stats / Details Divider */}
-              <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-3 gap-2 text-xs font-rajdhani">
+              <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-xs font-rajdhani">
                 <div>
-                  <span className="text-muted-foreground block text-[11px]">Cash Quota</span>
-                  <span className="font-mono font-bold text-amber-400">
+                  <span className="text-slate-500 block text-[11px] font-semibold">Cash Quota</span>
+                  <span className="font-mono font-bold text-slate-900">
                     ${(member.contribution || 0).toLocaleString()}
                   </span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block text-[11px] flex items-center gap-0.5">
-                    <Coins className="w-3 h-3 text-cyan-400" /> SVC Quota
+                  <span className="text-slate-500 block text-[11px] font-semibold flex items-center gap-0.5">
+                    <Coins className="w-3 h-3 text-cyan-600" /> SVC Quota
                   </span>
-                  <span className="font-mono font-bold text-cyan-400">
-                    {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[9px] text-cyan-300 font-orbitron">SVC</span>
+                  <span className="font-mono font-bold text-cyan-600">
+                    {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[9px] text-cyan-700 font-orbitron">SVC</span>
                   </span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground block text-[11px]">Cash Dues</span>
+                  <span className="text-slate-500 block text-[11px] font-semibold">Cash Dues</span>
                   {member.hasPaid ? (
-                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                    <span className="text-emerald-600 font-semibold flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5" /> Paid
                     </span>
                   ) : (
-                    <span className="text-amber-400/90 font-semibold flex items-center gap-1">
+                    <span className="text-amber-600 font-semibold flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" /> Pending
                     </span>
                   )}
@@ -409,30 +399,30 @@ export function MembersTab({ userMode }: MembersTabProps) {
 
       {/* Add Member Modal (Leader Only) */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-md bg-black/90 border border-red-900/60 text-foreground backdrop-blur-2xl">
+        <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-orbitron text-gang-glow">
+            <DialogTitle className="text-xl font-orbitron text-red-600">
               ADD GANG MEMBER
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 font-rajdhani">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+              <Label className="text-xs text-slate-600 font-bold uppercase">Member Name</Label>
               <Input
                 placeholder="e.g. Tatya Vinchu"
                 value={newMember.name}
                 onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
+              <Label className="text-xs text-slate-600 font-bold uppercase">Rank</Label>
               <select
                 value={newMember.rank}
                 onChange={(e) => setNewMember({ ...newMember, rank: e.target.value })}
-                className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500"
               >
                 {RANKS.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -444,31 +434,31 @@ export function MembersTab({ userMode }: MembersTabProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Dues ($)</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Weekly Cash Dues ($)</Label>
                 <Input
                   type="number"
                   value={newMember.contribution}
                   onChange={(e) => setNewMember({ ...newMember, contribution: Number(e.target.value) })}
-                  className="bg-black/50 border-red-900/50 font-mono"
+                  className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                <Label className="text-xs text-cyan-700 font-bold uppercase flex items-center gap-1">
                   <Coins className="w-3 h-3" /> Weekly SVC Dues
                 </Label>
                 <Input
                   type="number"
                   value={newMember.contributionSvc}
                   onChange={(e) => setNewMember({ ...newMember, contributionSvc: Number(e.target.value) })}
-                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                  className="bg-white border-cyan-300 text-cyan-700 font-mono focus-visible:ring-cyan-500"
                 />
               </div>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsAddOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="text-slate-600 hover:text-slate-900">
               Cancel
             </Button>
             <Button onClick={handleAddMember} className="btn-gang">
@@ -481,30 +471,30 @@ export function MembersTab({ userMode }: MembersTabProps) {
       {/* Edit Member Modal (Leader Only) */}
       {editingMember && (
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="sm:max-w-md bg-black/90 border border-red-900/60 text-foreground backdrop-blur-2xl">
+          <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-orbitron text-gang-glow">
+              <DialogTitle className="text-xl font-orbitron text-red-600">
                 UPDATE OPERATIVE DOSSIER
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3.5 py-2 font-rajdhani">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Member Name</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Member Name</Label>
                 <Input
                   placeholder="e.g. Tatya Vinchu"
                   value={editingMember.name}
                   onChange={(e) => setEditingMember({ ...editingMember, name: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Rank</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Rank</Label>
                 <select
                   value={editingMember.rank || "recruit"}
                   onChange={(e) => setEditingMember({ ...editingMember, rank: e.target.value })}
-                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500"
                 >
                   {RANKS.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -516,31 +506,31 @@ export function MembersTab({ userMode }: MembersTabProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Weekly Cash Quota ($)</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Weekly Cash Quota ($)</Label>
                   <Input
                     type="number"
                     value={editingMember.contribution}
                     onChange={(e) => setEditingMember({ ...editingMember, contribution: Number(e.target.value) })}
-                    className="bg-black/50 border-red-900/50 font-mono"
+                    className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
+                  <Label className="text-xs text-cyan-700 font-bold uppercase flex items-center gap-1">
                     <Coins className="w-3 h-3" /> Weekly SVC Quota
                   </Label>
                   <Input
                     type="number"
                     value={editingMember.contributionSvc ?? 100}
                     onChange={(e) => setEditingMember({ ...editingMember, contributionSvc: Number(e.target.value) })}
-                    className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                    className="bg-white border-cyan-300 text-cyan-700 font-mono focus-visible:ring-cyan-500"
                   />
                 </div>
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setIsEditOpen(false)}>
+              <Button variant="ghost" onClick={() => setIsEditOpen(false)} className="text-slate-600 hover:text-slate-900">
                 Cancel
               </Button>
               <Button onClick={handleEditSave} className="btn-gang">

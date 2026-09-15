@@ -281,15 +281,15 @@ export function WarsTab({ userMode }: WarsTabProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow flex items-center gap-2">
-              <Swords className="w-7 h-7 text-red-500" />
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-slate-900 flex items-center gap-2">
+              <Swords className="w-7 h-7 text-red-600" />
               SYNDICATE GANG WARS
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950/90 border border-red-500/50 text-red-300">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
               {wins}W - {losses}L ({winRate}% Win Rate)
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-slate-600 mt-0.5">
             Official Red Network war records, W/L turf battle ledger, and operative video POVs.
           </p>
         </div>
@@ -301,7 +301,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
               soundFx.playClickSound();
               setIsAddOpen(true);
             }}
-            className="btn-gang flex items-center gap-2"
+            className="btn-gang flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Log Gang War Record
@@ -311,61 +311,61 @@ export function WarsTab({ userMode }: WarsTabProps) {
 
       {/* KPI Stats HUD */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <Card className="card-gang p-4 border-l-4 border-l-red-600">
+        <Card className="card-gang p-4 border-l-4 border-l-red-600 bg-white">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Wars
             </span>
-            <Swords className="w-5 h-5 text-red-400" />
+            <Swords className="w-5 h-5 text-red-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-foreground mt-2 font-mono">
+          <p className="text-2xl font-orbitron font-bold text-slate-900 mt-2 font-mono">
             {totalWars}
           </p>
-          <span className="text-xs text-muted-foreground">Engagements on record</span>
+          <span className="text-xs text-slate-500">Engagements on record</span>
         </Card>
 
-        <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
+        <Card className="card-gang p-4 border-l-4 border-l-emerald-500 bg-white">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Victories (W)
             </span>
-            <Trophy className="w-5 h-5 text-emerald-400" />
+            <Trophy className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
-            {wins} <span className="text-xs text-emerald-300/80 font-normal">Wins</span>
+          <p className="text-2xl font-orbitron font-bold text-emerald-600 mt-2 font-mono">
+            {wins} <span className="text-xs text-slate-500 font-normal">Wins</span>
           </p>
-          <span className="text-xs text-emerald-300/80">Syndicate dominance confirmed</span>
+          <span className="text-xs text-emerald-600 font-medium">Syndicate dominance confirmed</span>
         </Card>
 
-        <Card className="card-gang p-4 border-l-4 border-l-rose-600">
+        <Card className="card-gang p-4 border-l-4 border-l-rose-600 bg-white">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Defeats (L)
             </span>
-            <Skull className="w-5 h-5 text-rose-500" />
+            <Skull className="w-5 h-5 text-rose-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-rose-400 mt-2 font-mono">
-            {losses} <span className="text-xs text-rose-300/80 font-normal">Losses</span>
+          <p className="text-2xl font-orbitron font-bold text-rose-600 mt-2 font-mono">
+            {losses} <span className="text-xs text-slate-500 font-normal">Losses</span>
           </p>
-          <span className="text-xs text-rose-300/80">Retaliation targets marked</span>
+          <span className="text-xs text-rose-600 font-medium">Retaliation targets marked</span>
         </Card>
 
-        <Card className="card-gang p-4 border-l-4 border-l-amber-500">
+        <Card className="card-gang p-4 border-l-4 border-l-amber-500 bg-white">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Dominance Ratio
             </span>
-            <Flame className="w-5 h-5 text-amber-400" />
+            <Flame className="w-5 h-5 text-amber-500" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-orbitron font-bold text-amber-400 font-mono">
+            <span className="text-2xl font-orbitron font-bold text-amber-600 font-mono">
               {winRate}%
             </span>
-            <span className="text-xs text-muted-foreground">Win Rate</span>
+            <span className="text-xs text-slate-500">Win Rate</span>
           </div>
-          <div className="w-full h-1.5 bg-black/60 rounded-full mt-2 overflow-hidden border border-red-950">
+          <div className="w-full h-1.5 bg-slate-100 rounded-full mt-2 overflow-hidden border border-slate-200">
             <div
-              className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-400 rounded-full"
+              className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 rounded-full"
               style={{ width: `${winRate}%` }}
             />
           </div>
@@ -373,15 +373,15 @@ export function WarsTab({ userMode }: WarsTabProps) {
       </div>
 
       {/* Search & Filters */}
-      <Card className="card-gang p-4">
+      <Card className="card-gang p-4 bg-white">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
           <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search rival gang, location, notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-black/40 border-red-900/40 text-sm font-rajdhani"
+              className="pl-9 bg-white border-slate-200 text-slate-900 text-sm font-rajdhani focus:border-red-500"
             />
           </div>
 
@@ -390,8 +390,8 @@ export function WarsTab({ userMode }: WarsTabProps) {
               onClick={() => setFilterOutcome("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 filterOutcome === "all"
-                  ? "bg-red-700 text-white shadow-[0_0_10px_rgba(220,38,38,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-red-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
               }`}
             >
               All Wars ({wars.length})
@@ -400,22 +400,22 @@ export function WarsTab({ userMode }: WarsTabProps) {
               onClick={() => setFilterOutcome("W")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 filterOutcome === "W"
-                  ? "bg-emerald-700 text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
               }`}
             >
-              <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+              <Trophy className="w-3.5 h-3.5" />
               Victories ({wins})
             </button>
             <button
               onClick={() => setFilterOutcome("L")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 filterOutcome === "L"
-                  ? "bg-rose-800 text-white shadow-[0_0_10px_rgba(225,29,72,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-rose-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
               }`}
             >
-              <Skull className="w-3.5 h-3.5 text-rose-400" />
+              <Skull className="w-3.5 h-3.5" />
               Defeats ({losses})
             </button>
           </div>
@@ -424,12 +424,12 @@ export function WarsTab({ userMode }: WarsTabProps) {
 
       {/* Wars List / Cards */}
       {loading ? (
-        <div className="py-16 text-center text-red-400 font-orbitron animate-pulse">
+        <div className="py-16 text-center text-red-600 font-orbitron animate-pulse">
           Decrypting syndicate military engagements...
         </div>
       ) : filteredWars.length === 0 ? (
-        <Card className="card-gang p-12 text-center text-muted-foreground">
-          <Swords className="w-12 h-12 mx-auto text-red-500/40 mb-3" />
+        <Card className="card-gang p-12 text-center text-slate-500 bg-white">
+          <Swords className="w-12 h-12 mx-auto text-red-300 mb-3" />
           <p className="text-lg">No gang war records matching current criteria.</p>
         </Card>
       ) : (
@@ -445,9 +445,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
                   soundFx.playClickSound();
                   setActiveWar(war);
                 }}
-                className={`card-gang p-4 transition-all duration-200 hover:border-red-600/60 cursor-pointer flex flex-col justify-between group relative ${
-                  isWin ? "hover:shadow-[0_0_25px_rgba(16,185,129,0.2)]" : "hover:shadow-[0_0_25px_rgba(225,29,72,0.2)]"
-                }`}
+                className={`card-gang p-4 transition-all duration-200 hover:border-red-400 hover:shadow-md cursor-pointer flex flex-col justify-between group relative bg-white`}
               >
                 <div>
                   {/* Top Bar: Outcome Badge & Rival Gang */}
@@ -456,25 +454,25 @@ export function WarsTab({ userMode }: WarsTabProps) {
                       <span
                         className={`px-2.5 py-1 rounded text-xs font-orbitron font-extrabold uppercase border flex items-center gap-1.5 shadow-sm ${
                           isWin
-                            ? "bg-emerald-950/80 border-emerald-500/60 text-emerald-300"
-                            : "bg-rose-950/80 border-rose-500/60 text-rose-300"
+                            ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                            : "bg-rose-50 border-rose-200 text-rose-700"
                         }`}
                       >
                         {isWin ? (
                           <>
-                            <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+                            <Trophy className="w-3.5 h-3.5 text-emerald-600" />
                             VICTORY [W]
                           </>
                         ) : (
                           <>
-                            <Skull className="w-3.5 h-3.5 text-rose-400" />
+                            <Skull className="w-3.5 h-3.5 text-rose-600" />
                             DEFEAT [L]
                           </>
                         )}
                       </span>
 
                       {war.score && (
-                        <span className="font-mono text-xs font-bold text-amber-400 px-2 py-0.5 rounded bg-black/60 border border-neutral-800">
+                        <span className="font-mono text-xs font-bold text-slate-700 px-2 py-0.5 rounded bg-slate-100 border border-slate-200">
                           {war.score}
                         </span>
                       )}
@@ -483,7 +481,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
                     {isLeader && (
                       <button
                         onClick={(e) => handleDeleteWar(war.id, war.rivalGang, e)}
-                        className="text-muted-foreground hover:text-red-400 transition-colors p-1 rounded hover:bg-red-950/60"
+                        className="text-slate-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50"
                         title="Delete War Record"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -493,36 +491,36 @@ export function WarsTab({ userMode }: WarsTabProps) {
 
                   {/* Rival Title */}
                   <div className="mt-3">
-                    <h3 className="font-orbitron font-bold text-lg text-foreground group-hover:text-red-300 transition-colors flex items-center gap-2">
+                    <h3 className="font-orbitron font-bold text-lg text-slate-900 group-hover:text-red-600 transition-colors flex items-center gap-2">
                       VS. {war.rivalGang}
                     </h3>
                   </div>
 
                   {/* Date */}
-                  <div className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  <div className="mt-2 space-y-1 text-xs text-slate-500">
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span>{war.date}</span>
                     </div>
                   </div>
 
                   {/* Summary */}
                   {war.summary && (
-                    <p className="text-xs text-muted-foreground mt-3 line-clamp-2 italic">
+                    <p className="text-xs text-slate-600 mt-3 line-clamp-2 italic">
                       "{war.summary}"
                     </p>
                   )}
                 </div>
 
                 {/* Bottom Bar: POV clips count & Click prompt */}
-                <div className="mt-4 pt-3 border-t border-red-900/30 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs text-red-300 font-semibold font-mono">
-                    <Video className="w-3.5 h-3.5 text-red-400" />
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-red-700 font-semibold font-mono">
+                    <Video className="w-3.5 h-3.5 text-red-600" />
                     <span>{povCount} Operative POV{povCount === 1 ? "" : "s"}</span>
                   </div>
 
-                  <span className="text-xs text-muted-foreground group-hover:text-white font-bold flex items-center gap-1 font-rajdhani">
-                    View War POVs <Play className="w-3 h-3 fill-current text-red-500" />
+                  <span className="text-xs text-slate-500 group-hover:text-red-600 font-bold flex items-center gap-1 font-rajdhani">
+                    View War POVs <Play className="w-3 h-3 fill-current text-red-600" />
                   </span>
                 </div>
               </Card>
@@ -534,36 +532,36 @@ export function WarsTab({ userMode }: WarsTabProps) {
       {/* WAR DETAIL & OPERATIVE POVs THEATER MODAL */}
       {activeWar && (
         <Dialog open={!!activeWar} onOpenChange={(open) => !open && setActiveWar(null)}>
-          <DialogContent className="max-w-4xl max-h-[88vh] flex flex-col bg-black/95 border-2 border-red-700/80 text-foreground backdrop-blur-2xl shadow-[0_0_50px_rgba(220,38,38,0.5)] p-0 overflow-hidden">
+          <DialogContent className="max-w-4xl max-h-[88vh] flex flex-col bg-white border-2 border-red-500/60 text-slate-900 shadow-2xl p-0 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-4 bg-gradient-to-r from-red-950/80 via-black to-red-950/80 border-b border-red-900/60 flex items-center justify-between shrink-0">
+            <div className="p-4 bg-gradient-to-r from-red-50 via-white to-red-50 border-b border-red-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <span
                   className={`px-2.5 py-1 rounded text-xs font-orbitron font-bold uppercase border flex items-center gap-1.5 ${
                     activeWar.outcome === "W"
-                      ? "bg-emerald-950/80 border-emerald-500/60 text-emerald-300"
-                      : "bg-rose-950/80 border-rose-500/60 text-rose-300"
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "bg-rose-50 border-rose-200 text-rose-700"
                   }`}
                 >
                   {activeWar.outcome === "W" ? (
                     <>
-                      <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+                      <Trophy className="w-3.5 h-3.5 text-emerald-600" />
                       VICTORY [W]
                     </>
                   ) : (
                     <>
-                      <Skull className="w-3.5 h-3.5 text-rose-400" />
+                      <Skull className="w-3.5 h-3.5 text-rose-600" />
                       DEFEAT [L]
                     </>
                   )}
                 </span>
                 <div>
-                  <h3 className="text-lg font-orbitron font-extrabold text-white flex items-center gap-2">
+                  <h3 className="text-lg font-orbitron font-extrabold text-slate-900 flex items-center gap-2">
                     RED NETWORK vs {activeWar.rivalGang}
                   </h3>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+                  <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
                     <span>📅 {activeWar.date}</span>
-                    {activeWar.score && <span className="text-amber-400 font-bold font-mono">// {activeWar.score}</span>}
+                    {activeWar.score && <span className="text-red-700 font-bold font-mono">// {activeWar.score}</span>}
                   </div>
                 </div>
               </div>
@@ -582,7 +580,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
                   size="sm"
                   variant="ghost"
                   onClick={() => setActiveWar(null)}
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-white"
+                  className="h-8 w-8 p-0 text-slate-400 hover:text-slate-900"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -593,8 +591,8 @@ export function WarsTab({ userMode }: WarsTabProps) {
             <div className="p-4 space-y-3.5 overflow-y-auto flex-1">
               {/* Summary note if present */}
               {activeWar.summary && (
-                <div className="p-3 bg-red-950/30 border border-red-900/40 rounded-lg text-xs font-rajdhani text-red-200">
-                  <span className="font-bold text-white block mb-0.5">War Briefing & Debrief:</span>
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs font-rajdhani text-slate-800">
+                  <span className="font-bold text-red-900 block mb-0.5">War Briefing & Debrief:</span>
                   {activeWar.summary}
                 </div>
               )}
@@ -602,7 +600,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
               {/* Main Player Area */}
               {selectedPov ? (
                 <div className="space-y-2">
-                  <div className="relative aspect-video w-full max-h-[380px] mx-auto rounded-xl overflow-hidden bg-black border border-red-900/60 shadow-xl">
+                  <div className="relative aspect-video w-full max-h-[380px] mx-auto rounded-xl overflow-hidden bg-black border border-slate-200 shadow-md">
                     <iframe
                       src={getEmbedVideoUrl(selectedPov.url)}
                       title={selectedPov.title || "War POV"}
@@ -612,13 +610,13 @@ export function WarsTab({ userMode }: WarsTabProps) {
                     />
                   </div>
 
-                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-black/60 border border-red-900/40 text-xs">
+                  <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
                     <div>
-                      <span className="font-bold text-foreground block font-rajdhani text-sm">
+                      <span className="font-bold text-slate-900 block font-rajdhani text-sm">
                         {selectedPov.title || "Operative POV"}
                       </span>
-                      <span className="text-muted-foreground font-mono">
-                        POV Recorded by: <span className="text-red-400 font-bold">{selectedPov.operativeName}</span>
+                      <span className="text-slate-500 font-mono">
+                        POV Recorded by: <span className="text-red-600 font-bold">{selectedPov.operativeName}</span>
                       </span>
                     </div>
 
@@ -626,7 +624,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
                       href={selectedPov.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-950/60 border border-red-500/40 text-red-200 hover:text-white text-xs font-bold font-rajdhani"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white border border-red-200 text-red-700 hover:bg-red-50 text-xs font-bold font-rajdhani shadow-sm"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       Watch on Original Host
@@ -634,8 +632,8 @@ export function WarsTab({ userMode }: WarsTabProps) {
                   </div>
                 </div>
               ) : (
-                <div className="p-12 text-center rounded-xl bg-black/60 border border-red-900/40 text-muted-foreground">
-                  <Video className="w-12 h-12 mx-auto text-red-500/40 mb-3" />
+                <div className="p-12 text-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500">
+                  <Video className="w-12 h-12 mx-auto text-red-400 mb-3" />
                   <p className="text-base font-rajdhani">No video POVs linked to this battle yet.</p>
                   {canAdd && (
                     <Button
@@ -652,7 +650,7 @@ export function WarsTab({ userMode }: WarsTabProps) {
               {/* Operative POVs Playlist / Switcher */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs uppercase font-orbitron font-bold text-muted-foreground">
+                  <span className="text-xs uppercase font-orbitron font-bold text-slate-500">
                     All War POVs & Angles ({(activeWar.povs || []).length})
                   </span>
                 </div>
@@ -669,24 +667,24 @@ export function WarsTab({ userMode }: WarsTabProps) {
                         }}
                         className={`p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between ${
                           isCurrent
-                            ? "bg-red-950/70 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.4)]"
-                            : "bg-black/60 border-red-900/40 hover:border-red-600/60"
+                            ? "bg-red-50 border-red-500 shadow-sm"
+                            : "bg-slate-50 border-slate-200 hover:border-red-300 hover:bg-red-50/30"
                         }`}
                       >
                         <div className="flex items-center gap-2 overflow-hidden">
-                          <Play className={`w-4 h-4 shrink-0 ${isCurrent ? "text-white fill-current" : "text-red-400"}`} />
+                          <Play className={`w-4 h-4 shrink-0 ${isCurrent ? "text-red-600 fill-current" : "text-red-500"}`} />
                           <div className="overflow-hidden">
-                            <span className="text-xs font-bold font-rajdhani text-foreground block truncate">
+                            <span className="text-xs font-bold font-rajdhani text-slate-900 block truncate">
                               {pov.operativeName}
                             </span>
-                            <span className="text-[10px] text-muted-foreground truncate block font-mono">
+                            <span className="text-[10px] text-slate-500 truncate block font-mono">
                               {pov.title || "POV Clip"}
                             </span>
                           </div>
                         </div>
 
                         {isCurrent && (
-                          <span className="text-[10px] uppercase font-bold text-red-400 font-orbitron shrink-0 ml-1">
+                          <span className="text-[10px] uppercase font-bold text-red-600 font-orbitron shrink-0 ml-1">
                             Playing
                           </span>
                         )}
@@ -701,12 +699,11 @@ export function WarsTab({ userMode }: WarsTabProps) {
       )}
 
       {/* Add War Record Modal (Leader Only) */}
-      {/* Add War Record Modal (Leader Only) */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[88vh] flex flex-col bg-black/95 border border-red-900/80 text-foreground backdrop-blur-2xl p-0 overflow-hidden">
-          <DialogHeader className="p-4 border-b border-red-900/60 shrink-0">
-            <DialogTitle className="text-xl font-orbitron text-gang-glow flex items-center gap-2">
-              <Swords className="w-5 h-5 text-red-500" />
+        <DialogContent className="sm:max-w-lg max-h-[88vh] flex flex-col bg-white border border-slate-200 text-slate-900 shadow-2xl p-0 overflow-hidden">
+          <DialogHeader className="p-4 border-b border-slate-100 shrink-0">
+            <DialogTitle className="text-xl font-orbitron text-slate-900 flex items-center gap-2">
+              <Swords className="w-5 h-5 text-red-600" />
               LOG GANG WAR ENGAGEMENT
             </DialogTitle>
           </DialogHeader>
@@ -714,21 +711,21 @@ export function WarsTab({ userMode }: WarsTabProps) {
           <div className="p-4 space-y-3.5 overflow-y-auto flex-1 font-rajdhani">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Rival Gang Name</Label>
+                <Label className="text-xs text-slate-500 uppercase font-bold">Rival Gang Name</Label>
                 <Input
                   placeholder="e.g. Ballas, Vagos, Marabunta"
                   value={newWar.rivalGang}
                   onChange={(e) => setNewWar({ ...newWar, rivalGang: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-200 text-slate-900"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Outcome</Label>
+                <Label className="text-xs text-slate-500 uppercase font-bold">Outcome</Label>
                 <select
                   value={newWar.outcome}
                   onChange={(e) => setNewWar({ ...newWar, outcome: e.target.value as "W" | "L" })}
-                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500"
                 >
                   <option value="W">VICTORY [W]</option>
                   <option value="L">DEFEAT [L]</option>
@@ -738,41 +735,41 @@ export function WarsTab({ userMode }: WarsTabProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Score / Kills</Label>
+                <Label className="text-xs text-slate-500 uppercase font-bold">Score / Kills</Label>
                 <Input
                   placeholder="e.g. RN 15 - 3 Ballas"
                   value={newWar.score}
                   onChange={(e) => setNewWar({ ...newWar, score: e.target.value })}
-                  className="bg-black/50 border-red-900/50 font-mono"
+                  className="bg-white border-slate-200 text-slate-900 font-mono"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Date of Battle</Label>
+                <Label className="text-xs text-slate-500 uppercase font-bold">Date of Battle</Label>
                 <Input
                   type="date"
                   value={newWar.date}
                   onChange={(e) => setNewWar({ ...newWar, date: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-200 text-slate-900"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">War Debrief & Notes</Label>
+              <Label className="text-xs text-slate-500 uppercase font-bold">War Debrief & Notes</Label>
               <Input
                 placeholder="Tactical summary, flanks executed, key operative kills..."
                 value={newWar.summary}
                 onChange={(e) => setNewWar({ ...newWar, summary: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
 
             {/* Dynamic Multi-Clip POVs */}
-            <div className="space-y-2 pt-2 border-t border-red-900/40">
+            <div className="space-y-2 pt-2 border-t border-slate-200">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-red-300 uppercase font-orbitron flex items-center gap-1.5">
-                  <Video className="w-3.5 h-3.5 text-red-400" />
+                <span className="text-xs font-bold text-red-700 uppercase font-orbitron flex items-center gap-1.5">
+                  <Video className="w-3.5 h-3.5 text-red-600" />
                   Operative POV Clips ({newWar.clips.length})
                 </span>
                 <Button
@@ -780,23 +777,23 @@ export function WarsTab({ userMode }: WarsTabProps) {
                   size="sm"
                   variant="outline"
                   onClick={handleAddClipField}
-                  className="h-7 text-xs bg-black/60 border-red-800/60 text-red-300 hover:text-white hover:bg-red-950/60"
+                  className="h-7 text-xs bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
                 >
                   <Plus className="w-3 h-3 mr-1" /> Add Another Clip
                 </Button>
               </div>
 
               {newWar.clips.map((clip, index) => (
-                <div key={index} className="p-3 bg-red-950/20 border border-red-900/50 rounded-lg space-y-2 relative group">
+                <div key={index} className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2 relative group">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-mono text-muted-foreground uppercase font-bold">
+                    <span className="text-[11px] font-mono text-slate-500 uppercase font-bold">
                       Clip #{index + 1}
                     </span>
                     {newWar.clips.length > 1 && (
                       <button
                         type="button"
                         onClick={() => handleRemoveClipField(index)}
-                        className="text-muted-foreground hover:text-rose-400 p-1 rounded"
+                        className="text-slate-400 hover:text-rose-600 p-1 rounded"
                         title="Remove Clip"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -809,27 +806,27 @@ export function WarsTab({ userMode }: WarsTabProps) {
                       placeholder="Operative Name (e.g. Red Operative)"
                       value={clip.operativeName}
                       onChange={(e) => handleClipFieldChange(index, "operativeName", e.target.value)}
-                      className="bg-black/50 border-red-900/50 text-xs"
+                      className="bg-white border-slate-200 text-slate-900 text-xs"
                     />
                     <Input
                       placeholder="POV Title (e.g. Roof Sniper Angle)"
                       value={clip.title}
                       onChange={(e) => handleClipFieldChange(index, "title", e.target.value)}
-                      className="bg-black/50 border-red-900/50 text-xs"
+                      className="bg-white border-slate-200 text-slate-900 text-xs"
                     />
                   </div>
                   <Input
                     placeholder="Video URL (YouTube, Medal.tv, Twitch, Streamable)"
                     value={clip.url}
                     onChange={(e) => handleClipFieldChange(index, "url", e.target.value)}
-                    className="bg-black/50 border-red-900/50 text-xs font-mono"
+                    className="bg-white border-slate-200 text-slate-900 text-xs font-mono"
                   />
                 </div>
               ))}
             </div>
           </div>
 
-          <DialogFooter className="p-4 border-t border-red-900/60 shrink-0">
+          <DialogFooter className="p-4 border-t border-slate-100 shrink-0">
             <Button variant="ghost" onClick={() => setIsAddOpen(false)}>
               Cancel
             </Button>
@@ -842,42 +839,42 @@ export function WarsTab({ userMode }: WarsTabProps) {
 
       {/* Add POV Clip to Active War Modal */}
       <Dialog open={isAddPovOpen} onOpenChange={setIsAddPovOpen}>
-        <DialogContent className="sm:max-w-md bg-black/95 border border-red-900/80 text-foreground backdrop-blur-2xl">
+        <DialogContent className="sm:max-w-md bg-white border border-slate-200 text-slate-900 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-orbitron text-gang-glow flex items-center gap-2">
-              <Video className="w-5 h-5 text-red-400" />
+            <DialogTitle className="text-lg font-orbitron text-slate-900 flex items-center gap-2">
+              <Video className="w-5 h-5 text-red-600" />
               ADD OPERATIVE POV CLIP
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3 py-2 font-rajdhani">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Operative Name</Label>
+              <Label className="text-xs text-slate-500 uppercase font-bold">Operative Name</Label>
               <Input
                 placeholder="e.g. Red Operative"
                 value={newPov.operativeName}
                 onChange={(e) => setNewPov({ ...newPov, operativeName: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Clip Title / Angle</Label>
+              <Label className="text-xs text-slate-500 uppercase font-bold">Clip Title / Angle</Label>
               <Input
                 placeholder="e.g. Leader Assault Push / Roof Sniper Angle"
                 value={newPov.title}
                 onChange={(e) => setNewPov({ ...newPov, title: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-200 text-slate-900"
               />
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Video Link (YouTube, Medal.tv, Twitch, Streamable)</Label>
+              <Label className="text-xs text-slate-500 uppercase font-bold">Video Link (YouTube, Medal.tv, Twitch, Streamable)</Label>
               <Input
                 placeholder="https://www.youtube.com/watch?v=..."
                 value={newPov.url}
                 onChange={(e) => setNewPov({ ...newPov, url: e.target.value })}
-                className="bg-black/50 border-red-900/50 font-mono text-xs"
+                className="bg-white border-slate-200 text-slate-900 font-mono text-xs"
               />
             </div>
           </div>

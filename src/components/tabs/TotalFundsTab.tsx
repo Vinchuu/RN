@@ -218,33 +218,33 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
   return (
     <div className="space-y-6 font-rajdhani">
-      {/* Top Banner & Action Controls */}
+      {/* Top Banner & Quick Controls */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
-              TOTAL FUNDS & LEDGER
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-red-600">
+              TOTAL FUNDS & VAULT
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950 border border-red-500/50 text-red-300">
-              Live Treasury
+            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
+              Live Balance & Ledger
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Manage gang vault funds, adjust total treasury balance, and record live income & expense transactions.
+          <p className="text-sm text-slate-500 mt-0.5 font-medium">
+            Syndicate treasury headquarters — track all heists, weapons, dues, drug operations & war expenses.
           </p>
         </div>
 
-        {/* Action Buttons (Leader Only) */}
+        {/* Action Controls (Leader Only) */}
         <div className="flex items-center gap-2 flex-wrap">
           {isLeader && (
             <>
               <Button
+                variant="outline"
                 onClick={() => {
                   soundFx.playClickSound();
                   setIsEditFundOpen(true);
                 }}
-                variant="outline"
-                className="bg-black/70 border-amber-500/50 text-amber-300 hover:bg-amber-950/60 font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
+                className="border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5"
               >
                 <Edit3 className="w-3.5 h-3.5" />
                 Edit Vault Reserves
@@ -254,7 +254,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   soundFx.playClickSound();
                   handleOpenTxModal("income", "cash");
                 }}
-                className="bg-emerald-800 hover:bg-emerald-700 text-white font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center gap-1.5"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm flex items-center gap-1.5"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
                 + Income
@@ -264,7 +264,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   soundFx.playClickSound();
                   handleOpenTxModal("expense", "cash");
                 }}
-                className="bg-rose-900 hover:bg-rose-800 text-rose-100 font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-[0_0_15px_rgba(244,63,94,0.3)] flex items-center gap-1.5"
+                className="bg-rose-600 hover:bg-rose-700 text-white font-rajdhani font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm flex items-center gap-1.5"
               >
                 <MinusCircle className="w-3.5 h-3.5" />
                 - Expense
@@ -279,22 +279,22 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
         {/* Total Cash Funds Balance */}
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500 relative overflow-hidden group">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Cash Vault
             </span>
-            <Wallet className="w-5 h-5 text-emerald-400" />
+            <Wallet className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-orbitron font-extrabold text-emerald-400 mt-2 font-mono">
+          <p className="text-2xl font-orbitron font-extrabold text-emerald-600 mt-2 font-mono">
             ${vaultCashTotal.toLocaleString()}
           </p>
           <div className="mt-1 flex items-center justify-between text-xs">
-            <span className="text-muted-foreground font-mono">
+            <span className="text-slate-500 font-mono">
               Base: ${(gangFund?.baseAmount ?? 350000).toLocaleString()}
             </span>
             {isLeader && (
               <button
                 onClick={() => setIsEditFundOpen(true)}
-                className="text-amber-400 hover:text-amber-300 font-bold underline"
+                className="text-amber-600 hover:text-amber-700 font-bold underline"
               >
                 Adjust
               </button>
@@ -303,30 +303,30 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
         </Card>
 
         {/* Total SVC Crypto Balance */}
-        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 relative overflow-hidden group bg-gradient-to-br from-black via-cyan-950/20 to-black">
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 relative overflow-hidden group bg-cyan-50/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+              <span className="text-xs text-cyan-800 uppercase font-bold tracking-wider">
                 Total SVC Treasury
               </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-bold">
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-orbitron bg-cyan-100 border border-cyan-300 text-cyan-800 font-bold">
                 CRYPTO
               </span>
             </div>
-            <Coins className="w-5 h-5 text-cyan-400" />
+            <Coins className="w-5 h-5 text-cyan-600" />
           </div>
-          <p className="text-2xl font-orbitron font-extrabold text-cyan-400 mt-2 font-mono flex items-center gap-1.5">
+          <p className="text-2xl font-orbitron font-extrabold text-cyan-700 mt-2 font-mono flex items-center gap-1.5">
             {vaultSvcTotal.toLocaleString()}{" "}
-            <span className="text-sm font-semibold text-cyan-300">SVC</span>
+            <span className="text-sm font-semibold text-cyan-800">SVC</span>
           </p>
           <div className="mt-1 flex items-center justify-between text-xs">
-            <span className="text-muted-foreground font-mono">
+            <span className="text-slate-500 font-mono">
               Base: {(gangFund?.baseSvcAmount ?? 15000).toLocaleString()} SVC
             </span>
             {isLeader && (
               <button
                 onClick={() => setIsEditFundOpen(true)}
-                className="text-cyan-400 hover:text-cyan-300 font-bold underline"
+                className="text-cyan-700 hover:text-cyan-800 font-bold underline"
               >
                 Adjust
               </button>
@@ -337,43 +337,43 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
         {/* Total Incomes */}
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Incomes
             </span>
-            <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+            <ArrowUpRight className="w-5 h-5 text-emerald-600" />
           </div>
           <div className="mt-2 space-y-0.5">
-            <p className="text-lg font-orbitron font-bold text-emerald-400 font-mono">
+            <p className="text-lg font-orbitron font-bold text-emerald-600 font-mono">
               +${cashIncome.toLocaleString()}{" "}
-              <span className="text-xs text-muted-foreground font-normal">Cash</span>
+              <span className="text-xs text-slate-500 font-normal">Cash</span>
             </p>
-            <p className="text-sm font-orbitron font-bold text-cyan-400 font-mono">
-              +{svcIncome.toLocaleString()} <span className="text-xs text-cyan-300 font-normal">SVC</span>
+            <p className="text-sm font-orbitron font-bold text-cyan-700 font-mono">
+              +{svcIncome.toLocaleString()} <span className="text-xs text-cyan-800 font-normal">SVC</span>
             </p>
           </div>
-          <span className="text-xs text-muted-foreground block mt-1">
+          <span className="text-xs text-slate-500 block mt-1">
             {transactions.filter((t) => t.type === "income").length} total deposits
           </span>
         </Card>
 
         {/* Total Expenses */}
-        <Card className="card-gang p-4 border-l-4 border-l-rose-600">
+        <Card className="card-gang p-4 border-l-4 border-l-rose-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Expenses
             </span>
-            <ArrowDownRight className="w-5 h-5 text-rose-400" />
+            <ArrowDownRight className="w-5 h-5 text-rose-500" />
           </div>
           <div className="mt-2 space-y-0.5">
-            <p className="text-lg font-orbitron font-bold text-rose-400 font-mono">
+            <p className="text-lg font-orbitron font-bold text-rose-600 font-mono">
               -${cashExpense.toLocaleString()}{" "}
-              <span className="text-xs text-muted-foreground font-normal">Cash</span>
+              <span className="text-xs text-slate-500 font-normal">Cash</span>
             </p>
-            <p className="text-sm font-orbitron font-bold text-rose-400 font-mono">
-              -{svcExpense.toLocaleString()} <span className="text-xs text-rose-300 font-normal">SVC</span>
+            <p className="text-sm font-orbitron font-bold text-rose-600 font-mono">
+              -{svcExpense.toLocaleString()} <span className="text-xs text-rose-700 font-normal">SVC</span>
             </p>
           </div>
-          <span className="text-xs text-muted-foreground block mt-1">
+          <span className="text-xs text-slate-500 block mt-1">
             {transactions.filter((t) => t.type === "expense").length} expense records
           </span>
         </Card>
@@ -383,12 +383,12 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
       <Card className="card-gang p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
           <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search description, category, operative..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-black/40 border-red-900/40 text-sm font-rajdhani"
+              className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm font-rajdhani focus:border-red-500"
             />
           </div>
 
@@ -397,8 +397,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               onClick={() => setTxFilter("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 txFilter === "all"
-                  ? "bg-red-700 text-white shadow-[0_0_10px_rgba(220,38,38,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-red-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               All ({transactions.length})
@@ -407,31 +407,31 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               onClick={() => setTxFilter("income")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 txFilter === "income"
-                  ? "bg-emerald-700 text-white shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
-              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-200" />
               + Income
             </button>
             <button
               onClick={() => setTxFilter("expense")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 txFilter === "expense"
-                  ? "bg-rose-800 text-white shadow-[0_0_10px_rgba(225,29,72,0.5)]"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-rose-600 text-white shadow-sm"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
-              <ArrowDownRight className="w-3.5 h-3.5 text-rose-400" />
+              <ArrowDownRight className="w-3.5 h-3.5 text-rose-200" />
               - Expense
             </button>
-            <div className="w-px h-5 bg-red-900/40 mx-1"></div>
+            <div className="w-px h-5 bg-slate-200 mx-1"></div>
             <button
               onClick={() => setCurrencyFilter("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 currencyFilter === "all"
-                  ? "bg-neutral-700 text-white"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-slate-700 text-white"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               All Currency
@@ -440,8 +440,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               onClick={() => setCurrencyFilter("cash")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 currencyFilter === "cash"
-                  ? "bg-emerald-900 border border-emerald-500/60 text-emerald-300"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-emerald-50 border border-emerald-300 text-emerald-700"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               <DollarSign className="w-3.5 h-3.5" /> Cash Only
@@ -450,8 +450,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               onClick={() => setCurrencyFilter("svc")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                 currencyFilter === "svc"
-                  ? "bg-cyan-900/80 border border-cyan-500/60 text-cyan-300"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-cyan-50 border border-cyan-300 text-cyan-700"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               <Coins className="w-3.5 h-3.5" /> SVC Only
@@ -462,10 +462,10 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
       {/* Total Funds Ledger Table */}
       <Card className="card-gang overflow-hidden">
-        <div className="p-4 border-b border-red-900/40 flex items-center justify-between bg-black/60">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-amber-400" />
-            <h3 className="text-lg font-orbitron font-extrabold text-white tracking-wide">
+            <Receipt className="w-5 h-5 text-red-600" />
+            <h3 className="text-lg font-orbitron font-extrabold text-slate-900 tracking-wide">
               TOTAL FUNDS LEDGER // INCOME & EXPENSE
             </h3>
           </div>
@@ -475,14 +475,14 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
               <Button
                 size="sm"
                 onClick={() => handleOpenTxModal("income")}
-                className="bg-emerald-800 hover:bg-emerald-700 text-white h-7 px-2.5 text-xs font-bold"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white h-7 px-2.5 text-xs font-bold shadow-sm"
               >
                 <PlusCircle className="w-3.5 h-3.5 mr-1" /> + Income
               </Button>
               <Button
                 size="sm"
                 onClick={() => handleOpenTxModal("expense")}
-                className="bg-rose-900 hover:bg-rose-800 text-white h-7 px-2.5 text-xs font-bold"
+                className="bg-rose-600 hover:bg-rose-700 text-white h-7 px-2.5 text-xs font-bold shadow-sm"
               >
                 <MinusCircle className="w-3.5 h-3.5 mr-1" /> - Expense
               </Button>
@@ -492,7 +492,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm font-rajdhani">
-            <thead className="bg-black/90 border-b border-red-900/50 text-xs font-orbitron uppercase text-muted-foreground">
+            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-orbitron uppercase text-slate-600">
               <tr>
                 <th className="py-3 px-4">Date / Time</th>
                 <th className="py-3 px-4">Type</th>
@@ -503,10 +503,10 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 {isLeader && <th className="py-3 px-4 text-right">Action</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-red-900/20">
+            <tbody className="divide-y divide-slate-100">
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={isLeader ? 7 : 6} className="py-12 text-center text-muted-foreground font-rajdhani">
+                  <td colSpan={isLeader ? 7 : 6} className="py-12 text-center text-slate-500 font-rajdhani">
                     No transactions recorded in the funds ledger yet.
                   </td>
                 </tr>
@@ -515,8 +515,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   const isInc = tx.type === "income";
                   const isSvc = tx.currency === "svc";
                   return (
-                    <tr key={tx.id} className="hover:bg-red-950/20 transition-colors group">
-                      <td className="py-3 px-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
+                    <tr key={tx.id} className="hover:bg-red-50/40 transition-colors group">
+                      <td className="py-3 px-4 text-xs font-mono text-slate-500 whitespace-nowrap">
                         {tx.date
                           ? new Date(tx.date).toLocaleDateString() +
                             " " +
@@ -526,41 +526,41 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                       <td className="py-3 px-4">
                         <div className="flex flex-col gap-0.5">
                           {isInc ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-950/80 border border-emerald-500/60 text-emerald-300">
-                              <ArrowUpRight className="w-3 h-3 text-emerald-400" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
+                              <ArrowUpRight className="w-3 h-3 text-emerald-600" />
                               + INCOME
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-950/80 border border-rose-500/60 text-rose-300">
-                              <ArrowDownRight className="w-3 h-3 text-rose-400" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 border border-rose-200 text-rose-700">
+                              <ArrowDownRight className="w-3 h-3 text-rose-600" />
                               - EXPENSE
                             </span>
                           )}
                           {isSvc ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 w-fit">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-cyan-50 border border-cyan-200 text-cyan-700 w-fit">
                               <Coins className="w-2.5 h-2.5" /> SVC
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-emerald-950/60 border border-emerald-800/50 text-emerald-400/70 w-fit">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-orbitron font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 w-fit">
                               <DollarSign className="w-2.5 h-2.5" /> Cash
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="py-3 px-4 font-mono text-xs">
-                        <span className="px-2 py-0.5 rounded bg-black/60 border border-neutral-800 text-[10px] font-bold uppercase text-amber-300">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-bold uppercase text-slate-700">
                           {tx.category || "General"}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-sm font-semibold text-foreground group-hover:text-red-200 transition-colors">
+                      <td className="py-3 px-4 text-sm font-semibold text-slate-900 group-hover:text-red-600 transition-colors">
                         {tx.description}
                       </td>
-                      <td className="py-3 px-4 text-xs text-muted-foreground font-mono">
+                      <td className="py-3 px-4 text-xs text-slate-500 font-mono">
                         {tx.addedBy || "Red Leader"}
                       </td>
                       <td
                         className={`py-3 px-4 text-right font-mono font-extrabold text-base whitespace-nowrap ${
-                          isInc ? "text-emerald-400" : "text-rose-400"
+                          isInc ? "text-emerald-600" : "text-rose-600"
                         }`}
                       >
                           {tx.currency === "svc"
@@ -573,7 +573,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                         <td className="py-3 px-4 text-right">
                           <button
                             onClick={() => handleDeleteTransaction(tx.id)}
-                            className="p-1.5 text-muted-foreground hover:text-rose-400 rounded hover:bg-rose-950/50 transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
                             title="Remove transaction"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -591,27 +591,27 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
       {/* Edit Total Funds Base Dialog (Leader Only) */}
       <Dialog open={isEditFundOpen} onOpenChange={setIsEditFundOpen}>
-        <DialogContent className="sm:max-w-md bg-black/95 border border-red-700 text-foreground backdrop-blur-2xl shadow-[0_0_40px_rgba(220,38,38,0.5)]">
+        <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 text-amber-400">
+            <div className="flex items-center gap-3 text-red-600">
               <Wallet className="w-6 h-6" />
-              <DialogTitle className="text-xl font-orbitron font-extrabold text-gang-glow">
+              <DialogTitle className="text-xl font-orbitron font-extrabold text-red-600">
                 ADJUST TOTAL FUNDS
               </DialogTitle>
             </div>
           </DialogHeader>
 
           <div className="space-y-4 py-3 font-rajdhani text-sm">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-600 font-medium">
               Specify the baseline vault reserve allocation. Total calculated balance equals base amount ± recorded transactions.
             </p>
 
             <div>
-              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
+              <label className="text-xs uppercase font-bold text-slate-700 block mb-1">
                 Base Cash Reserve ($)
               </label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-400" />
+                <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" />
                 <Input
                   type="number"
                   min="0"
@@ -619,17 +619,17 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   placeholder="350000"
                   value={newBaseFundInput}
                   onChange={(e) => setNewBaseFundInput(e.target.value)}
-                  className="pl-9 bg-black/80 border-red-800 text-lg font-mono font-bold text-emerald-400 focus:border-emerald-500"
+                  className="pl-9 bg-white border-slate-300 text-lg font-mono font-bold text-slate-900 focus-visible:ring-emerald-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs uppercase font-bold text-cyan-400/80 block mb-1">
-                Base SVC Reserve <span className="font-orbitron text-[10px] bg-cyan-950 border border-cyan-500/60 px-1.5 py-0.5 rounded text-cyan-300 ml-1">CRYPTO</span>
+              <label className="text-xs uppercase font-bold text-cyan-700 block mb-1">
+                Base SVC Reserve <span className="font-orbitron text-[10px] bg-cyan-100 border border-cyan-300 px-1.5 py-0.5 rounded text-cyan-800 ml-1">CRYPTO</span>
               </label>
               <div className="relative">
-                <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-600" />
                 <Input
                   type="number"
                   min="0"
@@ -637,20 +637,20 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   placeholder="15000"
                   value={newBaseSvcInput}
                   onChange={(e) => setNewBaseSvcInput(e.target.value)}
-                  className="pl-9 bg-black/80 border-cyan-900/60 text-lg font-mono font-bold text-cyan-400 focus:border-cyan-500"
+                  className="pl-9 bg-white border-slate-300 text-lg font-mono font-bold text-cyan-700 focus-visible:ring-cyan-500"
                 />
               </div>
-              <p className="text-[11px] text-cyan-400/60 mt-1">SVC is separate crypto — not equivalent to Cash ($)</p>
+              <p className="text-[11px] text-slate-500 mt-1">SVC is separate crypto — not equivalent to Cash ($)</p>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsEditFundOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsEditFundOpen(false)} className="text-slate-600 hover:text-slate-900">
               Cancel
             </Button>
             <Button
               onClick={handleUpdateFund}
-              className="bg-emerald-700 hover:bg-emerald-600 text-white font-bold"
+              className="btn-gang font-bold"
             >
               Update Total Funds
             </Button>
@@ -660,19 +660,19 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
       {/* Record Income / Expense Transaction Dialog (Leader Only) */}
       <Dialog open={isTxModalOpen} onOpenChange={setIsTxModalOpen}>
-        <DialogContent className="sm:max-w-md bg-black/95 border border-red-700 text-foreground backdrop-blur-2xl shadow-[0_0_40px_rgba(220,38,38,0.5)]">
+        <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
           <DialogHeader>
             <div className="flex items-center gap-3">
               {txType === "income" ? (
-                <div className="w-8 h-8 rounded-lg bg-emerald-950 border border-emerald-500 flex items-center justify-center">
-                  <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-300 flex items-center justify-center">
+                  <ArrowUpRight className="w-5 h-5 text-emerald-600" />
                 </div>
               ) : (
-                <div className="w-8 h-8 rounded-lg bg-rose-950 border border-rose-500 flex items-center justify-center">
-                  <ArrowDownRight className="w-5 h-5 text-rose-400" />
+                <div className="w-8 h-8 rounded-lg bg-rose-50 border border-rose-300 flex items-center justify-center">
+                  <ArrowDownRight className="w-5 h-5 text-rose-600" />
                 </div>
               )}
-              <DialogTitle className="text-xl font-orbitron font-extrabold text-gang-glow">
+              <DialogTitle className="text-xl font-orbitron font-extrabold text-slate-900">
                 {txType === "income" ? "RECORD GANG INCOME (+)" : "RECORD GANG EXPENSE (-)"}
               </DialogTitle>
             </div>
@@ -680,7 +680,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
           <div className="space-y-4 py-3 font-rajdhani text-sm">
             {/* Type Toggle */}
-            <div className="flex items-center gap-2 p-1 bg-black/70 rounded-lg border border-red-900/50">
+            <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-lg border border-slate-200">
               <button
                 type="button"
                 onClick={() => {
@@ -689,8 +689,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 }}
                 className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1 transition-all ${
                   txType === "income"
-                    ? "bg-emerald-800 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <ArrowUpRight className="w-3.5 h-3.5" /> + Income
@@ -703,8 +703,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 }}
                 className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1 transition-all ${
                   txType === "expense"
-                    ? "bg-rose-900 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-rose-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <ArrowDownRight className="w-3.5 h-3.5" /> - Expense
@@ -713,8 +713,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
             {/* Currency Toggle */}
             <div>
-              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1.5">Currency</label>
-              <div className="flex items-center gap-2 p-1 bg-black/70 rounded-lg border border-red-900/50">
+              <label className="text-xs uppercase font-bold text-slate-600 block mb-1.5">Currency</label>
+              <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-lg border border-slate-200">
                 <button
                   type="button"
                   onClick={() => {
@@ -723,8 +723,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   }}
                   className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
                     txCurrency === "cash"
-                      ? "bg-emerald-900 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
-                      : "text-muted-foreground hover:text-white"
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   <DollarSign className="w-3.5 h-3.5" /> Cash ($)
@@ -737,8 +737,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   }}
                   className={`flex-1 py-1.5 rounded-md font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
                     txCurrency === "svc"
-                      ? "bg-cyan-900/80 border border-cyan-500/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
-                      : "text-muted-foreground hover:text-white"
+                      ? "bg-cyan-600 text-white shadow-sm"
+                      : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   <Coins className="w-3.5 h-3.5" /> SVC Crypto
@@ -748,14 +748,14 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
             {/* Amount */}
             <div>
-              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
+              <label className="text-xs uppercase font-bold text-slate-600 block mb-1">
                 Amount {txCurrency === "svc" ? "(SVC)" : "($)"}
               </label>
               <div className="relative">
                 {txCurrency === "svc" ? (
-                  <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400" />
+                  <Coins className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-cyan-600" />
                 ) : (
-                  <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <DollarSign className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 )}
                 <Input
                   type="number"
@@ -764,8 +764,8 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                   placeholder={txCurrency === "svc" ? "e.g. 500" : "e.g. 50000"}
                   value={txAmount}
                   onChange={(e) => setTxAmount(e.target.value)}
-                  className={`pl-9 bg-black/80 border-red-800 text-base font-mono font-bold ${
-                    txCurrency === "svc" ? "text-cyan-400" : txType === "income" ? "text-emerald-400" : "text-rose-400"
+                  className={`pl-9 bg-white border-slate-300 text-base font-mono font-bold ${
+                    txCurrency === "svc" ? "text-cyan-700" : txType === "income" ? "text-emerald-600" : "text-rose-600"
                   }`}
                 />
               </div>
@@ -773,13 +773,13 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
             {/* Category */}
             <div>
-              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
+              <label className="text-xs uppercase font-bold text-slate-600 block mb-1">
                 Category
               </label>
               <select
                 value={txCategory}
                 onChange={(e) => setTxCategory(e.target.value)}
-                className="w-full px-3 py-2 bg-black/80 border border-red-800 rounded-md text-sm text-foreground focus:outline-none focus:border-red-500 font-rajdhani font-semibold"
+                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm text-slate-900 focus:outline-none focus:border-red-500 font-rajdhani font-semibold"
               >
                 {txType === "income" ? (
                   <>
@@ -810,7 +810,7 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
 
             {/* Description */}
             <div>
-              <label className="text-xs uppercase font-bold text-muted-foreground block mb-1">
+              <label className="text-xs uppercase font-bold text-slate-600 block mb-1">
                 Description / Purpose
               </label>
               <Input
@@ -819,21 +819,21 @@ export function TotalFundsTab({ userMode }: TotalFundsTabProps) {
                 }
                 value={txDescription}
                 onChange={(e) => setTxDescription(e.target.value)}
-                className="bg-black/80 border-red-800 text-sm font-rajdhani"
+                className="bg-white border-slate-300 text-slate-900 text-sm font-rajdhani focus-visible:ring-red-500"
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsTxModalOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsTxModalOpen(false)} className="text-slate-600 hover:text-slate-900">
               Cancel
             </Button>
             <Button
               onClick={handleAddTransaction}
               className={
                 txType === "income"
-                  ? "bg-emerald-700 hover:bg-emerald-600 text-white font-bold"
-                  : "bg-rose-900 hover:bg-rose-800 text-white font-bold"
+                  ? "bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                  : "bg-rose-600 hover:bg-rose-700 text-white font-bold"
               }
             >
               {txType === "income" ? "Record Income" : "Record Expense"}

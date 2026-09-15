@@ -197,14 +197,14 @@ export function App() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased">
       {/* Top Ticker / Announcement Bar */}
-      <div className="bg-gradient-to-r from-red-950/90 via-black/90 to-red-950/90 border-b border-red-900/50 px-4 py-2 flex items-center justify-between text-xs font-rajdhani backdrop-blur-xl sticky top-0 z-50">
+      <div className="bg-gradient-to-r from-red-700 via-rose-600 to-red-700 text-white border-b border-red-800 px-4 py-2 flex items-center justify-between text-xs font-rajdhani shadow-sm sticky top-0 z-50">
         <div className="flex items-center gap-3 flex-1 overflow-hidden">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-900/50 text-red-200 font-bold uppercase shrink-0 border border-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.4)]">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/20 text-white font-bold uppercase shrink-0 border border-white/20 shadow-sm">
             <span className="relative flex h-2 w-2 mr-0.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
             </span>
-            <Megaphone className="w-3.5 h-3.5 text-red-300" />
+            <Megaphone className="w-3.5 h-3.5 text-white" />
             <span className="font-orbitron text-[10px] tracking-wider">ORDERS</span>
           </div>
 
@@ -214,34 +214,34 @@ export function App() {
                 value={announcementInput}
                 onChange={(e) => setAnnouncementInput(e.target.value)}
                 placeholder="Broadcast syndicate directive to all operatives..."
-                className="h-7 text-xs bg-black/80 border-red-700/60 focus:border-red-500 text-foreground"
+                className="h-7 text-xs bg-white text-slate-900 border-white/40 focus:border-white focus:ring-0"
               />
-              <Button size="sm" onClick={handleSaveAnnouncement} className="h-7 px-3 btn-gang text-xs">
+              <Button size="sm" onClick={handleSaveAnnouncement} className="h-7 px-3 bg-white hover:bg-slate-100 text-red-700 font-bold text-xs shadow-sm">
                 <Save className="w-3 h-3 mr-1" /> Broadcast
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => setIsEditingAnnouncement(false)}
-                className="h-7 px-2 text-muted-foreground hover:text-white"
+                className="h-7 px-2 text-white/80 hover:text-white hover:bg-black/20"
               >
                 <X className="w-3 h-3" />
               </Button>
             </div>
           ) : (
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-red-100 font-medium truncate tracking-wide">
+              <span className="text-white font-semibold truncate tracking-wide">
                 {announcement?.text || "🔴 Welcome to Red Network. Report to Stash for operations."}
               </span>
               {announcement?.updatedBy && (
-                <span className="hidden sm:inline-block text-[10px] text-red-400/70 shrink-0 font-mono border-l border-red-900/50 pl-2">
+                <span className="hidden sm:inline-block text-[10px] text-white/80 shrink-0 font-mono border-l border-white/30 pl-2">
                   // {announcement.updatedBy}
                 </span>
               )}
               {isLeader && (
                 <button
                   onClick={() => setIsEditingAnnouncement(true)}
-                  className="text-red-400/60 hover:text-white shrink-0 ml-1.5 transition-colors p-1 rounded hover:bg-red-950/60"
+                  className="text-white/80 hover:text-white shrink-0 ml-1.5 transition-colors p-1 rounded hover:bg-black/20"
                   title="Broadcast New Directive"
                 >
                   <Edit className="w-3.5 h-3.5" />
@@ -253,24 +253,24 @@ export function App() {
 
         {/* Audio Mute & Connection Status */}
         <div className="flex items-center gap-3 shrink-0 ml-4">
-          <div className="hidden md:flex items-center gap-1.5 text-[11px] text-red-400/80 font-mono">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-1.5 text-[11px] text-white/90 font-mono">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
             <span>SYSTEM ENCRYPTED</span>
           </div>
           <button
             onClick={toggleSound}
-            className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/40 border border-red-900/40 text-muted-foreground hover:text-white transition-all hover:border-red-600/50"
+            className="flex items-center gap-1.5 px-2 py-1 rounded bg-black/20 border border-white/20 text-white hover:bg-black/30 transition-all"
             title={isMuted ? "Audio Muted (Click to Enable)" : "Audio Active (Click to Mute)"}
           >
             {isMuted ? (
               <>
-                <VolumeX className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-[10px] uppercase font-bold text-red-400">Muted</span>
+                <VolumeX className="w-3.5 h-3.5 text-white/80" />
+                <span className="text-[10px] uppercase font-bold text-white/90">Muted</span>
               </>
             ) : (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span className="text-[10px] uppercase font-bold text-emerald-400">Audio ON</span>
+                <Volume2 className="w-3.5 h-3.5 text-white animate-pulse" />
+                <span className="text-[10px] uppercase font-bold text-white">Audio ON</span>
               </>
             )}
           </button>
@@ -278,29 +278,29 @@ export function App() {
       </div>
 
       {/* Main Header & Branding */}
-      <header className="border-b border-red-900/40 bg-black/80 backdrop-blur-2xl sticky top-[41px] z-40">
+      <header className="border-b border-red-100 bg-white/95 backdrop-blur-xl shadow-sm sticky top-[37px] z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Logo & Title */}
           <div className="flex items-center gap-3.5">
             <div className="relative group cursor-pointer" onClick={() => setActiveTab("members")}>
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-800 via-red-600 to-rose-950 flex items-center justify-center border border-red-500/60 shadow-[0_0_25px_rgba(239,68,68,0.55)] group-hover:scale-105 transition-transform duration-200 overflow-hidden p-1">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-rose-700 flex items-center justify-center border border-red-400 shadow-md shadow-red-500/20 group-hover:scale-105 transition-transform duration-200 overflow-hidden p-1">
                 <img
                   src="/favicon.png"
                   alt="Red Network Logo"
-                  className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.7)] group-hover:scale-110 transition-transform duration-200"
+                  className="w-8 h-8 object-contain drop-shadow group-hover:scale-110 transition-transform duration-200"
                 />
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600 border border-black"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-red-600 border-2 border-white"></span>
               </span>
             </div>
 
             <div>
-              <h1 className="text-xl sm:text-2xl font-orbitron font-extrabold tracking-wider text-gang-glow flex items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-orbitron font-black tracking-wider text-gang-glow flex items-center gap-2">
                 RED NETWORK
               </h1>
-              <span className="text-xs font-rajdhani text-muted-foreground block -mt-0.5">
+              <span className="text-xs font-rajdhani text-slate-500 font-semibold block -mt-0.5">
                 StorymodebyChoice
               </span>
             </div>
@@ -309,39 +309,39 @@ export function App() {
           {/* Quick HUD Metrics & Role Auth Panel */}
           <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-end">
             {/* Total Funds HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-black/60 border border-red-900/50 hover:border-emerald-500/40 transition-colors shadow-inner">
-              <div className="w-7 h-7 rounded-lg bg-emerald-950/80 border border-emerald-500/30 flex items-center justify-center">
-                <DollarSign className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-500/60 transition-colors shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-emerald-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">Total Cash</span>
-                <span className="text-sm font-mono font-extrabold text-emerald-400 leading-tight">
+                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">Total Cash</span>
+                <span className="text-sm font-mono font-extrabold text-emerald-700 leading-tight">
                   ${fundBalance.toLocaleString()}
                 </span>
               </div>
             </div>
 
             {/* SVC Crypto HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-black/60 border border-red-900/50 hover:border-cyan-500/40 transition-colors shadow-inner">
-              <div className="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.25)]">
-                <Coins className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-cyan-500/60 transition-colors shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-cyan-100 border border-cyan-300 flex items-center justify-center">
+                <Coins className="w-4 h-4 text-cyan-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">SVC Vault</span>
-                <span className="text-sm font-mono font-extrabold text-cyan-400 leading-tight flex items-center gap-1">
-                  {svcBalance.toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-300">SVC</span>
+                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">SVC Vault</span>
+                <span className="text-sm font-mono font-extrabold text-cyan-700 leading-tight flex items-center gap-1">
+                  {svcBalance.toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-600">SVC</span>
                 </span>
               </div>
             </div>
 
             {/* Week HUD */}
-            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-black/60 border border-red-900/50 hover:border-amber-500/40 transition-colors shadow-inner">
-              <div className="w-7 h-7 rounded-lg bg-amber-950/80 border border-amber-500/30 flex items-center justify-center">
-                <RotateCcw className="w-4 h-4 text-amber-400" />
+            <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber-500/60 transition-colors shadow-sm">
+              <div className="w-7 h-7 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center">
+                <RotateCcw className="w-4 h-4 text-amber-700" />
               </div>
               <div className="text-left font-rajdhani">
-                <span className="text-[10px] text-muted-foreground uppercase block leading-none font-bold">Dues Cycle</span>
-                <span className="text-sm font-mono font-extrabold text-amber-300 leading-tight">
+                <span className="text-[10px] text-slate-500 uppercase block leading-none font-bold">Dues Cycle</span>
+                <span className="text-sm font-mono font-extrabold text-amber-700 leading-tight">
                   Week #{cycle.currentWeekNumber}
                 </span>
               </div>
@@ -349,26 +349,26 @@ export function App() {
 
             {/* Current Role Badge & Switcher */}
             <div className="flex items-center gap-2">
-              <div className={`px-3 py-1.5 rounded-xl bg-black/70 border flex items-center gap-2.5 ${
+              <div className={`px-3 py-1.5 rounded-xl bg-slate-50 border flex items-center gap-2.5 shadow-sm ${
                 isLeader 
-                  ? "border-red-500/60 shadow-[0_0_15px_rgba(239,68,68,0.3)]" 
+                  ? "border-red-400 bg-red-50/60 text-red-700" 
                   : isMember 
-                  ? "border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]" 
-                  : "border-blue-500/40"
+                  ? "border-amber-400 bg-amber-50/60 text-amber-800" 
+                  : "border-blue-300 bg-blue-50/60 text-blue-800"
               }`}>
                 {isLeader ? (
-                  <Shield className="w-4 h-4 text-red-500 animate-pulse" />
+                  <Shield className="w-4 h-4 text-red-600" />
                 ) : isMember ? (
-                  <Users className="w-4 h-4 text-amber-400" />
+                  <Users className="w-4 h-4 text-amber-600" />
                 ) : (
-                  <Globe className="w-4 h-4 text-blue-400" />
+                  <Globe className="w-4 h-4 text-blue-600" />
                 )}
                 <div className="text-left font-rajdhani">
-                  <span className="text-[9px] text-muted-foreground uppercase block leading-none">
+                  <span className="text-[9px] text-slate-500 uppercase block leading-none font-semibold">
                     {isLeader ? "Full Authority" : isMember ? "Gang Member" : "Public View"}
                   </span>
                   <span className={`text-xs font-bold font-orbitron leading-tight ${
-                    isLeader ? "text-red-400" : isMember ? "text-amber-300" : "text-blue-300"
+                    isLeader ? "text-red-700" : isMember ? "text-amber-700" : "text-blue-700"
                   }`}>
                     {isLeader ? "LEADER" : isMember ? "MEMBER" : "VIEWER"}
                   </span>
@@ -390,7 +390,7 @@ export function App() {
                 <Button
                   variant="outline"
                   onClick={handleLogout}
-                  className="h-9 px-3 text-xs bg-black/60 border-red-900/60 text-muted-foreground hover:text-white hover:bg-red-950/60 font-rajdhani hover:border-red-500/50 transition-colors"
+                  className="h-9 px-3 text-xs bg-white border-red-200 text-slate-600 hover:text-red-700 hover:bg-red-50 font-rajdhani hover:border-red-400 transition-colors shadow-sm"
                 >
                   Exit Role
                 </Button>
@@ -400,15 +400,15 @@ export function App() {
         </div>
 
         {/* Navigation Tabs Bar */}
-        <div className="border-t border-red-950/80 bg-black/95">
+        <div className="border-t border-slate-200/80 bg-slate-50/90 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1.5 overflow-x-auto py-1.5">
             {[
               { id: "members", label: "Gang Members", icon: Users, badge: `${membersCount}` },
               { id: "weekly", label: "Weekly Dues", icon: RotateCcw, badge: `W#${cycle.currentWeekNumber}` },
-              { id: "funds", label: "Total Funds", icon: Wallet, badge: `$${fundBalance >= 1000000 ? (fundBalance / 1000000).toFixed(1) + 'M' : (fundBalance / 1000).toFixed(0) + 'k'}`, badgeColor: "text-emerald-400 border-emerald-500/60 bg-emerald-950/80" },
+              { id: "funds", label: "Total Funds", icon: Wallet, badge: `$${fundBalance >= 1000000 ? (fundBalance / 1000000).toFixed(1) + 'M' : (fundBalance / 1000).toFixed(0) + 'k'}`, badgeColor: "text-emerald-700 border-emerald-300 bg-emerald-50" },
               { id: "inventory", label: "Gang Inventory (inv)", icon: Package, badge: "Stash" },
-              { id: "wars", label: "Gang Wars", icon: Swords, badge: "W/L", badgeColor: "text-amber-400 border-amber-500/60 bg-amber-950/80" },
-              { id: "streams", label: "Live Streams", icon: Radio, badge: "● LIVE", badgeColor: "text-red-400 border-red-500/60 bg-red-950/80" },
+              { id: "wars", label: "Gang Wars", icon: Swords, badge: "W/L", badgeColor: "text-amber-700 border-amber-300 bg-amber-50" },
+              { id: "streams", label: "Live Streams", icon: Radio, badge: "● LIVE", badgeColor: "text-red-700 border-red-300 bg-red-50" },
               { id: "logs", label: "Audit Logs", icon: FileText, badge: "Ledger" },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -422,17 +422,17 @@ export function App() {
                   }}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-rajdhani font-bold transition-all duration-200 whitespace-nowrap group ${
                     isActive
-                      ? "bg-gradient-to-r from-red-700 via-red-600 to-rose-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.55)] border border-red-400/50"
-                      : "text-muted-foreground hover:text-foreground hover:bg-red-950/40 border border-transparent hover:border-red-900/30"
+                      ? "bg-gradient-to-r from-red-600 via-red-600 to-rose-600 text-white shadow-md shadow-red-500/25 border border-red-500"
+                      : "text-slate-600 hover:text-red-700 hover:bg-white border border-transparent hover:border-red-200 shadow-none hover:shadow-sm"
                   }`}
                 >
-                  <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? "text-white" : "text-red-400"}`} />
+                  <Icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? "text-white" : "text-red-600"}`} />
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-orbitron font-semibold border ${
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-orbitron font-semibold border ${
                       isActive 
-                        ? "bg-black/40 border-white/30 text-white" 
-                        : tab.badgeColor || "bg-black/60 border-red-900/40 text-red-300"
+                        ? "bg-white/20 border-white/40 text-white" 
+                        : tab.badgeColor || "bg-white border-slate-200 text-slate-600"
                     }`}>
                       {tab.badge}
                     </span>
@@ -456,14 +456,14 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-red-950 bg-black/90 py-4 px-4 text-xs font-rajdhani text-muted-foreground">
+      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-xs font-rajdhani text-slate-500 shadow-inner">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <div className="flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-            <span className="font-orbitron font-bold text-foreground tracking-wider">RED NETWORK</span>
+            <span className="font-orbitron font-bold text-slate-800 tracking-wider">RED NETWORK</span>
           </div>
-          <div className="text-muted-foreground font-mono text-xs">
-            Developed by <span className="text-red-400 font-bold">Tatya Vinchu</span> <span className="text-zinc-400">(om006)</span>
+          <div className="text-slate-500 font-mono text-xs">
+            Developed by <span className="text-red-600 font-bold">Tatya Vinchu</span> <span className="text-slate-400">(om006)</span>
           </div>
         </div>
       </footer>

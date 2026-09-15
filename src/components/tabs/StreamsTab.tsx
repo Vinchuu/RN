@@ -396,17 +396,17 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
 
   return (
     <div className="space-y-6 font-rajdhani">
-      {/* Top Filter Bar - Replicating soulcity.live in Red Network Theme */}
-      <div className="bg-[#120609]/95 border border-red-900/50 rounded-xl px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-[0_4px_25px_rgba(220,38,38,0.12)] backdrop-blur-md">
+      {/* Top Filter & Action Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl px-4 py-3.5 flex flex-wrap items-center justify-between gap-3 shadow-sm shadow-red-500/5 backdrop-blur-md">
         {/* Left Side: Show Dropdown & Platform Toggles */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Show Dropdown */}
           <div className="flex items-center gap-2">
-            <span className="text-zinc-400 font-medium text-sm">Show:</span>
+            <span className="text-slate-500 font-medium text-sm">Show:</span>
             <select
               value={showFilter}
               onChange={(e) => setShowFilter(e.target.value as any)}
-              className="bg-[#1a080d] border border-red-900/60 hover:border-red-500 rounded-lg px-3 py-1.5 text-sm text-white font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
+              className="bg-slate-50 border border-slate-300 hover:border-red-500 rounded-lg px-3 py-1.5 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
             >
               <option value="live">Live ({liveCount})</option>
               <option value="all">All Registered ({streams.length})</option>
@@ -414,7 +414,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
           </div>
 
           {/* Platform Toggle Buttons */}
-          <div className="flex items-center gap-1.5 pl-1 border-l border-red-900/30">
+          <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200">
             {/* All toggle */}
             <button
               type="button"
@@ -424,8 +424,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
               }}
               className={`h-8 px-2.5 rounded-lg text-xs font-bold transition-all ${
                 platformFilter === "all"
-                  ? "bg-red-600 text-white shadow-[0_0_12px_rgba(220,38,38,0.7)]"
-                  : "bg-black/50 border border-red-900/40 text-zinc-400 hover:text-white"
+                  ? "bg-red-600 text-white shadow-sm shadow-red-500/50"
+                  : "bg-slate-100 border border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
               }`}
             >
               ALL
@@ -441,8 +441,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
               title="Filter YouTube streams"
               className={`h-8 px-3 rounded-lg flex items-center gap-1.5 font-bold text-xs transition-all ${
                 platformFilter === "youtube"
-                  ? "bg-[#ff0000] text-white ring-2 ring-red-400 shadow-[0_0_14px_rgba(255,0,0,0.7)]"
-                  : "bg-black/50 border border-red-900/40 text-zinc-400 hover:text-[#ff0000] hover:border-[#ff0000]/60"
+                  ? "bg-[#ff0000] text-white ring-2 ring-red-400 shadow-sm shadow-red-500/50"
+                  : "bg-slate-100 border border-slate-300 text-slate-600 hover:text-[#ff0000] hover:border-[#ff0000]/60 hover:bg-white"
               }`}
             >
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -461,8 +461,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
               title="Filter Kick streams"
               className={`h-8 px-3 rounded-lg flex items-center gap-1.5 font-black text-xs transition-all ${
                 platformFilter === "kick"
-                  ? "bg-[#53fc18] text-black ring-2 ring-white shadow-[0_0_14px_rgba(83,252,24,0.7)]"
-                  : "bg-black/50 border border-green-900/40 text-zinc-400 hover:text-[#53fc18] hover:border-[#53fc18]/60"
+                  ? "bg-[#53fc18] text-black ring-2 ring-slate-900 shadow-sm"
+                  : "bg-slate-100 border border-slate-300 text-slate-600 hover:text-emerald-700 hover:border-emerald-500 hover:bg-white"
               }`}
             >
               <svg viewBox="0 0 512 512" width="14" height="14" fill="currentColor">
@@ -475,17 +475,17 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
 
         {/* Center: Search Box */}
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-red-500/70" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-red-500" />
           <Input
             placeholder="Search streams..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-8 py-1.5 h-9 bg-[#1a080d] border-red-900/60 rounded-lg text-sm text-white placeholder:text-zinc-500 focus:border-red-500 focus:ring-0"
+            className="pl-9 pr-8 py-1.5 h-9 bg-slate-50 border-slate-300 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:border-red-500 focus:ring-0 focus:bg-white"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -496,11 +496,11 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
         <div className="flex items-center gap-3 flex-wrap">
           {/* Sort By Dropdown */}
           <div className="flex items-center gap-2">
-            <span className="text-zinc-400 font-medium text-sm">Sort By:</span>
+            <span className="text-slate-500 font-medium text-sm">Sort By:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#1a080d] border border-red-900/60 hover:border-red-500 rounded-lg px-3 py-1.5 text-sm text-white font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
+              className="bg-slate-50 border border-slate-300 hover:border-red-500 rounded-lg px-3 py-1.5 text-sm text-slate-900 font-medium focus:outline-none focus:border-red-500 transition-colors cursor-pointer"
             >
               <option value="viewers-desc">Viewers (High to Low)</option>
               <option value="viewers-asc">Viewers (Low to High)</option>
@@ -510,8 +510,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
             </select>
           </div>
 
-          {/* Showing Count Pill (soulcity style) */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/50 border border-red-900/40 text-red-400 text-xs font-bold">
+          {/* Showing Count Pill */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
             <Eye className="w-3.5 h-3.5" />
             <span>Showing: {filteredStreams.length}</span>
           </div>
@@ -522,10 +522,10 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
             variant="ghost"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="h-9 w-9 p-0 bg-red-950/40 border border-red-900/60 hover:border-red-500 text-red-400 hover:text-white"
+            className="h-9 w-9 p-0 bg-slate-100 border border-slate-200 hover:border-red-300 text-slate-600 hover:text-red-600 hover:bg-red-50"
             title="Refresh Live Data"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-400" : ""}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-red-500" : ""}`} />
           </Button>
 
           {/* Register Feed (Admin/Member only) */}
@@ -545,26 +545,26 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
         </div>
       </div>
 
-      {/* Main Stream Grid (4 Columns responsive matching .stream-grid) */}
+      {/* Main Stream Grid */}
       {loading ? (
         <div className="py-24 text-center">
-          <div className="w-10 h-10 border-3 border-red-500/30 border-t-red-500 rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-zinc-400 font-mono text-sm tracking-widest uppercase">
+          <div className="w-10 h-10 border-3 border-red-500/30 border-t-red-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-500 font-mono text-sm tracking-widest uppercase font-semibold">
             Synchronizing Red Network Broadcast Feeds...
           </p>
         </div>
       ) : filteredStreams.length === 0 ? (
         /* Empty State */
-        <Card className="bg-[#120609]/80 border-red-900/40 p-12 text-center shadow-xl">
-          <Radio className="w-12 h-12 text-red-500/50 mx-auto mb-3 animate-pulse" />
-          <h3 className="text-lg font-orbitron font-bold text-white mb-2 tracking-wider uppercase">
+        <Card className="bg-white border-slate-200 p-12 text-center shadow-md">
+          <Radio className="w-12 h-12 text-red-500 mx-auto mb-3 animate-pulse" />
+          <h3 className="text-lg font-orbitron font-bold text-slate-900 mb-2 tracking-wider uppercase">
             {showFilter === "live"
               ? platformFilter !== "all"
                 ? `NO ${platformFilter.toUpperCase()} STREAMS CURRENTLY LIVE`
                 : "ALL CHANNELS STANDBY // NO OPERATIVES CURRENTLY LIVE"
               : `NO ${platformFilter.toUpperCase()} FEEDS FOUND`}
           </h3>
-          <p className="text-zinc-400 text-sm max-w-md mx-auto mb-6">
+          <p className="text-slate-600 text-sm max-w-md mx-auto mb-6">
             {platformFilter !== "all"
               ? `There are currently no active ${platformFilter.toUpperCase()} broadcast feeds matching your filter. Switch platforms or view all registered feeds.`
               : showFilter === "live"
@@ -580,7 +580,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   soundFx.playClickSound();
                   setPlatformFilter("all");
                 }}
-                className="border-red-900/60 hover:border-red-500 text-zinc-200 hover:text-white"
+                className="border-slate-300 hover:border-red-500 text-slate-700 hover:text-red-600"
               >
                 View All Platforms
               </Button>
@@ -593,7 +593,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   soundFx.playClickSound();
                   setShowFilter("all");
                 }}
-                className="border-red-900/60 hover:border-red-500 text-zinc-200 hover:text-white"
+                className="border-slate-300 hover:border-red-500 text-slate-700 hover:text-red-600"
               >
                 View All Registered Feeds ({streams.length})
               </Button>
@@ -620,14 +620,14 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   soundFx.playClickSound();
                   setSelectedStream(stream);
                 }}
-                className={`group cursor-pointer rounded-xl overflow-hidden border transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col bg-[#140609] ${
+                className={`group cursor-pointer rounded-xl overflow-hidden border transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col bg-white ${
                   isStreamLive
-                    ? "border-red-900/50 hover:border-red-500 hover:shadow-[0_12px_35px_rgba(220,38,38,0.25)]"
-                    : "border-zinc-800/60 opacity-75 hover:opacity-100 hover:border-zinc-700"
+                    ? "border-red-200 hover:border-red-500 hover:shadow-xl hover:shadow-red-500/15"
+                    : "border-slate-200 opacity-80 hover:opacity-100 hover:border-slate-400"
                 }`}
               >
                 {/* 16:9 Thumbnail Container */}
-                <div className="relative aspect-video w-full bg-[#1e0a10] overflow-hidden">
+                <div className="relative aspect-video w-full bg-slate-100 overflow-hidden">
                   {(() => {
                     const fallbackVid = stream.videoId || (stream.channelSlug.length === 11 ? stream.channelSlug : null);
                     const effectiveThumb = stream.thumbnailUrl || (stream.platform === "youtube" && fallbackVid ? `https://img.youtube.com/vi/${fallbackVid}/hqdefault.jpg` : "");
@@ -653,9 +653,9 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                         }}
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#1b060d] to-[#090204] p-4 text-center">
-                        <Tv className="w-10 h-10 text-red-500/30 mb-2" />
-                        <span className="text-xs font-mono text-zinc-500 tracking-wider">
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 p-4 text-center">
+                        <Tv className="w-10 h-10 text-slate-400 mb-2" />
+                        <span className="text-xs font-mono text-slate-500 tracking-wider font-semibold">
                           {isStreamLive ? "LIVE BROADCAST" : "OFFLINE STANDBY"}
                         </span>
                       </div>
@@ -690,10 +690,10 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                     type="button"
                     onClick={(e) => handleShareStream(e, stream)}
                     title={copiedId === stream.id ? "Link Copied!" : "Share Stream Link"}
-                    className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white flex items-center justify-center opacity-80 hover:opacity-100 hover:scale-110 hover:bg-red-600 transition-all shadow-md"
+                    className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur-md border border-slate-300 text-slate-700 flex items-center justify-center opacity-85 hover:opacity-100 hover:scale-110 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-md"
                   >
                     {copiedId === stream.id ? (
-                      <Check className="w-3.5 h-3.5 text-green-400" />
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
                     ) : (
                       <Share2 className="w-3.5 h-3.5" />
                     )}
@@ -702,12 +702,12 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   {/* Bottom-Right: LIVE Badge or Offline Badge */}
                   <div className="absolute bottom-2.5 right-2.5 z-10">
                     {isStreamLive ? (
-                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-600/90 backdrop-blur-md text-white font-bold font-mono text-[11px] shadow-lg tracking-wider border border-red-400/40">
+                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-600 text-white font-bold font-mono text-[11px] shadow-lg tracking-wider border border-red-400">
                         <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                         LIVE
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-zinc-400 font-mono text-[10px] border border-zinc-700/40">
+                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-200 font-mono text-[10px]">
                         OFFLINE
                       </span>
                     )}
@@ -719,46 +719,46 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   <div>
                     {/* Stream Title (2 lines clamp) */}
                     <h4
-                      className="text-white text-sm font-bold line-clamp-2 leading-snug mb-1 group-hover:text-red-400 transition-colors"
+                      className="text-slate-900 text-sm font-bold line-clamp-2 leading-snug mb-1 group-hover:text-red-600 transition-colors"
                       title={stream.title || (isStreamLive ? `${stream.memberName} // Live Stream` : `${stream.memberName} // Offline Standby`)}
                     >
                       {stream.title || (isStreamLive ? `${stream.memberName} // Live Stream` : `${stream.memberName} // Offline Standby`)}
                     </h4>
 
                     {/* Streamer Username / Handle */}
-                    <p className="text-xs text-red-400/80 font-mono truncate mb-3">
+                    <p className="text-xs text-red-600 font-mono font-medium truncate mb-3">
                       {stream.memberName}
-                      <span className="text-zinc-500 ml-1">@{stream.channelSlug}</span>
+                      <span className="text-slate-500 ml-1">@{stream.channelSlug}</span>
                     </p>
                   </div>
 
-                  {/* Bottom Stats Footer (soulcity style) */}
-                  <div className="pt-2.5 border-t border-red-900/30 flex items-center justify-between gap-2 text-xs">
+                  {/* Bottom Stats Footer */}
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
                     {/* Viewers (Live Watching) */}
                     <div
-                      className="flex items-center gap-1.5 font-semibold text-zinc-300"
+                      className="flex items-center gap-1.5 font-bold text-slate-800"
                       title="Current Live Viewers"
                     >
-                      <Users className="w-3.5 h-3.5 text-red-500" />
+                      <Users className="w-3.5 h-3.5 text-red-600" />
                       <span>{formatNumber(stream.viewers)}</span>
                     </div>
 
                     {/* Likes */}
                     <div
-                      className="flex items-center gap-1.5 text-zinc-400 font-medium"
+                      className="flex items-center gap-1.5 text-slate-500 font-medium"
                       title="Realtime Likes"
                     >
-                      <Heart className="w-3.5 h-3.5 text-red-400/80 fill-red-500/20" />
+                      <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/20" />
                       <span>{formatNumber(stream.likes || Math.round((stream.viewers || 0) * 0.15))}</span>
                     </div>
 
                     {/* Total Views / Views */}
                     {stream.views ? (
                       <div
-                        className="hidden sm:flex items-center gap-1.5 text-zinc-400 font-medium"
+                        className="hidden sm:flex items-center gap-1.5 text-slate-500 font-medium"
                         title="Total Views"
                       >
-                        <Eye className="w-3.5 h-3.5 text-zinc-500" />
+                        <Eye className="w-3.5 h-3.5 text-slate-400" />
                         <span>{formatNumber(stream.views)}</span>
                       </div>
                     ) : null}
@@ -770,7 +770,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="p-1 text-zinc-400 hover:text-white hover:bg-red-950/60 rounded transition-colors"
+                        className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                         title="Open in Platform"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -782,8 +782,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                           onClick={(e) => handleQuickToggleLive(e, stream)}
                           className={`p-1 rounded transition-colors ${
                             stream.isLive
-                              ? "text-red-400 hover:text-zinc-400 hover:bg-red-950/40"
-                              : "text-zinc-500 hover:text-green-400 hover:bg-green-950/40"
+                              ? "text-red-600 hover:text-slate-400 hover:bg-red-50"
+                              : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
                           }`}
                           title={stream.isLive ? "Mark Standby (Offline)" : "Mark Live"}
                         >
@@ -798,7 +798,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                             e.stopPropagation();
                             handleOpenEdit(stream);
                           }}
-                          className="p-1 text-zinc-400 hover:text-yellow-400 hover:bg-yellow-950/40 rounded transition-colors"
+                          className="p-1 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded transition-colors"
                           title="Edit Feed"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -812,7 +812,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                             e.stopPropagation();
                             handleDeleteStream(stream.id);
                           }}
-                          className="p-1 text-zinc-400 hover:text-red-400 hover:bg-red-950/40 rounded transition-colors"
+                          className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Delete Feed"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -829,18 +829,18 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
 
       {/* Cinematic Theater Modal (Embedded Kick / YouTube Player) */}
       <Dialog open={!!selectedStream} onOpenChange={(open) => !open && setSelectedStream(null)}>
-        <DialogContent className="max-w-5xl bg-[#0e0306] border-red-900/60 text-white p-0 overflow-hidden shadow-2xl">
+        <DialogContent className="max-w-5xl bg-white border-red-200 text-slate-900 p-0 overflow-hidden shadow-2xl">
           {selectedStream && (
             <div>
               {/* Theater Header */}
-              <div className="px-5 py-3.5 border-b border-red-900/40 flex items-center justify-between bg-[#150509]">
+              <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center gap-3">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
                   <div>
-                    <h3 className="font-orbitron font-bold text-sm text-white tracking-wide">
+                    <h3 className="font-orbitron font-bold text-sm text-slate-900 tracking-wide">
                       THEATER FEED: {selectedStream.memberName}
                     </h3>
-                    <span className="text-xs text-red-400/80 font-mono">
+                    <span className="text-xs text-red-600 font-mono font-semibold">
                       /{selectedStream.channelSlug} &bull; {selectedStream.platform.toUpperCase()}
                     </span>
                   </div>
@@ -860,7 +860,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                     size="sm"
                     variant="ghost"
                     onClick={() => setSelectedStream(null)}
-                    className="h-8 w-8 p-0 text-zinc-400 hover:text-white hover:bg-red-950/60"
+                    className="h-8 w-8 p-0 text-slate-400 hover:text-slate-700 hover:bg-slate-200"
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -878,12 +878,12 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                     allowFullScreen
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#0e0306]">
-                    <Radio className="w-12 h-12 text-red-500/40 mb-3 animate-pulse" />
-                    <h4 className="text-base font-orbitron font-bold text-white mb-1">
+                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-slate-100">
+                    <Radio className="w-12 h-12 text-red-500 mb-3 animate-pulse" />
+                    <h4 className="text-base font-orbitron font-bold text-slate-900 mb-1">
                       BROADCAST CURRENTLY OFFLINE
                     </h4>
-                    <p className="text-xs text-zinc-400 max-w-sm mb-4">
+                    <p className="text-xs text-slate-600 max-w-sm mb-4">
                       {selectedStream.memberName} is not currently live broadcasting. You can visit their channel directly.
                     </p>
                     <a
@@ -900,18 +900,18 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
               </div>
 
               {/* Theater Live Stats Footer */}
-              <div className="px-5 py-3 border-t border-red-900/40 bg-[#120508] flex items-center justify-between text-xs text-zinc-300">
+              <div className="px-5 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-700">
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 font-bold text-white">
-                    <Users className="w-4 h-4 text-red-500" />
+                  <div className="flex items-center gap-1.5 font-bold text-slate-900">
+                    <Users className="w-4 h-4 text-red-600" />
                     <span>{formatNumber(selectedStream.viewers)} Watching</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-zinc-300">
-                    <Heart className="w-4 h-4 text-red-400" />
+                  <div className="flex items-center gap-1.5 text-slate-600">
+                    <Heart className="w-4 h-4 text-red-500" />
                     <span>{formatNumber(selectedStream.likes || Math.round((selectedStream.viewers || 0) * 0.15))} Likes</span>
                   </div>
                 </div>
-                <div className="truncate max-w-md text-zinc-400 font-medium">
+                <div className="truncate max-w-md text-slate-600 font-medium">
                   {selectedStream.title || `${selectedStream.memberName} // Live Stream`}
                 </div>
               </div>
@@ -922,20 +922,20 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
 
       {/* Register Broadcast Feed Modal (Add) */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="bg-[#120609] border-red-900/60 text-white max-w-md">
+        <DialogContent className="bg-white border-red-200 text-slate-900 max-w-md shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="font-orbitron text-red-500 text-base tracking-wider flex items-center gap-2">
+            <DialogTitle className="font-orbitron text-red-600 text-base tracking-wider flex items-center gap-2">
               <Tv className="w-4 h-4" />
               <span>LINK BROADCAST FEED</span>
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleCreateStream} className="space-y-4 text-sm mt-2">
             <div>
-              <Label className="text-zinc-300 text-xs">Assigned Operative</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Assigned Operative</Label>
               <select
                 value={memberName}
                 onChange={(e) => setMemberName(e.target.value)}
-                className="w-full mt-1 bg-[#1a080d] border border-red-900/60 rounded-md px-3 py-2 text-white focus:outline-none focus:border-red-500"
+                className="w-full mt-1 bg-white border border-slate-300 rounded-md px-3 py-2 text-slate-900 focus:outline-none focus:border-red-500"
               >
                 {members.map((m) => (
                   <option key={m.id} value={m.name}>
@@ -946,15 +946,15 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
             </div>
 
             <div>
-              <Label className="text-zinc-300 text-xs">Streaming Platform</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Streaming Platform</Label>
               <div className="grid grid-cols-2 gap-2 mt-1">
                 <button
                   type="button"
                   onClick={() => setPlatform("kick")}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     platform === "kick"
-                      ? "bg-[#53fc18] text-black border-[#53fc18]"
-                      : "bg-black/40 border-red-900/40 text-zinc-400"
+                      ? "bg-[#53fc18] text-black border-slate-900 font-black shadow-sm"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   KICK
@@ -964,8 +964,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   onClick={() => setPlatform("youtube")}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     platform === "youtube"
-                      ? "bg-red-600 text-white border-red-500"
-                      : "bg-black/40 border-red-900/40 text-zinc-400"
+                      ? "bg-red-600 text-white border-red-600 shadow-sm"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   YOUTUBE
@@ -974,7 +974,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
             </div>
 
             <div>
-              <Label className="text-zinc-300 text-xs">
+              <Label className="text-slate-700 text-xs font-semibold">
                 {platform === "kick" ? "Kick Username / Channel URL" : "YouTube Channel Handle / URL"}
               </Label>
               <Input
@@ -982,7 +982,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
                 required
-                className="mt-1 bg-[#1a080d] border-red-900/60 text-white"
+                className="mt-1 bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
 
@@ -991,7 +991,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                 type="button"
                 variant="ghost"
                 onClick={() => setIsAddOpen(false)}
-                className="text-zinc-400 hover:text-white"
+                className="text-slate-600 hover:text-slate-900"
               >
                 Cancel
               </Button>
@@ -1005,34 +1005,34 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
 
       {/* Edit Broadcast Feed Modal */}
       <Dialog open={!!editingStream} onOpenChange={(open) => !open && setEditingStream(null)}>
-        <DialogContent className="bg-[#120609] border-red-900/60 text-white max-w-md">
+        <DialogContent className="bg-white border-red-200 text-slate-900 max-w-md shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="font-orbitron text-red-500 text-base tracking-wider flex items-center gap-2">
+            <DialogTitle className="font-orbitron text-red-600 text-base tracking-wider flex items-center gap-2">
               <Edit2 className="w-4 h-4" />
               <span>EDIT BROADCAST FEED</span>
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveEdit} className="space-y-4 text-sm mt-2">
             <div>
-              <Label className="text-zinc-300 text-xs">Assigned Operative</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Assigned Operative</Label>
               <Input
                 value={editMemberName}
                 onChange={(e) => setEditMemberName(e.target.value)}
                 required
-                className="mt-1 bg-[#1a080d] border-red-900/60 text-white"
+                className="mt-1 bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
 
             <div>
-              <Label className="text-zinc-300 text-xs">Streaming Platform</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Streaming Platform</Label>
               <div className="grid grid-cols-2 gap-2 mt-1">
                 <button
                   type="button"
                   onClick={() => setEditPlatform("kick")}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     editPlatform === "kick"
-                      ? "bg-[#53fc18] text-black border-[#53fc18]"
-                      : "bg-black/40 border-red-900/40 text-zinc-400"
+                      ? "bg-[#53fc18] text-black border-slate-900 font-black shadow-sm"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   KICK
@@ -1042,8 +1042,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   onClick={() => setEditPlatform("youtube")}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     editPlatform === "youtube"
-                      ? "bg-red-600 text-white border-red-500"
-                      : "bg-black/40 border-red-900/40 text-zinc-400"
+                      ? "bg-red-600 text-white border-red-600 shadow-sm"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   YOUTUBE
@@ -1052,25 +1052,25 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
             </div>
 
             <div>
-              <Label className="text-zinc-300 text-xs">Channel Username or URL</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Channel Username or URL</Label>
               <Input
                 value={editUrlInput}
                 onChange={(e) => setEditUrlInput(e.target.value)}
                 required
-                className="mt-1 bg-[#1a080d] border-red-900/60 text-white"
+                className="mt-1 bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
 
             <div>
-              <Label className="text-zinc-300 text-xs">Broadcast Status</Label>
+              <Label className="text-slate-700 text-xs font-semibold">Broadcast Status</Label>
               <div className="grid grid-cols-2 gap-2 mt-1">
                 <button
                   type="button"
                   onClick={() => setEditIsLive(true)}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     editIsLive
-                      ? "bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.5)]"
-                      : "bg-black/40 border-red-900/40 text-zinc-400 hover:text-white"
+                      ? "bg-red-600 text-white border-red-500 shadow-sm"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   🔴 LIVE NOW
@@ -1080,8 +1080,8 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                   onClick={() => setEditIsLive(false)}
                   className={`py-2 px-3 rounded border text-xs font-bold transition-all ${
                     !editIsLive
-                      ? "bg-zinc-800 text-zinc-200 border-zinc-600"
-                      : "bg-black/40 border-red-900/40 text-zinc-400 hover:text-white"
+                      ? "bg-slate-700 text-white border-slate-600"
+                      : "bg-slate-50 border-slate-300 text-slate-600 hover:text-slate-900"
                   }`}
                 >
                   ⚪ STANDBY (OFFLINE)
@@ -1094,7 +1094,7 @@ const KNOWN_YT_CHANNEL_MAP: Record<string, string> = {
                 type="button"
                 variant="ghost"
                 onClick={() => setEditingStream(null)}
-                className="text-zinc-400 hover:text-white"
+                className="text-slate-600 hover:text-slate-900"
               >
                 Cancel
               </Button>

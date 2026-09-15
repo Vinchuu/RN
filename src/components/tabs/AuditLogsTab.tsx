@@ -76,41 +76,41 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
   const getCategoryBadge = (category: string) => {
     if (category === "dues") {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-amber-950/60 border border-amber-500/50 text-amber-300">
+        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-amber-50 border border-amber-200 text-amber-700">
           Weekly Dues
         </span>
       );
     }
     if (category === "reset") {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-rose-950/80 border border-rose-500 text-rose-300 animate-pulse">
+        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-rose-50 border border-rose-200 text-rose-700 animate-pulse">
           Cycle Reset
         </span>
       );
     }
     if (category === "inventory") {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-blue-950/60 border border-blue-500/50 text-blue-300">
+        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-blue-50 border border-blue-200 text-blue-700">
           Stash / Armory
         </span>
       );
     }
     if (category === "members") {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-purple-950/60 border border-purple-500/50 text-purple-300">
+        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-purple-50 border border-purple-200 text-purple-700">
           Roster
         </span>
       );
     }
     if (category === "vault") {
       return (
-        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-emerald-950/60 border border-emerald-500/50 text-emerald-300">
+        <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-emerald-50 border border-emerald-200 text-emerald-700">
           Vault Cash
         </span>
       );
     }
     return (
-      <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-neutral-900 border border-neutral-700 text-neutral-400">
+      <span className="px-2 py-0.5 rounded text-[10px] font-orbitron font-bold uppercase bg-slate-100 border border-slate-200 text-slate-600">
         {category}
       </span>
     );
@@ -180,14 +180,14 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-slate-900">
               SYNDICATE AUDIT LEDGER
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950/90 border border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
               {logs.length} Recorded Events
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-slate-600 mt-0.5">
             Cryptographically signed activity records for dues verification, weekly resets, stash alterations, and member status changes.
           </p>
         </div>
@@ -196,14 +196,14 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
           <Button
             onClick={handleCopyLogs}
             variant="outline"
-            className="bg-black/60 border-red-900/50 hover:bg-red-950/60 text-xs font-bold flex items-center gap-2 text-muted-foreground hover:text-white"
+            className="bg-white border-slate-200 hover:bg-slate-50 text-xs font-bold flex items-center gap-2 text-slate-700 hover:text-slate-900 shadow-sm"
           >
             {copiedAll ? "Copied! ✓" : "Copy Plaintext"}
           </Button>
           <Button
             onClick={handleExportJson}
             variant="outline"
-            className="bg-black/60 border-red-900/50 hover:bg-red-950/60 text-xs font-bold flex items-center gap-2 text-muted-foreground hover:text-white"
+            className="bg-white border-slate-200 hover:bg-slate-50 text-xs font-bold flex items-center gap-2 text-slate-700 hover:text-slate-900 shadow-sm"
           >
             <Download className="w-3.5 h-3.5" />
             Export (JSON)
@@ -212,15 +212,15 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
       </div>
 
       {/* Filters & Search */}
-      <Card className="card-gang p-4">
+      <Card className="card-gang p-4 bg-white">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
           <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search description, operator, action..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
+              className="pl-9 bg-white border-slate-200 text-sm font-rajdhani text-slate-900 focus:border-red-500"
             />
           </div>
 
@@ -238,8 +238,8 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
                 onClick={() => setCategoryFilter(cat.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   categoryFilter === cat.id
-                    ? "bg-red-700 text-white shadow-[0_0_12px_rgba(239,68,68,0.5)] border border-red-500/50"
-                    : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                    ? "bg-red-600 text-white shadow-sm border border-red-600"
+                    : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200"
                 }`}
               >
                 {cat.label}
@@ -250,10 +250,10 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
       </Card>
 
       {/* Logs Table / List */}
-      <Card className="card-gang overflow-hidden">
+      <Card className="card-gang overflow-hidden bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm font-rajdhani">
-            <thead className="bg-black/90 border-b border-red-900/50 text-xs font-orbitron uppercase text-muted-foreground">
+            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-orbitron uppercase text-slate-500">
               <tr>
                 <th className="py-3 px-4">Time / Age</th>
                 <th className="py-3 px-4">Category</th>
@@ -262,16 +262,16 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
                 <th className="py-3 px-4 text-right">Executor</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-red-900/20">
+            <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-red-400 font-orbitron animate-pulse">
+                  <td colSpan={5} className="py-12 text-center text-red-600 font-orbitron animate-pulse">
                     Decrypting syndicate audit logs...
                   </td>
                 </tr>
               ) : filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-muted-foreground">
+                  <td colSpan={5} className="py-12 text-center text-slate-500">
                     No activity logs recorded matching current criteria.
                   </td>
                 </tr>
@@ -279,25 +279,25 @@ export function AuditLogsTab({ userMode }: AuditLogsTabProps) {
                 filteredLogs.map((log) => (
                   <tr
                     key={log.id}
-                    className="hover:bg-red-950/20 transition-colors duration-150 group"
+                    className="hover:bg-red-50/40 transition-colors duration-150 group"
                   >
-                    <td className="py-3 px-4 text-xs font-mono text-muted-foreground whitespace-nowrap">
-                      <span className="text-foreground font-semibold block">{formatRelativeTime(log.timestamp)}</span>
-                      <span className="text-[10px] text-neutral-500">{formatDate(log.timestamp)}</span>
+                    <td className="py-3 px-4 text-xs font-mono text-slate-500 whitespace-nowrap">
+                      <span className="text-slate-900 font-semibold block">{formatRelativeTime(log.timestamp)}</span>
+                      <span className="text-[10px] text-slate-400">{formatDate(log.timestamp)}</span>
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       {getCategoryBadge(log.category)}
                     </td>
-                    <td className="py-3 px-4 font-mono text-xs uppercase font-bold text-red-300 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded bg-black/50 border border-red-900/40">
+                    <td className="py-3 px-4 font-mono text-xs uppercase font-bold text-red-700 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded bg-red-50 border border-red-200">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-foreground font-medium">
+                    <td className="py-3 px-4 text-slate-800 font-medium">
                       {log.description}
                     </td>
-                    <td className="py-3 px-4 text-right text-xs font-bold text-amber-400 font-mono whitespace-nowrap">
-                      <span className="px-2.5 py-1 rounded-full bg-black/60 border border-amber-500/30 text-amber-300">
+                    <td className="py-3 px-4 text-right text-xs font-bold text-slate-700 font-mono whitespace-nowrap">
+                      <span className="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700">
                         {log.performedBy || "System"}
                       </span>
                     </td>

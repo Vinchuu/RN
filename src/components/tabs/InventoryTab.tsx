@@ -42,12 +42,12 @@ interface InventoryTabProps {
 }
 
 const CATEGORIES = [
-  { id: "weapons", label: "Firearms & Weapons", icon: Crosshair, color: "text-red-400" },
-  { id: "ammo", label: "Ammunition", icon: Layers, color: "text-amber-400" },
-  { id: "armor", label: "Tactical Armor", icon: Shield, color: "text-blue-400" },
-  { id: "meds", label: "Medical Supplies", icon: Pill, color: "text-emerald-400" },
-  { id: "tools", label: "Heist & Tools", icon: Wrench, color: "text-purple-400" },
-  { id: "contraband", label: "Contraband & Goods", icon: Flame, color: "text-rose-500" },
+  { id: "weapons", label: "Firearms & Weapons", icon: Crosshair, color: "text-red-600" },
+  { id: "ammo", label: "Ammunition", icon: Layers, color: "text-amber-600" },
+  { id: "armor", label: "Tactical Armor", icon: Shield, color: "text-blue-600" },
+  { id: "meds", label: "Medical Supplies", icon: Pill, color: "text-emerald-600" },
+  { id: "tools", label: "Heist & Tools", icon: Wrench, color: "text-purple-600" },
+  { id: "contraband", label: "Contraband & Goods", icon: Flame, color: "text-rose-600" },
 ];
 
 export function InventoryTab({ userMode }: InventoryTabProps) {
@@ -306,14 +306,14 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-red-600">
               GANG STASH & ARSENAL
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950/90 border border-red-500/50 text-red-300 shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
               {items.length} Asset Types
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5 font-medium">
             Realtime weapons, ammunition, armor, medkits, and contraband stash reserves.
           </p>
         </div>
@@ -339,45 +339,45 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="card-gang p-4 border-l-4 border-l-red-600">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Total Units In Stash
             </span>
-            <Box className="w-5 h-5 text-red-400" />
+            <Box className="w-5 h-5 text-red-500" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-foreground mt-2">
-            {totalStockCount.toLocaleString()} <span className="text-xs text-muted-foreground font-normal">Units</span>
+          <p className="text-2xl font-orbitron font-bold text-slate-900 mt-2">
+            {totalStockCount.toLocaleString()} <span className="text-xs text-slate-500 font-normal">Units</span>
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             Distributed across {items.length} tactical asset classes
           </span>
         </Card>
 
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Estimated Stash Value
             </span>
-            <DollarSign className="w-5 h-5 text-emerald-400" />
+            <DollarSign className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-emerald-400 mt-2">
+          <p className="text-2xl font-orbitron font-bold text-emerald-600 mt-2">
             ${totalStashValue.toLocaleString()}
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             Black market syndicate valuation
           </span>
         </Card>
 
         <Card className="card-gang p-4 border-l-4 border-l-amber-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Low Stock Alerts
             </span>
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
+            <AlertTriangle className="w-5 h-5 text-amber-600" />
           </div>
-          <p className="text-2xl font-orbitron font-bold text-amber-300 mt-2">
+          <p className="text-2xl font-orbitron font-bold text-amber-700 mt-2">
             {items.filter((i) => (i.quantity || 0) <= 5).length} Items
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             Reserves below critical threshold (&le; 5 units)
           </span>
         </Card>
@@ -387,12 +387,12 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
       <Card className="card-gang p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
           <div className="relative sm:col-span-1">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Search weapons, ammo, contraband..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
+              className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm font-rajdhani focus:border-red-500"
             />
           </div>
 
@@ -401,8 +401,8 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
               onClick={() => setCategoryFilter("all")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 categoryFilter === "all"
-                  ? "bg-red-700 text-white shadow-[0_0_12px_rgba(239,68,68,0.5)] border border-red-500/50"
-                  : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                  ? "bg-red-600 text-white shadow-sm border border-red-600"
+                  : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               All Assets ({items.length})
@@ -415,11 +415,11 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                   onClick={() => setCategoryFilter(cat.id)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                     categoryFilter === cat.id
-                      ? "bg-red-700 text-white shadow-[0_0_12px_rgba(239,68,68,0.5)] border border-red-500/50"
-                      : "bg-black/60 border border-red-900/40 text-muted-foreground hover:text-white"
+                      ? "bg-red-600 text-white shadow-sm border border-red-600"
+                      : "bg-slate-100 border border-slate-200 text-slate-600 hover:text-slate-900"
                   }`}
                 >
-                  <cat.icon className={`w-3.5 h-3.5 ${cat.color}`} />
+                  <cat.icon className={`w-3.5 h-3.5 ${categoryFilter === cat.id ? "text-white" : cat.color}`} />
                   {cat.label} ({count})
                 </button>
               );
@@ -430,11 +430,11 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
 
       {/* Items Grid */}
       {loading ? (
-        <div className="py-16 text-center text-red-400 font-orbitron animate-pulse">
+        <div className="py-16 text-center text-red-600 font-orbitron animate-pulse font-bold">
           Accessing Red Network tactical armory...
         </div>
       ) : filteredItems.length === 0 ? (
-        <Card className="card-gang p-12 text-center text-muted-foreground">
+        <Card className="card-gang p-12 text-center text-slate-500">
           <Package className="w-12 h-12 mx-auto text-red-500/40 mb-3" />
           <p className="text-lg">No stash items found matching criteria.</p>
         </Card>
@@ -449,20 +449,20 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
             return (
               <Card
                 key={item.id}
-                className="card-gang p-4 transition-all duration-200 hover:border-red-600/60 relative flex flex-col justify-between group hover:shadow-[0_0_20px_rgba(220,38,38,0.2)]"
+                className="card-gang p-4 transition-all duration-200 hover:border-red-400 relative flex flex-col justify-between group hover:shadow-md"
               >
                 <div>
                   {/* Top Item Bar */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-950 via-black to-neutral-900 border border-red-800/50 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
-                        <Icon className={`w-5 h-5 ${categoryMeta?.color || "text-red-400"}`} />
+                      <div className="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                        <Icon className={`w-5 h-5 ${categoryMeta?.color || "text-red-600"}`} />
                       </div>
                       <div>
-                        <h3 className="font-rajdhani font-bold text-base text-foreground group-hover:text-red-300 transition-colors">
+                        <h3 className="font-rajdhani font-bold text-base text-slate-900 group-hover:text-red-600 transition-colors">
                           {item.name}
                         </h3>
-                        <span className="text-[11px] font-orbitron text-muted-foreground uppercase font-medium">
+                        <span className="text-[11px] font-orbitron text-slate-500 uppercase font-medium">
                           {categoryMeta?.label || item.category}
                         </span>
                       </div>
@@ -470,7 +470,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
 
                     {/* Stock Alert Badge */}
                     {isLowStock && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950/90 border border-rose-500 text-rose-300 animate-pulse shadow-[0_0_8px_rgba(244,63,94,0.4)]">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 border border-rose-300 text-rose-700 shadow-sm">
                         LOW STOCK
                       </span>
                     )}
@@ -478,33 +478,33 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
 
                   {/* Description */}
                   {item.description && (
-                    <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                    <p className="text-xs text-slate-500 mt-2 line-clamp-2">
                       {item.description}
                     </p>
                   )}
 
                   {/* Stock Progress & Value */}
-                  <div className="mt-4 pt-3 border-t border-red-900/30 grid grid-cols-2 gap-3 text-xs">
+                  <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 font-semibold">
                         <span>Current Stash</span>
-                        <span className="font-mono text-xs text-muted-foreground">{stockPct}%</span>
+                        <span className="font-mono text-xs text-slate-500">{stockPct}%</span>
                       </div>
-                      <span className="font-mono font-bold text-lg text-foreground block mt-0.5">
+                      <span className="font-mono font-bold text-lg text-slate-900 block mt-0.5">
                         {item.quantity || 0}{" "}
-                        <span className="text-xs text-muted-foreground font-normal">
+                        <span className="text-xs text-slate-500 font-normal">
                           / {item.maxCapacity || 100}
                         </span>
                       </span>
                       {/* Visual Capacity Meter Bar */}
-                      <div className="w-full h-1.5 bg-black/80 rounded-full mt-1.5 overflow-hidden border border-red-950">
+                      <div className="w-full h-1.5 bg-slate-100 rounded-full mt-1.5 overflow-hidden border border-slate-200">
                         <div
                           className={`h-full rounded-full transition-all duration-300 ${
                             isLowStock 
-                              ? "bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.7)]" 
+                              ? "bg-rose-500" 
                               : stockPct < 50 
-                              ? "bg-amber-400" 
-                              : "bg-emerald-400"
+                              ? "bg-amber-500" 
+                              : "bg-emerald-500"
                           }`}
                           style={{ width: `${stockPct}%` }}
                         />
@@ -512,14 +512,14 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                     </div>
 
                     <div>
-                      <span className="text-muted-foreground block text-[11px]">Unit Price</span>
-                      <span className="font-mono font-bold text-lg text-amber-400 block mt-0.5">
+                      <span className="text-slate-500 block text-[11px] font-semibold">Unit Price</span>
+                      <span className="font-mono font-bold text-lg text-slate-900 block mt-0.5">
                         ${(item.price || 0).toLocaleString()}
                       </span>
-                      <span className="font-mono font-bold text-xs text-cyan-400 flex items-center gap-0.5 mt-0.5">
+                      <span className="font-mono font-bold text-xs text-cyan-700 flex items-center gap-0.5 mt-0.5">
                         <Coins className="w-3 h-3" />{(item.priceSvc ?? Math.round((item.price || 0) / 100)).toLocaleString()} SVC
                       </span>
-                      <span className="text-[10px] text-muted-foreground block mt-1">
+                      <span className="text-[10px] text-slate-500 block mt-1">
                         Valuation: ${((item.quantity || 0) * (item.price || 0)).toLocaleString()}
                       </span>
                     </div>
@@ -527,35 +527,35 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                 </div>
 
                 {/* Bottom Controls */}
-                <div className="mt-4 pt-3 border-t border-red-900/30 flex items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
                   {/* Quick Quantity Modifier for Leader */}
                   {isLeader ? (
-                    <div className="flex items-center gap-1.5 bg-black/60 border border-red-900/50 rounded-lg p-1">
+                    <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 rounded-lg p-1">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleQuickQuantityStep(item, -1)}
-                        className="h-7 w-7 p-0 text-red-300 hover:text-white hover:bg-red-900/60"
+                        className="h-7 w-7 p-0 text-slate-600 hover:text-red-600 hover:bg-red-50"
                         title="Reduce stock -1"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </Button>
-                      <span className="font-mono font-bold text-xs px-1 min-w-[24px] text-center">
+                      <span className="font-mono font-bold text-xs px-1 min-w-[24px] text-center text-slate-900">
                         {item.quantity || 0}
                       </span>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleQuickQuantityStep(item, 1)}
-                        className="h-7 w-7 p-0 text-emerald-300 hover:text-white hover:bg-emerald-900/60"
+                        className="h-7 w-7 p-0 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                         title="Increase stock +1"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Package className="w-3.5 h-3.5" /> Available in Stash
+                    <div className="text-xs text-slate-500 flex items-center gap-1 font-semibold">
+                      <Package className="w-3.5 h-3.5 text-red-600" /> In Stash
                     </div>
                   )}
 
@@ -569,7 +569,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                           setActionType("withdraw");
                           setIsWithdrawOpen(true);
                         }}
-                        className="bg-red-950/60 border border-red-700/60 hover:bg-red-900/60 text-xs text-red-200 px-2.5 h-8 font-semibold"
+                        className="btn-gang text-xs px-2.5 h-8 font-semibold"
                       >
                         Take / Deposit
                       </Button>
@@ -584,7 +584,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                             setEditingItem(item);
                             setIsEditOpen(true);
                           }}
-                          className="h-8 w-8 p-0 text-muted-foreground hover:text-white hover:bg-red-950"
+                          className="h-8 w-8 p-0 text-slate-400 hover:text-slate-800 hover:bg-slate-100"
                         >
                           <Edit className="w-3.5 h-3.5" />
                         </Button>
@@ -592,7 +592,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                           size="sm"
                           variant="ghost"
                           onClick={() => handleDeleteItem(item)}
-                          className="h-8 w-8 p-0 text-muted-foreground hover:text-red-400 hover:bg-red-950"
+                          className="h-8 w-8 p-0 text-slate-400 hover:text-red-600 hover:bg-red-50"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
@@ -608,31 +608,31 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
 
       {/* Add Item Modal (Leader Only) */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-md bg-black/90 border border-red-900/60 text-foreground backdrop-blur-2xl">
+        <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-orbitron text-gang-glow">
+            <DialogTitle className="text-xl font-orbitron text-red-600">
               ADD STASH ARSENAL ASSET
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-3.5 py-2 font-rajdhani">
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Asset Name</Label>
+              <Label className="text-xs text-slate-600 font-bold uppercase">Asset Name</Label>
               <Input
                 placeholder="e.g. Combat MG, 9mm Box, Armor..."
                 value={newItem.name}
                 onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Category</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Category</Label>
                 <select
                   value={newItem.category}
                   onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                  className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -643,63 +643,63 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Unit Value ($)</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Unit Value ($)</Label>
                 <Input
                   type="number"
                   value={newItem.price}
                   onChange={(e) => setNewItem({ ...newItem, price: Number(e.target.value) })}
-                  className="bg-black/50 border-red-900/50 font-mono"
+                  className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
-                <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+              <Label className="text-xs text-cyan-700 font-bold uppercase flex items-center gap-1">
+                <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-100 border border-cyan-300 px-1 rounded text-cyan-800">CRYPTO</span>
               </Label>
               <Input
                 type="number"
                 value={newItem.priceSvc}
                 onChange={(e) => setNewItem({ ...newItem, priceSvc: Number(e.target.value) })}
-                className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                className="bg-white border-cyan-300 font-mono text-cyan-700 focus-visible:ring-cyan-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Starting Quantity</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Starting Quantity</Label>
                 <Input
                   type="number"
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
-                  className="bg-black/50 border-red-900/50 font-mono"
+                  className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Max Capacity</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Max Capacity</Label>
                 <Input
                   type="number"
                   value={newItem.maxCapacity}
                   onChange={(e) => setNewItem({ ...newItem, maxCapacity: Number(e.target.value) })}
-                  className="bg-black/50 border-red-900/50 font-mono"
+                  className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground uppercase">Description / Notes</Label>
+              <Label className="text-xs text-slate-600 font-bold uppercase">Description / Notes</Label>
               <Input
                 placeholder="Tactical use or caliber specs..."
                 value={newItem.description}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                className="bg-black/50 border-red-900/50"
+                className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
               />
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsAddOpen(false)}>
+            <Button variant="ghost" onClick={() => setIsAddOpen(false)} className="text-slate-600 hover:text-slate-900">
               Cancel
             </Button>
             <Button onClick={handleAddItem} className="btn-gang">
@@ -712,30 +712,30 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
       {/* Edit Item Modal (Leader Only) */}
       {editingItem && (
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="sm:max-w-md bg-black/90 border border-red-900/60 text-foreground backdrop-blur-2xl">
+          <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-orbitron text-gang-glow">
+              <DialogTitle className="text-xl font-orbitron text-red-600">
                 MODIFY STASH RECORD
               </DialogTitle>
             </DialogHeader>
 
             <div className="space-y-3.5 py-2 font-rajdhani">
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Asset Name</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Asset Name</Label>
                 <Input
                   value={editingItem.name}
                   onChange={(e) => setEditingItem({ ...editingItem, name: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Category</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Category</Label>
                   <select
                     value={editingItem.category}
                     onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-black/60 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none"
+                    className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -746,62 +746,62 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Unit Value ($)</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Unit Value ($)</Label>
                   <Input
                     type="number"
                     value={editingItem.price}
                     onChange={(e) => setEditingItem({ ...editingItem, price: Number(e.target.value) })}
-                    className="bg-black/50 border-red-900/50 font-mono"
+                    className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-cyan-400/80 uppercase flex items-center gap-1">
-                  <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 px-1 rounded text-cyan-300">CRYPTO</span>
+                <Label className="text-xs text-cyan-700 font-bold uppercase flex items-center gap-1">
+                  <Coins className="w-3 h-3" /> SVC Price <span className="text-[9px] font-orbitron bg-cyan-100 border border-cyan-300 px-1 rounded text-cyan-800">CRYPTO</span>
                 </Label>
                 <Input
                   type="number"
                   value={editingItem.priceSvc ?? Math.round((editingItem.price || 0) / 100)}
                   onChange={(e) => setEditingItem({ ...editingItem, priceSvc: Number(e.target.value) })}
-                  className="bg-black/50 border-cyan-900/50 font-mono text-cyan-400"
+                  className="bg-white border-cyan-300 font-mono text-cyan-700 focus-visible:ring-cyan-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Stock Quantity</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Stock Quantity</Label>
                   <Input
                     type="number"
                     value={editingItem.quantity}
                     onChange={(e) => setEditingItem({ ...editingItem, quantity: Number(e.target.value) })}
-                    className="bg-black/50 border-red-900/50 font-mono"
+                    className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground uppercase">Capacity</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Capacity</Label>
                   <Input
                     type="number"
                     value={editingItem.maxCapacity || 100}
                     onChange={(e) => setEditingItem({ ...editingItem, maxCapacity: Number(e.target.value) })}
-                    className="bg-black/50 border-red-900/50 font-mono"
+                    className="bg-white border-slate-300 text-slate-900 font-mono focus-visible:ring-red-500"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Description</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Description</Label>
                 <Input
                   value={editingItem.description || ""}
                   onChange={(e) => setEditingItem({ ...editingItem, description: e.target.value })}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
                 />
               </div>
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setIsEditOpen(false)}>
+              <Button variant="ghost" onClick={() => setIsEditOpen(false)} className="text-slate-600 hover:text-slate-900">
                 Cancel
               </Button>
               <Button onClick={handleSaveEdit} className="btn-gang">
@@ -815,9 +815,9 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
       {/* Take / Deposit Modal */}
       {selectedItemForAction && (
         <Dialog open={isWithdrawOpen} onOpenChange={setIsWithdrawOpen}>
-          <DialogContent className="sm:max-w-md bg-black/95 border border-red-900/70 text-foreground backdrop-blur-2xl">
+          <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-orbitron text-gang-glow">
+              <DialogTitle className="text-xl font-orbitron text-red-600">
                 STASH OPERATION // {selectedItemForAction.name}
               </DialogTitle>
             </DialogHeader>
@@ -830,8 +830,8 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                   onClick={() => setActionType("withdraw")}
                   className={`py-2 rounded-lg text-xs font-bold font-orbitron uppercase border transition-all ${
                     actionType === "withdraw"
-                      ? "bg-red-700 text-white border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.5)]"
-                      : "bg-black/60 border-red-950 text-muted-foreground"
+                      ? "bg-red-600 text-white border-red-600 shadow-sm"
+                      : "bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   Withdraw from Stash
@@ -841,8 +841,8 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                   onClick={() => setActionType("deposit")}
                   className={`py-2 rounded-lg text-xs font-bold font-orbitron uppercase border transition-all ${
                     actionType === "deposit"
-                      ? "bg-emerald-700 text-white border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
-                      : "bg-black/60 border-red-950 text-muted-foreground"
+                      ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                      : "bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
                   Deposit into Stash
@@ -851,9 +851,9 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
 
               {/* Payment / Currency Option */}
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground uppercase flex items-center justify-between">
+                <Label className="text-xs text-slate-600 font-bold uppercase flex items-center justify-between">
                   <span>Settlement Currency Option</span>
-                  <span className="text-[10px] text-red-400 font-mono">Vault Auto-Linked</span>
+                  <span className="text-[10px] text-red-600 font-mono">Vault Auto-Linked</span>
                 </Label>
                 <div className="grid grid-cols-3 gap-1.5">
                   <button
@@ -861,11 +861,11 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                     onClick={() => setPaymentMode("cash")}
                     className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
                       paymentMode === "cash"
-                        ? "bg-amber-950/80 text-amber-300 border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
-                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                        ? "bg-amber-50 text-amber-800 border-amber-400 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300"
                     }`}
                   >
-                    <DollarSign className="w-4 h-4 text-amber-400" />
+                    <DollarSign className="w-4 h-4 text-amber-600" />
                     <span>Cash ($)</span>
                   </button>
 
@@ -874,11 +874,11 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                     onClick={() => setPaymentMode("svc")}
                     className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
                       paymentMode === "svc"
-                        ? "bg-cyan-950/80 text-cyan-300 border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                        ? "bg-cyan-50 text-cyan-800 border-cyan-400 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300"
                     }`}
                   >
-                    <Coins className="w-4 h-4 text-cyan-400" />
+                    <Coins className="w-4 h-4 text-cyan-600" />
                     <span>SVC (Crypto)</span>
                   </button>
 
@@ -887,45 +887,45 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                     onClick={() => setPaymentMode("none")}
                     className={`py-2 px-1.5 rounded-lg text-xs font-bold font-orbitron flex flex-col items-center justify-center gap-1 border transition-all ${
                       paymentMode === "none"
-                        ? "bg-slate-900 text-slate-200 border-slate-500 shadow-[0_0_12px_rgba(148,163,184,0.3)]"
-                        : "bg-black/50 border-neutral-800 text-neutral-400 hover:border-neutral-700"
+                        ? "bg-slate-200 text-slate-900 border-slate-400 shadow-sm"
+                        : "bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300"
                     }`}
                   >
-                    <Package className="w-4 h-4 text-neutral-400" />
+                    <Package className="w-4 h-4 text-slate-500" />
                     <span>No Vault Cost</span>
                   </button>
                 </div>
               </div>
 
-              <div className="p-3 bg-red-950/30 border border-red-900/40 rounded-lg text-xs space-y-1.5">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs space-y-1.5">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Current Stock in Stash:</span>
-                  <span className="font-mono font-bold text-foreground">{selectedItemForAction.quantity} units</span>
+                  <span className="text-slate-600 font-semibold">Current Stock in Stash:</span>
+                  <span className="font-mono font-bold text-slate-900">{selectedItemForAction.quantity} units</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Unit Price:</span>
-                  <span className="font-mono font-bold text-amber-400">
+                  <span className="text-slate-600 font-semibold">Unit Price:</span>
+                  <span className="font-mono font-bold text-slate-900">
                     ${(selectedItemForAction.price || 0).toLocaleString()}{" "}
-                    <span className="text-cyan-400 ml-1">/ {(selectedItemForAction.priceSvc ?? Math.round((selectedItemForAction.price || 0) / 100)).toLocaleString()} SVC</span>
+                    <span className="text-cyan-700 ml-1">/ {(selectedItemForAction.priceSvc ?? Math.round((selectedItemForAction.price || 0) / 100)).toLocaleString()} SVC</span>
                   </span>
                 </div>
-                <div className="flex justify-between pt-1 border-t border-red-900/40 font-bold items-center">
-                  <span className="text-muted-foreground">
+                <div className="flex justify-between pt-1 border-t border-red-200 font-bold items-center">
+                  <span className="text-slate-600 font-semibold">
                     {actionType === "withdraw" ? "You Pay / Vault Receives:" : "You Receive / Vault Pays:"}
                   </span>
                   {paymentMode === "cash" && (
-                    <span className="font-mono text-amber-400 text-sm">
+                    <span className="font-mono text-slate-900 text-sm">
                       ${(Number(actionQuantity) * (selectedItemForAction.price || 0)).toLocaleString()} Cash
                     </span>
                   )}
                   {paymentMode === "svc" && (
-                    <span className="font-mono text-cyan-400 text-sm flex items-center gap-1">
+                    <span className="font-mono text-cyan-700 text-sm flex items-center gap-1">
                       <Coins className="w-3.5 h-3.5" />
                       {(Number(actionQuantity) * (selectedItemForAction.priceSvc ?? Math.round((selectedItemForAction.price || 0) / 100))).toLocaleString()} SVC
                     </span>
                   )}
                   {paymentMode === "none" && (
-                    <span className="font-mono text-muted-foreground text-xs">
+                    <span className="font-mono text-slate-500 text-xs">
                       $0 (Free Handover)
                     </span>
                   )}
@@ -933,20 +933,20 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
               </div>
 
               <div className="space-y-1">
-                <Label className="text-xs text-muted-foreground uppercase">Operative Name / Call-Sign</Label>
+                <Label className="text-xs text-slate-600 font-bold uppercase">Operative Name / Call-Sign</Label>
                 <Input
                   placeholder="e.g. Marcus Vance / Trigger"
                   value={operativeName}
                   onChange={(e) => setOperativeName(e.target.value)}
-                  className="bg-black/50 border-red-900/50"
+                  className="bg-white border-slate-300 text-slate-900 focus-visible:ring-red-500"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs text-muted-foreground uppercase">Quantity to {actionType === "withdraw" ? "Withdraw" : "Deposit"}</Label>
+                  <Label className="text-xs text-slate-600 font-bold uppercase">Quantity to {actionType === "withdraw" ? "Withdraw" : "Deposit"}</Label>
                   {actionType === "withdraw" && (
-                    <span className="text-[11px] text-muted-foreground font-mono">Max: {selectedItemForAction.quantity}</span>
+                    <span className="text-[11px] text-slate-500 font-mono">Max: {selectedItemForAction.quantity}</span>
                   )}
                 </div>
                 <Input
@@ -955,7 +955,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                   max={actionType === "withdraw" ? selectedItemForAction.quantity : 999}
                   value={actionQuantity}
                   onChange={(e) => setActionQuantity(Number(e.target.value))}
-                  className="bg-black/50 border-red-900/50 font-mono text-base"
+                  className="bg-white border-slate-300 text-slate-900 font-mono text-base focus-visible:ring-red-500"
                 />
 
                 {/* Quick Presets */}
@@ -965,7 +965,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                       key={preset}
                       type="button"
                       onClick={() => setActionQuantity(preset)}
-                      className="px-2.5 py-1 rounded bg-black/60 border border-red-900/40 text-xs font-mono font-bold hover:border-red-500 hover:text-white transition-colors"
+                      className="px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-xs font-mono font-bold hover:border-red-500 hover:text-red-600 transition-colors text-slate-700"
                     >
                       +{preset}
                     </button>
@@ -973,7 +973,7 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
                   <button
                     type="button"
                     onClick={() => setActionQuantity(actionType === "withdraw" ? (selectedItemForAction.quantity || 1) : 50)}
-                    className="px-2.5 py-1 rounded bg-red-950/60 border border-red-500/50 text-xs font-orbitron font-bold text-red-300 hover:bg-red-900/60 transition-colors ml-auto"
+                    className="px-2.5 py-1 rounded bg-red-50 border border-red-300 text-xs font-orbitron font-bold text-red-700 hover:bg-red-100 transition-colors ml-auto"
                   >
                     MAX
                   </button>
@@ -982,12 +982,12 @@ export function InventoryTab({ userMode }: InventoryTabProps) {
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setIsWithdrawOpen(false)}>
+              <Button variant="ghost" onClick={() => setIsWithdrawOpen(false)} className="text-slate-600 hover:text-slate-900">
                 Cancel
               </Button>
               <Button
                 onClick={handleExecuteStashAction}
-                className={actionType === "withdraw" ? "btn-gang" : "bg-emerald-700 hover:bg-emerald-600 text-white font-bold"}
+                className={actionType === "withdraw" ? "btn-gang" : "bg-emerald-600 hover:bg-emerald-700 text-white font-bold"}
               >
                 Confirm {actionType === "withdraw" ? "Withdrawal" : "Deposit"}
               </Button>

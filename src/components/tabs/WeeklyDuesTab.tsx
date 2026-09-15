@@ -348,14 +348,14 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-gang-glow">
+            <h2 className="text-2xl md:text-3xl font-orbitron font-extrabold text-red-600">
               WEEKLY DUES & CONTRIBUTIONS
             </h2>
-            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-950 border border-red-500/50 text-red-300">
+            <span className="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-red-50 border border-red-200 text-red-700 shadow-sm">
               Week #{selectedWeek} {isCurrentWeekSelected ? "(Current Active)" : "(Archived)"}
             </span>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-slate-500 mt-0.5 font-medium">
             Track syndicate quotas, verify weekly gang dues, and initiate weekly reset cycles.
           </p>
         </div>
@@ -368,7 +368,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                 soundFx.playClickSound();
                 setIsResetDialogOpen(true);
               }}
-              className="bg-gradient-to-r from-red-700 via-rose-600 to-red-800 hover:from-red-600 hover:to-rose-500 text-white font-rajdhani font-bold px-4 py-2 rounded-lg shadow-[0_0_20px_rgba(220,38,38,0.4)] flex items-center gap-2"
+              className="btn-gang flex items-center gap-2"
             >
               <RotateCcw className="w-4 h-4" />
               Reset Weekly Cycle
@@ -382,15 +382,15 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         {/* Cash Quota Expected */}
         <Card className="card-gang p-4 border-l-4 border-l-red-600">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Cash Quota Expected
             </span>
-            <DollarSign className="w-5 h-5 text-red-400" />
+            <DollarSign className="w-5 h-5 text-red-500" />
           </div>
-          <p className="text-xl font-orbitron font-bold text-foreground mt-2 font-mono">
+          <p className="text-xl font-orbitron font-bold text-slate-900 mt-2 font-mono">
             ${totalCashExpected.toLocaleString()}
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             {members.length} registered syndicate operatives
           </span>
         </Card>
@@ -398,50 +398,50 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
         {/* Cash Collected */}
         <Card className="card-gang p-4 border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
+            <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
               Cash Collected
             </span>
-            <TrendingUp className="w-5 h-5 text-emerald-400" />
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-xl font-orbitron font-bold text-emerald-400 mt-2 font-mono">
+          <p className="text-xl font-orbitron font-bold text-emerald-600 mt-2 font-mono">
             ${totalCashCollected.toLocaleString()}
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             {paidCount} of {members.length} Paid ({collectionRate}%)
           </span>
         </Card>
 
         {/* SVC Quota Expected */}
-        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 bg-gradient-to-br from-black via-cyan-950/20 to-black">
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-500 bg-cyan-50/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+              <span className="text-xs text-cyan-800 uppercase font-bold tracking-wider">
                 SVC Expected
               </span>
-              <span className="px-1.5 rounded text-[9px] font-orbitron bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-bold">CRYPTO</span>
+              <span className="px-1.5 rounded text-[9px] font-orbitron bg-cyan-100 border border-cyan-300 text-cyan-800 font-bold">CRYPTO</span>
             </div>
-            <Coins className="w-5 h-5 text-cyan-400" />
+            <Coins className="w-5 h-5 text-cyan-600" />
           </div>
-          <p className="text-xl font-orbitron font-bold text-cyan-400 mt-2 font-mono flex items-center gap-1">
-            {totalSvcExpected.toLocaleString()} <span className="text-sm text-cyan-300">SVC</span>
+          <p className="text-xl font-orbitron font-bold text-cyan-700 mt-2 font-mono flex items-center gap-1">
+            {totalSvcExpected.toLocaleString()} <span className="text-sm text-cyan-800">SVC</span>
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             Weekly crypto quota for {members.length} operatives
           </span>
         </Card>
 
         {/* SVC Collected */}
-        <Card className="card-gang p-4 border-l-4 border-l-cyan-400 bg-gradient-to-br from-black via-cyan-950/15 to-black">
+        <Card className="card-gang p-4 border-l-4 border-l-cyan-600 bg-cyan-50/30">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-cyan-300 uppercase font-bold tracking-wider">
+            <span className="text-xs text-cyan-800 uppercase font-bold tracking-wider">
               SVC Collected
             </span>
-            <Award className="w-5 h-5 text-cyan-400" />
+            <Award className="w-5 h-5 text-cyan-600" />
           </div>
-          <p className="text-xl font-orbitron font-bold text-cyan-400 mt-2 font-mono flex items-center gap-1">
-            {totalSvcCollected.toLocaleString()} <span className="text-sm text-cyan-300">SVC</span>
+          <p className="text-xl font-orbitron font-bold text-cyan-700 mt-2 font-mono flex items-center gap-1">
+            {totalSvcCollected.toLocaleString()} <span className="text-sm text-cyan-800">SVC</span>
           </p>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-slate-500">
             {weekMemberRows.filter((r) => r.isPaidSvc).length} of {members.length} SVC Settled
           </span>
         </Card>
@@ -450,24 +450,23 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
       {/* Compliance Bar */}
       <Card className="card-gang p-4 border-l-4 border-l-amber-500">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Cycle Compliance Rate (Cash)</span>
-          <span className="text-lg font-orbitron font-bold text-amber-400 font-mono">{collectionRate}% Settled</span>
+          <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">Cycle Compliance Rate (Cash)</span>
+          <span className="text-lg font-orbitron font-bold text-amber-700 font-mono">{collectionRate}% Settled</span>
         </div>
-        <div className="w-full h-2 bg-black/80 rounded-full overflow-hidden border border-red-950">
+        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
           <div
-            className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-400 transition-all duration-500 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"
+            className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 transition-all duration-500 rounded-full"
             style={{ width: `${Math.min(collectionRate, 100)}%` }}
           />
         </div>
       </Card>
-
 
       {/* Week Selector & Filters Bar */}
       <Card className="card-gang p-4">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
           {/* Select Week Dropdown */}
           <div>
-            <label className="text-[11px] uppercase font-bold text-muted-foreground block mb-1">
+            <label className="text-[11px] uppercase font-bold text-slate-600 block mb-1">
               Select Cycle Week
             </label>
             <select
@@ -476,7 +475,7 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                 setSelectedWeek(Number(e.target.value));
                 soundFx.playClickSound();
               }}
-              className="w-full px-3 py-2 bg-black/70 border border-red-900/50 rounded-lg text-sm text-foreground focus:outline-none focus:border-red-500 font-rajdhani font-bold"
+              className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:border-red-500 font-rajdhani font-bold"
             >
               {availableWeeks.map((wk) => (
                 <option key={wk} value={wk}>
@@ -488,32 +487,32 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
           {/* Search Member */}
           <div className="sm:col-span-2">
-            <label className="text-[11px] uppercase font-bold text-muted-foreground block mb-1">
+            <label className="text-[11px] uppercase font-bold text-slate-600 block mb-1">
               Search Member
             </label>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search operative by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-black/50 border-red-900/40 text-sm font-rajdhani focus:border-red-500"
+                className="pl-9 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 text-sm font-rajdhani focus:border-red-500"
               />
             </div>
           </div>
 
           {/* Status Filter Segmented Controls */}
           <div>
-            <label className="text-[11px] uppercase font-bold text-muted-foreground block mb-1">
+            <label className="text-[11px] uppercase font-bold text-slate-600 block mb-1">
               Filter (Cash Status)
             </label>
-            <div className="flex items-center gap-1 bg-black/60 p-1 rounded-lg border border-red-900/40">
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
               <button
                 onClick={() => setStatusFilter("all")}
                 className={`flex-1 py-1 rounded text-xs font-bold transition-all ${
                   statusFilter === "all"
-                    ? "bg-red-700 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-red-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 All ({members.length})
@@ -522,8 +521,8 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                 onClick={() => setStatusFilter("paid")}
                 className={`flex-1 py-1 rounded text-xs font-bold transition-all ${
                   statusFilter === "paid"
-                    ? "bg-emerald-700 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Paid ({paidCount})
@@ -532,8 +531,8 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                 onClick={() => setStatusFilter("pending")}
                 className={`flex-1 py-1 rounded text-xs font-bold transition-all ${
                   statusFilter === "pending"
-                    ? "bg-amber-700 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-white"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Pending
@@ -547,29 +546,29 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
       <Card className="card-gang overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm font-rajdhani">
-            <thead className="bg-black/90 border-b border-red-900/50 text-xs font-orbitron uppercase text-muted-foreground">
+            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-orbitron uppercase text-slate-600">
               <tr>
                 <th className="py-3 px-4">Operative</th>
                 <th className="py-3 px-4">Rank</th>
                 <th className="py-3 px-4">Cash Quota</th>
                 <th className="py-3 px-4">
-                  <span className="flex items-center gap-1 text-cyan-400/80">
+                  <span className="flex items-center gap-1 text-cyan-700">
                     <Coins className="w-3.5 h-3.5" /> SVC Quota
                   </span>
                 </th>
                 <th className="py-3 px-4">Cash Status</th>
                 <th className="py-3 px-4">
-                  <span className="flex items-center gap-1 text-cyan-400/80">SVC Status</span>
+                  <span className="flex items-center gap-1 text-cyan-700">SVC Status</span>
                 </th>
                 <th className="py-3 px-4 text-right">
                   {isLeader ? "Actions" : "Verification"}
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-red-900/20">
+            <tbody className="divide-y divide-slate-100">
               {filteredRows.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-muted-foreground font-rajdhani">
+                  <td colSpan={7} className="py-12 text-center text-slate-500 font-rajdhani">
                     No operatives found matching current filters.
                   </td>
                 </tr>
@@ -577,51 +576,51 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                 filteredRows.map(({ member, isPaidCash, isPaidSvc, paymentDate, markedBy }) => (
                   <tr
                     key={member.id}
-                    className="hover:bg-red-950/20 transition-colors duration-150 group"
+                    className="hover:bg-red-50/40 transition-colors duration-150 group"
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-900/60 to-black border border-red-600/30 flex items-center justify-center font-orbitron font-bold text-xs text-red-300">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-rose-500 border border-red-200 flex items-center justify-center font-orbitron font-bold text-xs text-white">
                           {member.name[0]?.toUpperCase()}
                         </div>
-                        <span className="font-bold text-foreground group-hover:text-red-300 transition-colors">
+                        <span className="font-bold text-slate-900 group-hover:text-red-600 transition-colors">
                           {member.name}
                         </span>
                       </div>
                     </td>
-                    <td className="py-3 px-4 font-mono text-xs uppercase text-muted-foreground">
-                      <span className="px-2 py-0.5 rounded bg-black/60 border border-neutral-800 text-[10px] font-bold font-orbitron">
+                    <td className="py-3 px-4 font-mono text-xs uppercase text-slate-500">
+                      <span className="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-[10px] font-bold font-orbitron text-slate-700">
                         {member.rank || "recruit"}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-mono font-bold text-amber-400 text-sm">
+                    <td className="py-3 px-4 font-mono font-bold text-slate-900 text-sm">
                       ${(member.contribution || 0).toLocaleString()}
                     </td>
-                    <td className="py-3 px-4 font-mono font-bold text-cyan-400 text-sm">
-                      {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-300">SVC</span>
+                    <td className="py-3 px-4 font-mono font-bold text-cyan-700 text-sm">
+                      {(member.contributionSvc ?? 100).toLocaleString()} <span className="text-[10px] font-orbitron text-cyan-600">SVC</span>
                     </td>
                     <td className="py-3 px-4">
                       {isPaidCash ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950/80 border border-emerald-500/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.25)]">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                           PAID
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-950/80 border border-amber-500/50 text-amber-300 animate-pulse">
-                          <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700">
+                          <Clock className="w-3.5 h-3.5 text-amber-600" />
                           PENDING
                         </span>
                       )}
                     </td>
                     <td className="py-3 px-4">
                       {isPaidSvc ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-950/80 border border-cyan-500/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.25)]">
-                          <Coins className="w-3.5 h-3.5 text-cyan-400" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-cyan-50 border border-cyan-200 text-cyan-700 shadow-sm">
+                          <Coins className="w-3.5 h-3.5 text-cyan-600" />
                           PAID
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 border border-neutral-700 text-neutral-400">
-                          <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 border border-slate-200 text-slate-600">
+                          <Clock className="w-3.5 h-3.5 text-slate-400" />
                           PENDING
                         </span>
                       )}
@@ -635,19 +634,19 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                             disabled={togglingId === member.id + "_cash"}
                             className={
                               isPaidCash
-                                ? "bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-900/70 text-xs font-bold"
-                                : "bg-red-950/70 border border-red-500/60 text-red-200 hover:bg-red-900/70 text-xs font-bold shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+                                ? "bg-emerald-50 border border-emerald-300 text-emerald-700 hover:bg-emerald-100 text-xs font-bold"
+                                : "btn-gang text-xs font-bold shadow-sm"
                             }
                           >
                             {togglingId === member.id + "_cash" ? (
                               "..."
                             ) : isPaidCash ? (
                               <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-amber-400" /> Unpay $
+                                <Clock className="w-3 h-3 text-amber-600" /> Unpay $
                               </span>
                             ) : (
                               <span className="flex items-center gap-1">
-                                <DollarSign className="w-3 h-3 text-emerald-400" /> Mark Paid $
+                                <DollarSign className="w-3 h-3 text-white" /> Mark Paid $
                               </span>
                             )}
                           </Button>
@@ -657,25 +656,25 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
                             disabled={togglingId === member.id + "_svc"}
                             className={
                               isPaidSvc
-                                ? "bg-cyan-950/60 border border-cyan-500/60 text-cyan-300 hover:bg-cyan-900/70 text-xs font-bold"
-                                : "bg-black/70 border border-cyan-800/60 text-cyan-300/80 hover:bg-cyan-950/60 text-xs font-bold"
+                                ? "bg-cyan-50 border border-cyan-300 text-cyan-700 hover:bg-cyan-100 text-xs font-bold"
+                                : "bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold"
                             }
                           >
                             {togglingId === member.id + "_svc" ? (
                               "..."
                             ) : isPaidSvc ? (
                               <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-neutral-400" /> Unpay SVC
+                                <Clock className="w-3 h-3 text-slate-500" /> Unpay SVC
                               </span>
                             ) : (
                               <span className="flex items-center gap-1">
-                                <Coins className="w-3 h-3 text-cyan-400" /> Mark Paid SVC
+                                <Coins className="w-3 h-3 text-white" /> Mark Paid SVC
                               </span>
                             )}
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foreground flex items-center justify-end gap-1">
+                        <span className="text-xs text-slate-400 flex items-center justify-end gap-1">
                           <Lock className="w-3 h-3" /> Leader Only
                         </span>
                       )}
@@ -690,30 +689,30 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
 
       {/* Weekly Reset Confirmation Modal (Leader Only) */}
       <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-black/95 border border-red-700 text-foreground backdrop-blur-2xl shadow-[0_0_40px_rgba(220,38,38,0.5)]">
+        <DialogContent className="sm:max-w-md bg-white border border-red-200 text-slate-900 shadow-2xl">
           <DialogHeader>
-            <div className="flex items-center gap-3 text-red-500">
-              <AlertTriangle className="w-7 h-7 animate-bounce" />
-              <DialogTitle className="text-xl font-orbitron font-extrabold text-gang-glow">
+            <div className="flex items-center gap-3 text-red-600">
+              <AlertTriangle className="w-7 h-7" />
+              <DialogTitle className="text-xl font-orbitron font-extrabold text-red-600">
                 RESET WEEKLY DUES CYCLE
               </DialogTitle>
             </div>
           </DialogHeader>
 
           <div className="space-y-4 py-3 font-rajdhani text-sm">
-            <div className="p-3 rounded-lg bg-red-950/40 border border-red-900/60 text-red-200">
-              <p className="font-bold text-white mb-1">
+            <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-900">
+              <p className="font-bold text-red-950 mb-1">
                 You are about to close Week #{cycle.currentWeekNumber} and start Week #{cycle.currentWeekNumber + 1}.
               </p>
-              <ul className="list-disc list-inside space-y-1 text-xs text-red-300/90 mt-2">
+              <ul className="list-disc list-inside space-y-1 text-xs text-red-800 mt-2">
                 <li>Snapshots all {members.length} members' current week payment status into permanent audit logs.</li>
-                <li>Resets all operatives' dues status to <strong className="text-amber-300">Pending</strong> for the new week.</li>
-                <li>Increments active cycle to <strong className="text-red-300">Week #{cycle.currentWeekNumber + 1}</strong>.</li>
+                <li>Resets all operatives' dues status to <strong className="text-amber-700">Pending</strong> for the new week.</li>
+                <li>Increments active cycle to <strong className="text-red-700">Week #{cycle.currentWeekNumber + 1}</strong>.</li>
                 <li>Logs timestamp and authorizing Leader ID to Syndicate records.</li>
               </ul>
             </div>
 
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-600">
               Are you sure you want to proceed with the weekly dues cycle reset?
             </p>
           </div>
@@ -723,13 +722,14 @@ export function WeeklyDuesTab({ userMode }: WeeklyDuesTabProps) {
               variant="ghost"
               onClick={() => setIsResetDialogOpen(false)}
               disabled={isResetting}
+              className="text-slate-600 hover:text-slate-900"
             >
               Cancel
             </Button>
             <Button
               onClick={handleWeeklyReset}
               disabled={isResetting}
-              className="bg-red-700 hover:bg-red-600 text-white font-bold"
+              className="btn-gang font-bold"
             >
               {isResetting ? "Archiving & Resetting..." : "Confirm Weekly Reset"}
             </Button>
