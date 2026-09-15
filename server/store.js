@@ -812,17 +812,40 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
     if (target.type === 'video') {
       videoId = target.value;
       thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      let html = '';
       try {
-        const { stdout: html } = await execFileAsync(curlBin, [
-          '-sL',
-          '--compressed',
-          '--max-time', '6',
-          '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          '-H', 'Accept-Language: en-US,en;q=0.9',
-          `https://www.youtube.com/watch?v=${videoId}`,
-        ], { maxBuffer: 10 * 1024 * 1024 });
+        const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          },
+          signal: AbortSignal.timeout(6000)
+        });
+        if (res.ok) {
+          html = await res.text();
+          ytChecked = true;
+        }
+      } catch (e) {}
 
-        ytChecked = true;
+      if (!html) {
+        try {
+          const { stdout } = await execFileAsync(curlBin, [
+            '-sL',
+            '--compressed',
+            '--max-time', '6',
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            '-H', 'Accept-Language: en-US,en;q=0.9',
+            `https://www.youtube.com/watch?v=${videoId}`,
+          ], { maxBuffer: 10 * 1024 * 1024 });
+          if (stdout) {
+            html = stdout;
+            ytChecked = true;
+          }
+        } catch (e) {}
+      }
+
+      if (html) {
         const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW') || html.includes('"status":"LIVE"');
         if (liveActive) {
           isLive = true;
@@ -841,9 +864,9 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
           if (titleMatch) title = titleMatch.replace(/ - YouTube$/, '');
           views = viewers * 8;
         }
-      } catch (e) {}
+      }
     } else {
-      // Channel or handle: fetch the channel's /live endpoint directly (never use RSS feeds which return old non-live videos)
+      // Channel or handle: fetch the channel's /live endpoint directly
       const slugUpper = (target.value || '').toUpperCase();
       const memberUpper = (memberName || '').toUpperCase().trim();
       const channelId = KNOWN_YT_CHANNEL_IDS[slugUpper] || KNOWN_YT_CHANNEL_IDS[memberUpper] || (target.type === 'channel' ? target.value : null);
@@ -852,48 +875,70 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
         ? `https://www.youtube.com/channel/${channelId}/live`
         : `https://www.youtube.com/@${target.value}/live`;
 
+      let html = '';
       try {
-        const { stdout: html } = await execFileAsync(curlBin, [
-          '-sL',
-          '--compressed',
-          '--max-time', '6',
-          '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          '-H', 'Accept-Language: en-US,en;q=0.9',
-          liveUrl,
-        ], { maxBuffer: 10 * 1024 * 1024 });
-
-        if (html && html.length > 500) {
+        const res = await fetch(liveUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          },
+          redirect: 'follow',
+          signal: AbortSignal.timeout(6000)
+        });
+        if (res.ok) {
+          html = await res.text();
           ytChecked = true;
-          const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
-          const isWatch = canonical.includes('/watch?v=') || canonical.includes('/live/');
-          const hasLiveFlags = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW') || html.includes('"status":"LIVE"');
-
-          if (isWatch && hasLiveFlags) {
-            const vidMatch = (canonical.match(/\/(?:watch\?v=|live\/)([a-zA-Z0-9_-]{11})/) || html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/))?.[1] || '';
-            if (vidMatch) {
-              videoId = vidMatch;
-              isLive = true;
-              thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-              const v1 = html.match(/"viewCount":\{"videoViewCountRenderer":\{"viewCount":\{"runs":\[\{"text":"([0-9,]+)"/);
-              const v2 = html.match(/"originalViewCount":"(\d+)"/);
-              const v3 = html.match(/"text":"([0-9,]+)"\},\{"text":"\s*(?:watching|waiting)/i);
-              const v4 = html.match(/"shortViewCount":\{"accessibility":\{"accessibilityData":\{"label":"([0-9,]+)\s*(?:watching|views)/i);
-              const rawV = v1?.[1] || v2?.[1] || v3?.[1] || v4?.[1] || '0';
-              viewers = parseInt(String(rawV).replace(/,/g, ''), 10) || 0;
-
-              const likeMatch = html.match(/"label":"([0-9,]+) likes"/) || html.match(/"likeCount":"(\d+)"/);
-              if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || Math.round(viewers * 0.18);
-              else likes = Math.round(viewers * 0.18);
-
-              views = viewers * 8;
-
-              const titleMatch = (html.match(/<meta name="title" content="([^"]+)"/) || html.match(/"title":"([^"]+)"/))?.[1] || '';
-              if (titleMatch) title = titleMatch.replace(/ - YouTube$/, '');
-            }
-          }
         }
       } catch (e) {}
+
+      if (!html) {
+        try {
+          const { stdout } = await execFileAsync(curlBin, [
+            '-sL',
+            '--compressed',
+            '--max-time', '6',
+            '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            '-H', 'Accept-Language: en-US,en;q=0.9',
+            liveUrl,
+          ], { maxBuffer: 10 * 1024 * 1024 });
+          if (stdout) {
+            html = stdout;
+            ytChecked = true;
+          }
+        } catch (e) {}
+      }
+
+      if (html && html.length > 500) {
+        const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
+        const isWatch = canonical.includes('/watch?v=') || canonical.includes('/live/');
+        const hasLiveFlags = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW') || html.includes('"status":"LIVE"');
+
+        if (isWatch && hasLiveFlags) {
+          const vidMatch = (canonical.match(/\/(?:watch\?v=|live\/)([a-zA-Z0-9_-]{11})/) || html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/))?.[1] || '';
+          if (vidMatch) {
+            videoId = vidMatch;
+            isLive = true;
+            thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+            const v1 = html.match(/"viewCount":\{"videoViewCountRenderer":\{"viewCount":\{"runs":\[\{"text":"([0-9,]+)"/);
+            const v2 = html.match(/"originalViewCount":"(\d+)"/);
+            const v3 = html.match(/"text":"([0-9,]+)"\},\{"text":"\s*(?:watching|waiting)/i);
+            const v4 = html.match(/"shortViewCount":\{"accessibility":\{"accessibilityData":\{"label":"([0-9,]+)\s*(?:watching|views)/i);
+            const rawV = v1?.[1] || v2?.[1] || v3?.[1] || v4?.[1] || '0';
+            viewers = parseInt(String(rawV).replace(/,/g, ''), 10) || 0;
+
+            const likeMatch = html.match(/"label":"([0-9,]+) likes"/) || html.match(/"likeCount":"(\d+)"/);
+            if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || Math.round(viewers * 0.18);
+            else likes = Math.round(viewers * 0.18);
+
+            views = viewers * 8;
+
+            const titleMatch = (html.match(/<meta name="title" content="([^"]+)"/) || html.match(/"title":"([^"]+)"/))?.[1] || '';
+            if (titleMatch) title = titleMatch.replace(/ - YouTube$/, '');
+          }
+        }
+      }
     }
 
     if (!isLive) {
