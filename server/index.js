@@ -177,9 +177,17 @@ app.post('/api/auth/discord/verify', (req, res) => {
     return res.status(400).json({ success: false, message: 'discordId is required' });
   }
 
-  const effectiveAdminIds = ADMIN_DISCORD_IDS.length > 0 ? ADMIN_DISCORD_IDS : ['879604109366394880'];
+  const defaultAdminIds = ['879604109366394880', '777365342396743690', '223682838250127361'];
+  const defaultMemberIds = [
+    '432605534898880524', '1061934383768023050', '499581964311986176',
+    '748476126569037915', '823265513375268865', '546744058668777494',
+    '500346488124080138', '727840426366599208', '499633892660346922',
+    '589507025650843669', '829943498782015529'
+  ];
+  const effectiveAdminIds = ADMIN_DISCORD_IDS.length > 0 ? ADMIN_DISCORD_IDS : defaultAdminIds;
+  const effectiveMemberIds = MEMBER_DISCORD_IDS.length > 0 ? MEMBER_DISCORD_IDS : defaultMemberIds;
   const isAdmin = effectiveAdminIds.includes(discordId);
-  const isMember = MEMBER_DISCORD_IDS.length === 0 || MEMBER_DISCORD_IDS.includes(discordId) || isAdmin;
+  const isMember = effectiveMemberIds.includes(discordId) || isAdmin;
 
   console.log(`[Discord Auth] ${username} (${discordId}) | Target: ${targetMode} | Admin: ${isAdmin} | Member: ${isMember}`);
 

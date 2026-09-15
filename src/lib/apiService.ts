@@ -430,7 +430,7 @@ export const apiService = {
     );
   },
   getDiscordLoginUrl(targetMode: string): string {
-    const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID;
+    const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID || '1549427232827506739';
     if (!clientId) {
       return '#no_discord_client_id';
     }
