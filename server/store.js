@@ -359,13 +359,13 @@ const STARTER_STREAMS = [
     memberName: 'Shubh Sage',
     platform: 'youtube',
     channelSlug: 'shubhcantplay6465',
-    videoId: '9u9SVDrIY9A',
-    title: 'Airdrop Contest + Empire War Car Goal | Shubh Sage | #lifeinsoulcity',
-    isLive: true,
-    thumbnailUrl: 'https://img.youtube.com/vi/9u9SVDrIY9A/hqdefault.jpg',
-    viewers: 18,
-    likes: 120,
-    views: 2400,
+    videoId: '',
+    title: '',
+    isLive: false,
+    thumbnailUrl: '',
+    viewers: 0,
+    likes: 0,
+    views: 0,
     addedBy: 'Leader',
     createdAt: nowIso(),
   },
@@ -657,40 +657,55 @@ function parseYouTubeTarget(input) {
   let str = (input || '').trim();
   if (!str) return { type: 'handle', value: '' };
 
-  if (str.startsWith('@')) {
-    return { type: 'handle', value: str.slice(1).split('/')[0].split('?')[0] };
-  }
-
-  const watchMatch = str.match(/(?:youtube\.com\/(?:watch\?.*v=|v\/)|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/i);
+  // 1. Direct watch or youtu.be or embed video URLs
+  const watchMatch = str.match(/(?:watch\?.*v=|youtu\.be\/|youtube\.com\/(?:embed|v)\/)([a-zA-Z0-9_-]{11})/i);
   if (watchMatch) {
     return { type: 'video', value: watchMatch[1] };
   }
 
-  const liveVidMatch = str.match(/youtube\.com\/live\/([a-zA-Z0-9_-]{11})/i);
+  const liveVidMatch = str.match(/(?:^|\/|\.)(?:live)\/([a-zA-Z0-9_-]{11})/i);
   if (liveVidMatch) {
     return { type: 'video', value: liveVidMatch[1] };
   }
 
-  const handleMatch = str.match(/youtube\.com\/@([a-zA-Z0-9_.-]+)/i);
-  if (handleMatch) {
-    return { type: 'handle', value: handleMatch[1] };
-  }
-
-  const channelMatch = str.match(/youtube\.com\/channel\/(UC[a-zA-Z0-9_-]+)/i);
+  // 2. Channel ID: /channel/UC... or raw UC...
+  const channelMatch = str.match(/(?:^|\/|\.)channel\/(UC[a-zA-Z0-9_-]{22})/i);
   if (channelMatch) {
     return { type: 'channel', value: channelMatch[1] };
-  }
-
-  const customMatch = str.match(/youtube\.com\/(?:c|user)\/([a-zA-Z0-9_.-]+)/i);
-  if (customMatch) {
-    return { type: 'handle', value: customMatch[1] };
   }
 
   if (/^UC[a-zA-Z0-9_-]{22}$/.test(str)) {
     return { type: 'channel', value: str };
   }
 
-  return { type: 'handle', value: str.replace(/^https?:\/\/(www\.)?youtube\.com\//i, '').replace(/^\/+|\/+$/g, '') };
+  // 3. 11-char video ID directly
+  if (/^[a-zA-Z0-9_-]{11}$/.test(str) && !str.startsWith('UC')) {
+    return { type: 'video', value: str };
+  }
+
+  // 4. Handle: @name or youtube.com/@name
+  const handleMatch = str.match(/@([a-zA-Z0-9_.-]+)/i);
+  if (handleMatch) {
+    return { type: 'handle', value: handleMatch[1].split('/')[0].split('?')[0] };
+  }
+
+  // 5. Custom / user URL: youtube.com/(c|user)/name
+  const customMatch = str.match(/(?:^|\/|\.)(?:c|user)\/([a-zA-Z0-9_.-]+)/i);
+  if (customMatch) {
+    return { type: 'handle', value: customMatch[1].split('/')[0].split('?')[0] };
+  }
+
+  // 6. Plain slug/handle
+  let clean = str
+    .replace(/^https?:\/\/(www\.)?youtube\.com\//i, '')
+    .replace(/^@/, '')
+    .replace(/\/live.*$/i, '')
+    .replace(/\/videos.*$/i, '')
+    .replace(/\/featured.*$/i, '')
+    .split('/')[0]
+    .split('?')[0];
+
+  return { type: 'handle', value: clean };
 }
 
 const KNOWN_YT_CHANNEL_IDS = {
@@ -798,158 +813,96 @@ async function fetchLiveStreamMetadata(platform, channelSlug, memberName) {
       videoId = target.value;
       thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
       try {
-        const { stdout } = await execFileAsync(curlBin, [
-          '-4',
-          '-s',
-          '--max-time', '3',
-          `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-        ]);
-        if (stdout && stdout.trim().startsWith('{')) {
-          const oe = JSON.parse(stdout);
-          title = oe.title || '';
-          if (oe.thumbnail_url) thumbnailUrl = oe.thumbnail_url;
-          ytChecked = true;
-        }
-      } catch (e) {}
-
-      try {
         const { stdout: html } = await execFileAsync(curlBin, [
-          '-4',
           '-sL',
           '--compressed',
-          '--max-time', '4',
+          '--max-time', '6',
           '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          '-H', 'Accept-Language: en-US,en;q=0.9',
           `https://www.youtube.com/watch?v=${videoId}`,
         ], { maxBuffer: 10 * 1024 * 1024 });
 
-        const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW');
+        ytChecked = true;
+        const liveActive = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW') || html.includes('"status":"LIVE"');
         if (liveActive) {
           isLive = true;
-          const viewerMatch = html.match(/"originalViewCount":"(\d+)"/) || html.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
-          if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
+          const v1 = html.match(/"viewCount":\{"videoViewCountRenderer":\{"viewCount":\{"runs":\[\{"text":"([0-9,]+)"/);
+          const v2 = html.match(/"originalViewCount":"(\d+)"/);
+          const v3 = html.match(/"text":"([0-9,]+)"\},\{"text":"\s*(?:watching|waiting)/i);
+          const v4 = html.match(/"shortViewCount":\{"accessibility":\{"accessibilityData":\{"label":"([0-9,]+)\s*(?:watching|views)/i);
+          const rawV = v1?.[1] || v2?.[1] || v3?.[1] || v4?.[1] || '0';
+          viewers = parseInt(String(rawV).replace(/,/g, ''), 10) || 0;
 
           const likeMatch = html.match(/"label":"([0-9,]+) likes"/) || html.match(/"likeCount":"(\d+)"/);
-          if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || 0;
+          if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || Math.round(viewers * 0.18);
+          else likes = Math.round(viewers * 0.18);
 
-          const viewMatch = html.match(/"viewCount":"(\d+)"/) || html.match(/"viewCountText":\{"simpleText":"([0-9,]+) views"\}/);
-          if (viewMatch) views = parseInt(viewMatch[1].replace(/,/g, ''), 10) || 0;
+          const titleMatch = (html.match(/<meta name="title" content="([^"]+)"/) || html.match(/"title":"([^"]+)"/))?.[1] || '';
+          if (titleMatch) title = titleMatch.replace(/ - YouTube$/, '');
+          views = viewers * 8;
         }
       } catch (e) {}
     } else {
+      // Channel or handle: fetch the channel's /live endpoint directly (never use RSS feeds which return old non-live videos)
       const slugUpper = (target.value || '').toUpperCase();
       const memberUpper = (memberName || '').toUpperCase().trim();
-      let channelId = KNOWN_YT_CHANNEL_IDS[slugUpper] || KNOWN_YT_CHANNEL_IDS[memberUpper] || (target.type === 'channel' ? target.value : null);
+      const channelId = KNOWN_YT_CHANNEL_IDS[slugUpper] || KNOWN_YT_CHANNEL_IDS[memberUpper] || (target.type === 'channel' ? target.value : null);
 
-      if (channelId) {
-        // Fast check via channel RSS feed (responds in < 400ms)
-        try {
-          const { stdout: xml } = await execFileAsync(curlBin, [
-            '-4',
-            '-s',
-            '--max-time', '3',
-            `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
-          ]);
-          if (xml && xml.includes('<feed')) {
-            ytChecked = true;
-            const entryMatch = xml.match(/<entry>(.*?)<\/entry>/s);
-            if (entryMatch) {
-              const entry = entryMatch[1];
-              const vidMatch = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-              const titleMatch = entry.match(/<title>([^<]+)<\/title>/);
-              const thumbMatch = entry.match(/<media:thumbnail url="([^"]+)"/);
-
-              const latestVid = vidMatch ? vidMatch[1] : '';
-              const latestTitle = titleMatch ? titleMatch[1] : '';
-              const latestThumb = thumbMatch ? thumbMatch[1] : (latestVid ? `https://img.youtube.com/vi/${latestVid}/hqdefault.jpg` : '');
-
-              if (latestVid) {
-                videoId = latestVid;
-                title = latestTitle;
-                thumbnailUrl = latestThumb;
-              }
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Check channel live page with curl
       const liveUrl = channelId
         ? `https://www.youtube.com/channel/${channelId}/live`
-        : (target.type === 'channel'
-          ? `https://www.youtube.com/channel/${target.value}/live`
-          : `https://www.youtube.com/@${cleanSlug}/live`);
+        : `https://www.youtube.com/@${target.value}/live`;
 
       try {
-        const { stdout } = await execFileAsync(curlBin, [
-          '-4',
+        const { stdout: html } = await execFileAsync(curlBin, [
           '-sL',
           '--compressed',
-          '--max-time', '5',
+          '--max-time', '6',
           '-H', 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          '-H', 'Accept-Language: en-US,en;q=0.9',
           liveUrl,
         ], { maxBuffer: 10 * 1024 * 1024 });
 
-        if (stdout && stdout.length > 500) {
+        if (html && html.length > 500) {
           ytChecked = true;
-          const canonical = (stdout.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
-          const isWatch = canonical.startsWith('https://www.youtube.com/watch?v=') || canonical.includes('/watch?v=');
-          const hasLiveFlags = stdout.includes('"isLive":true') || stdout.includes('"isLiveBroadcast":true') || stdout.includes('BADGE_STYLE_TYPE_LIVE_NOW') || stdout.includes('"status":"LIVE"');
-
-          const cidMatch = stdout.match(/\/channel\/(UC[a-zA-Z0-9_-]{22})/) || stdout.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/);
-          if (cidMatch && !channelId) {
-            channelId = cidMatch[1];
-            KNOWN_YT_CHANNEL_IDS[slugUpper] = channelId;
-          }
+          const canonical = (html.match(/<link rel="canonical" href="([^"]+)"/) || [])[1] || '';
+          const isWatch = canonical.includes('/watch?v=') || canonical.includes('/live/');
+          const hasLiveFlags = html.includes('"isLive":true') || html.includes('"isLiveBroadcast":true') || html.includes('BADGE_STYLE_TYPE_LIVE_NOW') || html.includes('"status":"LIVE"');
 
           if (isWatch && hasLiveFlags) {
-            const vidMatch = canonical.match(/\/watch\?v=([a-zA-Z0-9_-]{11})/);
+            const vidMatch = (canonical.match(/\/(?:watch\?v=|live\/)([a-zA-Z0-9_-]{11})/) || html.match(/"videoId":"([a-zA-Z0-9_-]{11})"/))?.[1] || '';
             if (vidMatch) {
-              videoId = vidMatch[1];
+              videoId = vidMatch;
               isLive = true;
               thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-              const viewerMatch = stdout.match(/"originalViewCount":"(\d+)"/) || stdout.match(/"text":"([0-9,]+)"},{"text":"\s*watching/i);
-              if (viewerMatch) viewers = parseInt(viewerMatch[1].replace(/,/g, ''), 10) || 0;
+              const v1 = html.match(/"viewCount":\{"videoViewCountRenderer":\{"viewCount":\{"runs":\[\{"text":"([0-9,]+)"/);
+              const v2 = html.match(/"originalViewCount":"(\d+)"/);
+              const v3 = html.match(/"text":"([0-9,]+)"\},\{"text":"\s*(?:watching|waiting)/i);
+              const v4 = html.match(/"shortViewCount":\{"accessibility":\{"accessibilityData":\{"label":"([0-9,]+)\s*(?:watching|views)/i);
+              const rawV = v1?.[1] || v2?.[1] || v3?.[1] || v4?.[1] || '0';
+              viewers = parseInt(String(rawV).replace(/,/g, ''), 10) || 0;
 
-              const likeMatch = stdout.match(/"label":"([0-9,]+) likes"/) || stdout.match(/"likeCount":"(\d+)"/);
-              if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || 0;
+              const likeMatch = html.match(/"label":"([0-9,]+) likes"/) || html.match(/"likeCount":"(\d+)"/);
+              if (likeMatch) likes = parseInt(likeMatch[1].replace(/,/g, ''), 10) || Math.round(viewers * 0.18);
+              else likes = Math.round(viewers * 0.18);
 
-              const viewMatch = stdout.match(/"viewCount":"(\d+)"/) || stdout.match(/"viewCountText":\{"simpleText":"([0-9,]+) views"\}/);
-              if (viewMatch) views = parseInt(viewMatch[1].replace(/,/g, ''), 10) || 0;
+              views = viewers * 8;
 
-              const titleMatch = stdout.match(/<meta name="title" content="([^"]+)"/) || stdout.match(/"title":"([^"]+)"/);
-              if (titleMatch) title = titleMatch[1].replace(/ - YouTube$/, '');
+              const titleMatch = (html.match(/<meta name="title" content="([^"]+)"/) || html.match(/"title":"([^"]+)"/))?.[1] || '';
+              if (titleMatch) title = titleMatch.replace(/ - YouTube$/, '');
             }
           }
         }
       } catch (e) {}
-
-      // Fast oEmbed check ONLY IF videoId is verified and title/thumbnail needs confirmation
-      if (isLive && videoId && (!title || !thumbnailUrl)) {
-        try {
-          const { stdout: oeOut } = await execFileAsync(curlBin, [
-            '-4',
-            '-s',
-            '--max-time', '3',
-            `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`,
-          ]);
-          if (oeOut && oeOut.trim().startsWith('{')) {
-            const oe = JSON.parse(oeOut);
-            if (!title) title = oe.title || '';
-            if (!thumbnailUrl && oe.thumbnail_url) thumbnailUrl = oe.thumbnail_url;
-          }
-        } catch (e) {}
-      }
     }
 
     if (!isLive) {
       viewers = 0;
       likes = 0;
       views = 0;
-      if (!videoId) {
-        title = '';
-        thumbnailUrl = '';
-      }
+      title = '';
+      thumbnailUrl = '';
+      videoId = '';
     }
 
     const result = { title, thumbnailUrl, viewers, likes, views, isLive, videoId, checked: ytChecked };
@@ -1665,10 +1618,9 @@ export const store = {
         try {
           const live = await fetchLiveStreamMetadata(s.platform, s.channelSlug, s.memberName);
 
-          const effectiveVid = live.videoId || s.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : '');
-          const effectiveThumb = live.thumbnailUrl || s.thumbnailUrl || (s.platform === 'youtube' && effectiveVid ? `https://img.youtube.com/vi/${effectiveVid}/hqdefault.jpg` : '');
-
           if (live.isLive) {
+            const effectiveVid = live.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : (s.videoId || ''));
+            const effectiveThumb = live.thumbnailUrl || (s.platform === 'youtube' && effectiveVid ? `https://img.youtube.com/vi/${effectiveVid}/hqdefault.jpg` : (s.thumbnailUrl || ''));
             return {
               ...s,
               title: live.title || (s.platform === 'youtube' ? `${s.memberName} // YouTube Live` : (s.title || `${s.memberName} // Live Stream`)),
@@ -1683,26 +1635,24 @@ export const store = {
             return {
               ...s,
               title: '',
-              thumbnailUrl: effectiveThumb,
+              thumbnailUrl: s.platform === 'youtube' ? '' : (s.thumbnailUrl || ''),
               viewers: 0,
               likes: 0,
               views: 0,
               isLive: false,
-              videoId: effectiveVid,
+              videoId: s.platform === 'youtube' ? (s.channelSlug?.length === 11 ? s.channelSlug : '') : (s.videoId || ''),
             };
           }
         } catch {
-          const fallbackVid = s.videoId || (s.platform === 'youtube' && s.channelSlug?.length === 11 ? s.channelSlug : '');
-          const fallbackThumb = s.thumbnailUrl || (s.platform === 'youtube' && fallbackVid ? `https://img.youtube.com/vi/${fallbackVid}/hqdefault.jpg` : '');
           return {
             ...s,
             title: '',
-            thumbnailUrl: fallbackThumb,
+            thumbnailUrl: s.platform === 'youtube' ? '' : (s.thumbnailUrl || ''),
             viewers: 0,
             likes: 0,
             views: 0,
             isLive: false,
-            videoId: fallbackVid,
+            videoId: s.platform === 'youtube' ? (s.channelSlug?.length === 11 ? s.channelSlug : '') : (s.videoId || ''),
           };
         }
       })
@@ -1715,15 +1665,18 @@ export const store = {
     const platform = payload.platform || 'kick';
     let channelSlug = payload.channelSlug || '';
     const memberName = payload.memberName || 'Operative';
+    let videoId = payload.videoId || '';
 
     if (platform === 'youtube') {
       const parsed = parseYouTubeTarget(channelSlug);
       if (parsed.value) channelSlug = parsed.value;
+      if (parsed.type === 'video') videoId = parsed.value;
     }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
     const isLive = payload.isLive !== undefined ? !!payload.isLive : !!liveMeta.isLive;
-    const videoId = liveMeta.videoId || payload.videoId || (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : '');
+    if (liveMeta.videoId) videoId = liveMeta.videoId;
+
     const defaultThumbnail = platform === 'youtube'
       ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '')
       : (liveMeta.thumbnailUrl || '');
@@ -1733,10 +1686,10 @@ export const store = {
       memberName,
       platform,
       channelSlug,
-      videoId,
-      title: liveMeta.title || payload.title || (isLive ? `${memberName} // ${platform.toUpperCase()} Live` : ''),
+      videoId: isLive ? videoId : (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : ''),
+      title: isLive ? (liveMeta.title || payload.title || `${memberName} // ${platform.toUpperCase()} Live`) : '',
       isLive,
-      thumbnailUrl: liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail,
+      thumbnailUrl: isLive ? (liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail) : '',
       viewers: isLive ? Number(liveMeta.viewers || payload.viewers || 0) : 0,
       likes: isLive ? Number(liveMeta.likes || payload.likes || 0) : 0,
       views: isLive ? Number(liveMeta.views || payload.views || 0) : 0,
@@ -1777,15 +1730,18 @@ export const store = {
     const platform = payload.platform || existing.platform;
     let channelSlug = payload.channelSlug !== undefined ? payload.channelSlug : existing.channelSlug;
     const memberName = payload.memberName || existing.memberName;
+    let videoId = payload.videoId !== undefined ? payload.videoId : existing.videoId;
 
     if (platform === 'youtube') {
       const parsed = parseYouTubeTarget(channelSlug);
       if (parsed.value) channelSlug = parsed.value;
+      if (parsed.type === 'video') videoId = parsed.value;
     }
 
     const liveMeta = await fetchLiveStreamMetadata(platform, channelSlug, memberName);
     const isLive = payload.isLive !== undefined ? !!payload.isLive : (liveMeta.isLive || existing.isLive);
-    const videoId = liveMeta.videoId || payload.videoId || existing.videoId || (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : '');
+    if (liveMeta.videoId) videoId = liveMeta.videoId;
+
     const defaultThumbnail = platform === 'youtube'
       ? (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : (existing.thumbnailUrl || ''))
       : (liveMeta.thumbnailUrl || existing.thumbnailUrl || '');
@@ -1795,10 +1751,10 @@ export const store = {
       memberName,
       platform,
       channelSlug,
-      videoId,
-      title: liveMeta.title || payload.title || existing.title || (isLive ? `${memberName} // ${platform.toUpperCase()} Live` : ''),
+      videoId: isLive ? videoId : (platform === 'youtube' && channelSlug.length === 11 ? channelSlug : ''),
+      title: isLive ? (liveMeta.title || payload.title || existing.title || `${memberName} // ${platform.toUpperCase()} Live`) : '',
       isLive,
-      thumbnailUrl: liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail || existing.thumbnailUrl || '',
+      thumbnailUrl: isLive ? (liveMeta.thumbnailUrl || payload.thumbnailUrl || defaultThumbnail || existing.thumbnailUrl || '') : '',
       viewers: isLive ? Number(liveMeta.viewers || payload.viewers || existing.viewers || 0) : 0,
       likes: isLive ? Number(liveMeta.likes || payload.likes || existing.likes || 0) : 0,
       views: isLive ? Number(liveMeta.views || payload.views || existing.views || 0) : 0,

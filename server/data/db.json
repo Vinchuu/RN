@@ -254,6 +254,21 @@
   "orders": [],
   "streams": [
     {
+      "id": "stream_1789462457672_yeyk39",
+      "memberName": "Lawrence Williams",
+      "platform": "youtube",
+      "channelSlug": "whizzergaming3364",
+      "videoId": "",
+      "title": "",
+      "isLive": false,
+      "thumbnailUrl": "",
+      "viewers": 0,
+      "likes": 0,
+      "views": 0,
+      "addedBy": "Red Leader",
+      "createdAt": "2026-09-15T08:54:17.672Z"
+    },
+    {
       "id": "stream_1789401746828_8gkzhg",
       "memberName": "Shubh Sage",
       "platform": "youtube",
@@ -445,6 +460,15 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log_1789462457678_ak2etx",
+      "action": "stream_add",
+      "category": "streams",
+      "description": "Broadcast feed linked for Lawrence Williams (YOUTUBE: whizzergaming3364)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-15T08:54:17.678Z"
+    },
     {
       "id": "log_1789401746831_lhukbe",
       "action": "stream_add",

@@ -71,3 +71,4 @@ Thumbs.db
 # Build artifacts
 dist-ssr
 *.local
+scratch/

@@ -136,9 +136,39 @@ export function StreamsTab({ userMode }: StreamsTabProps) {
       return clean;
     }
     if (plat === "youtube") {
-      clean = clean.replace(/^(https?:\/\/)?(www\.)?youtube\.com\//i, "");
-      clean = clean.replace(/^@/, "");
-      return clean;
+      // 1. Direct watch or youtu.be or embed video URLs
+      const watchMatch = clean.match(/(?:watch\?.*v=|youtu\.be\/|youtube\.com\/(?:embed|v)\/)([a-zA-Z0-9_-]{11})/i);
+      if (watchMatch) return watchMatch[1];
+
+      // 2. /live/VIDEO_ID
+      const liveVidMatch = clean.match(/(?:^|\/|\.)(?:live)\/([a-zA-Z0-9_-]{11})/i);
+      if (liveVidMatch) return liveVidMatch[1];
+
+      // 3. Channel ID: /channel/UC... or raw UC...
+      const channelMatch = clean.match(/(?:^|\/|\.)channel\/(UC[a-zA-Z0-9_-]{22})/i);
+      if (channelMatch) return channelMatch[1];
+      if (/^UC[a-zA-Z0-9_-]{22}$/.test(clean)) return clean;
+
+      // 4. Exact 11-character video ID
+      if (/^[a-zA-Z0-9_-]{11}$/.test(clean) && !clean.startsWith("UC")) return clean;
+
+      // 5. Handle: @name or /@name
+      const handleMatch = clean.match(/@([a-zA-Z0-9_.-]+)/i);
+      if (handleMatch) return handleMatch[1].split("/")[0].split("?")[0];
+
+      // 6. Custom or user: /c/name or /user/name
+      const customMatch = clean.match(/(?:^|\/|\.)(?:c|user)\/([a-zA-Z0-9_.-]+)/i);
+      if (customMatch) return customMatch[1].split("/")[0].split("?")[0];
+
+      // 7. Plain handle/slug
+      return clean
+        .replace(/^https?:\/\/(www\.)?youtube\.com\//i, "")
+        .replace(/^@/, "")
+        .replace(/\/live.*$/i, "")
+        .replace(/\/videos.*$/i, "")
+        .replace(/\/featured.*$/i, "")
+        .split("/")[0]
+        .split("?")[0];
     }
     return clean;
   };
