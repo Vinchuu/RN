@@ -71,9 +71,28 @@ export function App() {
       // Check stored session
       const savedRole = localStorage.getItem("rn_role") as UserMode | null;
       const savedUser = localStorage.getItem("rn_user");
+      const savedDiscordId = localStorage.getItem("rn_discord_id");
+
       if (savedRole) {
         setUserMode(savedRole);
         if (savedUser) setCurrentUsername(savedUser);
+
+        // If logged in via Discord, verify permissions are still active in database
+        if (savedDiscordId && savedRole !== "viewer2") {
+          apiService
+            .verifyDiscordUser(savedDiscordId, savedUser || "User", savedRole)
+            .then((check) => {
+              if (!check.success) {
+                localStorage.removeItem("rn_role");
+                localStorage.removeItem("rn_user");
+                localStorage.removeItem("rn_discord_id");
+                setUserMode("viewer2");
+                setCurrentUsername("Guest Viewer");
+                soundFx.playErrorSound();
+              }
+            })
+            .catch(() => {});
+        }
       }
 
       // 1. Check Discord URL Hash (#access_token=...&state=...)
@@ -98,8 +117,14 @@ export function App() {
                 setCurrentUsername(verifyRes.username || username);
                 localStorage.setItem("rn_role", mode);
                 localStorage.setItem("rn_user", verifyRes.username || username);
+                localStorage.setItem("rn_discord_id", discordId);
                 soundFx.playSuccessSound();
               } else {
+                localStorage.removeItem("rn_role");
+                localStorage.removeItem("rn_user");
+                localStorage.removeItem("rn_discord_id");
+                setUserMode("viewer2");
+                setCurrentUsername("Guest Viewer");
                 soundFx.playErrorSound();
                 alert(verifyRes.message || "Access Denied.");
               }
@@ -177,6 +202,7 @@ export function App() {
     setCurrentUsername("Guest Viewer");
     localStorage.removeItem("rn_role");
     localStorage.removeItem("rn_user");
+    localStorage.removeItem("rn_discord_id");
   };
 
   const handleSaveAnnouncement = async () => {

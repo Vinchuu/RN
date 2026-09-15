@@ -177,20 +177,19 @@ app.post('/api/auth/discord/verify', async (req, res) => {
     return res.status(400).json({ success: false, message: 'discordId is required' });
   }
 
-  let dbAdminIds = [];
-  let dbMemberIds = [];
+  let effectiveAdminIds = [];
+  let effectiveMemberIds = [];
   let openMemberAccess = false;
   try {
     const access = await store.getDiscordAccess();
-    dbAdminIds = (access.adminDiscordIds || []).map((a) => a.discordId);
-    dbMemberIds = (access.memberDiscordIds || []).map((m) => m.discordId);
+    effectiveAdminIds = (access.adminDiscordIds || []).map((a) => a.discordId);
+    effectiveMemberIds = (access.memberDiscordIds || []).map((m) => m.discordId);
     openMemberAccess = Boolean(access.openMemberAccess);
   } catch (err) {
     console.error('Failed to load dynamic discord access from store:', err);
+    effectiveAdminIds = ADMIN_DISCORD_IDS;
+    effectiveMemberIds = MEMBER_DISCORD_IDS;
   }
-
-  const effectiveAdminIds = Array.from(new Set([...ADMIN_DISCORD_IDS, ...dbAdminIds]));
-  const effectiveMemberIds = Array.from(new Set([...MEMBER_DISCORD_IDS, ...dbMemberIds]));
 
   const isAdmin = effectiveAdminIds.includes(discordId);
   const isMember = openMemberAccess || effectiveMemberIds.includes(discordId) || isAdmin;
