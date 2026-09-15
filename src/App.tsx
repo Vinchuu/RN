@@ -20,6 +20,7 @@ import {
   Swords,
   Wallet,
   Coins,
+  ShieldCheck,
 } from "lucide-react";
 import { LoginModal, UserMode } from "./components/auth/LoginModal";
 import { MembersTab } from "./components/tabs/MembersTab";
@@ -29,6 +30,7 @@ import { InventoryTab } from "./components/tabs/InventoryTab";
 import { StreamsTab } from "./components/tabs/StreamsTab";
 import { WarsTab } from "./components/tabs/WarsTab";
 import { AuditLogsTab } from "./components/tabs/AuditLogsTab";
+import { DiscordAccessTab } from "./components/tabs/DiscordAccessTab";
 import { Toaster } from "./components/ui/toaster";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -410,6 +412,7 @@ export function App() {
               { id: "wars", label: "Gang Wars", icon: Swords, badge: "W/L", badgeColor: "text-amber-700 border-amber-300 bg-amber-50" },
               { id: "streams", label: "Live Streams", icon: Radio, badge: "● LIVE", badgeColor: "text-red-700 border-red-300 bg-red-50" },
               { id: "logs", label: "Audit Logs", icon: FileText, badge: "Ledger" },
+              ...(isLeader ? [{ id: "access", label: "Discord Access", icon: ShieldCheck, badge: "Leader Only", badgeColor: "text-red-700 border-red-300 bg-red-50" }] : []),
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -453,6 +456,7 @@ export function App() {
         {activeTab === "wars" && <WarsTab userMode={userMode} />}
         {activeTab === "streams" && <StreamsTab userMode={userMode} />}
         {activeTab === "logs" && <AuditLogsTab userMode={userMode} />}
+        {activeTab === "access" && isLeader && <DiscordAccessTab currentUsername={currentUsername} />}
       </main>
 
       {/* Footer */}

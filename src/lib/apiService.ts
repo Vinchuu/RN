@@ -438,4 +438,47 @@ export const apiService = {
     const scope = encodeURIComponent('identify');
     return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&state=${targetMode}`;
   },
+
+  // --- Dynamic Discord Access Management (Leader Only) ---
+  async getDiscordAccess(): Promise<{
+    adminDiscordIds: { discordId: string; label?: string; addedBy?: string; addedAt?: string }[];
+    memberDiscordIds: { discordId: string; label?: string; addedBy?: string; addedAt?: string }[];
+    openMemberAccess: boolean;
+  }> {
+    return request('/api/access/discord');
+  },
+
+  async addDiscordAccess(
+    type: 'admin' | 'member',
+    discordId: string,
+    label?: string,
+    addedBy?: string
+  ): Promise<{ success: boolean; access: any }> {
+    return request('/api/access/discord/add', {
+      method: 'POST',
+      body: JSON.stringify({ type, discordId, label, addedBy }),
+    });
+  },
+
+  async removeDiscordAccess(
+    type: 'admin' | 'member',
+    discordId: string,
+    performedBy?: string
+  ): Promise<{ success: boolean; access: any }> {
+    return request('/api/access/discord/remove', {
+      method: 'POST',
+      body: JSON.stringify({ type, discordId, performedBy }),
+    });
+  },
+
+  async toggleOpenMemberAccess(
+    openMemberAccess: boolean,
+    performedBy?: string
+  ): Promise<{ success: boolean; access: any }> {
+    return request('/api/access/discord/toggle-open-member', {
+      method: 'POST',
+      body: JSON.stringify({ openMemberAccess, performedBy }),
+    });
+  },
 };
+

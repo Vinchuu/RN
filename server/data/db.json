@@ -461,6 +461,24 @@
   ],
   "auditLogs": [
     {
+      "id": "log_1789494187171_y3i4vc",
+      "action": "discord_access_revoked",
+      "category": "security",
+      "description": "Revoked Member Discord access from ID 999999999999999999",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-15T17:43:07.171Z"
+    },
+    {
+      "id": "log_1789494186100_x6z3np",
+      "action": "discord_access_added",
+      "category": "security",
+      "description": "Granted Gang Member Discord access to ID 999999999999999999 (Test Operative)",
+      "details": {},
+      "performedBy": "Red Leader",
+      "timestamp": "2026-09-15T17:43:06.100Z"
+    },
+    {
       "id": "log_1789462457678_ak2etx",
       "action": "stream_add",
       "category": "streams",
@@ -653,5 +671,109 @@
     "text": "🔴 RED NETWORK ALERT: Weekly dues are $50,000. All operatives report to Stash Warehouse for Syndicate Operations!",
     "updatedBy": "Red Command",
     "updatedAt": "2026-09-06T10:18:43.693Z"
+  },
+  "discordAccess": {
+    "id": "main",
+    "adminDiscordIds": [
+      {
+        "discordId": "879604109366394880",
+        "label": "Primary Leader",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.559Z"
+      },
+      {
+        "discordId": "777365342396743690",
+        "label": "Leader",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "223682838250127361",
+        "label": "Leader",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "500932873206104085",
+        "label": "Leader",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      }
+    ],
+    "memberDiscordIds": [
+      {
+        "discordId": "432605534898880524",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "1061934383768023050",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "499581964311986176",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "748476126569037915",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "823265513375268865",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "546744058668777494",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "500346488124080138",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "727840426366599208",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "499633892660346922",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "589507025650843669",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "829943498782015529",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      },
+      {
+        "discordId": "884846893186822225",
+        "label": "Operative",
+        "addedBy": "System",
+        "addedAt": "2026-09-15T17:40:26.560Z"
+      }
+    ],
+    "openMemberAccess": false
   }
 }

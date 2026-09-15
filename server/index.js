@@ -115,7 +115,7 @@ io.on('connection', async (socket) => {
 setInterval(async () => {
   try {
     await emitStreams();
-  } catch {}
+  } catch { }
 }, 60000);
 
 // Health check
@@ -171,31 +171,37 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-app.post('/api/auth/discord/verify', (req, res) => {
+app.post('/api/auth/discord/verify', async (req, res) => {
   const { discordId, username, targetMode } = req.body || {};
   if (!discordId) {
     return res.status(400).json({ success: false, message: 'discordId is required' });
   }
 
-  const defaultAdminIds = ['879604109366394880', '777365342396743690', '223682838250127361'];
-  const defaultMemberIds = [
-    '432605534898880524', '1061934383768023050', '499581964311986176',
-    '748476126569037915', '823265513375268865', '546744058668777494',
-    '500346488124080138', '727840426366599208', '499633892660346922',
-    '589507025650843669', '829943498782015529'
-  ];
-  const effectiveAdminIds = ADMIN_DISCORD_IDS.length > 0 ? ADMIN_DISCORD_IDS : defaultAdminIds;
-  const effectiveMemberIds = MEMBER_DISCORD_IDS.length > 0 ? MEMBER_DISCORD_IDS : defaultMemberIds;
-  const isAdmin = effectiveAdminIds.includes(discordId);
-  const isMember = effectiveMemberIds.includes(discordId) || isAdmin;
+  let dbAdminIds = [];
+  let dbMemberIds = [];
+  let openMemberAccess = false;
+  try {
+    const access = await store.getDiscordAccess();
+    dbAdminIds = (access.adminDiscordIds || []).map((a) => a.discordId);
+    dbMemberIds = (access.memberDiscordIds || []).map((m) => m.discordId);
+    openMemberAccess = Boolean(access.openMemberAccess);
+  } catch (err) {
+    console.error('Failed to load dynamic discord access from store:', err);
+  }
 
-  console.log(`[Discord Auth] ${username} (${discordId}) | Target: ${targetMode} | Admin: ${isAdmin} | Member: ${isMember}`);
+  const effectiveAdminIds = Array.from(new Set([...ADMIN_DISCORD_IDS, ...dbAdminIds]));
+  const effectiveMemberIds = Array.from(new Set([...MEMBER_DISCORD_IDS, ...dbMemberIds]));
+
+  const isAdmin = effectiveAdminIds.includes(discordId);
+  const isMember = openMemberAccess || effectiveMemberIds.includes(discordId) || isAdmin;
+
+  console.log(`[Discord Auth] ${username} (${discordId}) | Target: ${targetMode} | Admin: ${isAdmin} | Member: ${isMember} | OpenAccess: ${openMemberAccess}`);
 
   if (targetMode === 'admin') {
     if (!isAdmin) {
       return res.status(403).json({
         success: false,
-        message: `Access Denied: Discord ID ${discordId} (${username || 'User'}) is not in ADMIN_DISCORD_IDS. Add this ID to your Railway environment variables, or log in as Member.`,
+        message: `Access Denied: Discord ID ${discordId} (${username || 'User'}) is not authorized as Red Leader. Request Leader access or log in as Member.`,
       });
     }
     return res.json({
@@ -209,7 +215,7 @@ app.post('/api/auth/discord/verify', (req, res) => {
   if (!isMember) {
     return res.status(403).json({
       success: false,
-      message: `Access Denied: Discord ID ${discordId} is not authorized for Member access.`,
+      message: `Access Denied: Discord ID ${discordId} (${username || 'User'}) is not in the authorized Syndicate Discord list.`,
     });
   }
 
@@ -219,6 +225,59 @@ app.post('/api/auth/discord/verify', (req, res) => {
     token: `rn_member_${discordId}_${Date.now()}`,
     username: username || 'Red Operative',
   });
+});
+
+// --- Dynamic Discord Access Management (Leader Only) ---
+app.get('/api/access/discord', async (req, res) => {
+  try {
+    const access = await store.getDiscordAccess();
+    res.json(access);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/access/discord/add', async (req, res) => {
+  try {
+    const { type, discordId, label, addedBy } = req.body || {};
+    if (!type || !discordId) {
+      return res.status(400).json({ success: false, message: 'type and discordId are required' });
+    }
+    if (!['admin', 'member'].includes(type)) {
+      return res.status(400).json({ success: false, message: 'Invalid access type' });
+    }
+    const updated = await store.addDiscordAccess(type, {
+      discordId,
+      label,
+      addedBy: addedBy || 'Red Leader',
+    });
+    res.json({ success: true, access: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/access/discord/remove', async (req, res) => {
+  try {
+    const { type, discordId, performedBy } = req.body || {};
+    if (!type || !discordId) {
+      return res.status(400).json({ success: false, message: 'type and discordId are required' });
+    }
+    const updated = await store.removeDiscordAccess(type, discordId, performedBy || 'Red Leader');
+    res.json({ success: true, access: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/access/discord/toggle-open-member', async (req, res) => {
+  try {
+    const { openMemberAccess, performedBy } = req.body || {};
+    const updated = await store.toggleOpenMemberAccess(Boolean(openMemberAccess), performedBy || 'Red Leader');
+    res.json({ success: true, access: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 // Members API

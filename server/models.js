@@ -142,6 +142,23 @@ const WarSchema = new mongoose.Schema({
   }],
 }, { timestamps: true });
 
+const DiscordAccessSchema = new mongoose.Schema({
+  id: { type: String, default: 'main', unique: true },
+  adminDiscordIds: [{
+    discordId: { type: String, required: true },
+    label: { type: String, default: '' },
+    addedBy: { type: String, default: 'Leader' },
+    addedAt: { type: String, default: () => new Date().toISOString() },
+  }],
+  memberDiscordIds: [{
+    discordId: { type: String, required: true },
+    label: { type: String, default: '' },
+    addedBy: { type: String, default: 'Leader' },
+    addedAt: { type: String, default: () => new Date().toISOString() },
+  }],
+  openMemberAccess: { type: Boolean, default: false },
+}, { timestamps: true });
+
 export const MemberModel = mongoose.models.Member || mongoose.model('Member', MemberSchema);
 export const TransactionModel = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
 export const ItemModel = mongoose.models.Item || mongoose.model('Item', ItemSchema);
@@ -153,3 +170,5 @@ export const GangFundModel = mongoose.models.GangFund || mongoose.model('GangFun
 export const AnnouncementModel = mongoose.models.Announcement || mongoose.model('Announcement', AnnouncementSchema);
 export const CycleModel = mongoose.models.Cycle || mongoose.model('Cycle', CycleSchema);
 export const WarModel = mongoose.models.War || mongoose.model('War', WarSchema);
+export const DiscordAccessModel = mongoose.models.DiscordAccess || mongoose.model('DiscordAccess', DiscordAccessSchema);
+

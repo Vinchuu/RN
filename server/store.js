@@ -18,6 +18,7 @@ import {
   AnnouncementModel,
   CycleModel,
   WarModel,
+  DiscordAccessModel,
 } from './models.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1965,4 +1966,151 @@ export const store = {
     });
     return true;
   },
+
+  // --- Discord Access Control ---
+  async getDiscordAccess() {
+    const DEFAULT_ADMIN_DISCORDS = [
+      { discordId: '879604109366394880', label: 'Primary Leader', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '777365342396743690', label: 'Leader', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '223682838250127361', label: 'Leader', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '500932873206104085', label: 'Leader', addedBy: 'System', addedAt: nowIso() },
+    ];
+    const DEFAULT_MEMBER_DISCORDS = [
+      { discordId: '432605534898880524', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '1061934383768023050', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '499581964311986176', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '748476126569037915', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '823265513375268865', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '546744058668777494', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '500346488124080138', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '727840426366599208', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '499633892660346922', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '589507025650843669', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '829943498782015529', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+      { discordId: '884846893186822225', label: 'Operative', addedBy: 'System', addedAt: nowIso() },
+    ];
+
+    if (isMongoConnected()) {
+      let doc = await DiscordAccessModel.findOne({ id: 'main' }).lean();
+      if (!doc) {
+        doc = await DiscordAccessModel.create({
+          id: 'main',
+          adminDiscordIds: DEFAULT_ADMIN_DISCORDS,
+          memberDiscordIds: DEFAULT_MEMBER_DISCORDS,
+          openMemberAccess: false,
+        });
+        doc = doc.toObject();
+      }
+      return doc;
+    }
+
+    if (!db.discordAccess) {
+      db.discordAccess = {
+        id: 'main',
+        adminDiscordIds: DEFAULT_ADMIN_DISCORDS,
+        memberDiscordIds: DEFAULT_MEMBER_DISCORDS,
+        openMemberAccess: false,
+      };
+      save();
+    }
+    return db.discordAccess;
+  },
+
+  async addDiscordAccess(type, { discordId, label, addedBy = 'Red Leader' }) {
+    const cleanId = String(discordId || '').trim();
+    if (!cleanId) throw new Error('Discord ID is required');
+
+    const entry = {
+      discordId: cleanId,
+      label: label ? String(label).trim() : (type === 'admin' ? 'Leader' : 'Operative'),
+      addedBy,
+      addedAt: nowIso(),
+    };
+
+    if (isMongoConnected()) {
+      const field = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      await DiscordAccessModel.updateOne(
+        { id: 'main' },
+        {
+          $pull: { [field]: { discordId: cleanId } },
+        }
+      );
+      await DiscordAccessModel.updateOne(
+        { id: 'main' },
+        {
+          $push: { [field]: entry },
+        },
+        { upsert: true }
+      );
+    } else {
+      if (!db.discordAccess) await this.getDiscordAccess();
+      const listKey = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      db.discordAccess[listKey] = (db.discordAccess[listKey] || []).filter((e) => e.discordId !== cleanId);
+      db.discordAccess[listKey].push(entry);
+      save();
+    }
+
+    await this.addAuditLog({
+      action: 'discord_access_added',
+      category: 'security',
+      description: `Granted ${type === 'admin' ? 'Leader (Admin)' : 'Gang Member'} Discord access to ID ${cleanId} (${entry.label})`,
+      performedBy: addedBy,
+    });
+
+    return await this.getDiscordAccess();
+  },
+
+  async removeDiscordAccess(type, discordId, performedBy = 'Red Leader') {
+    const cleanId = String(discordId || '').trim();
+    if (!cleanId) return await this.getDiscordAccess();
+
+    if (isMongoConnected()) {
+      const field = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      await DiscordAccessModel.updateOne(
+        { id: 'main' },
+        { $pull: { [field]: { discordId: cleanId } } }
+      );
+    } else {
+      if (!db.discordAccess) await this.getDiscordAccess();
+      const listKey = type === 'admin' ? 'adminDiscordIds' : 'memberDiscordIds';
+      db.discordAccess[listKey] = (db.discordAccess[listKey] || []).filter((e) => e.discordId !== cleanId);
+      save();
+    }
+
+    await this.addAuditLog({
+      action: 'discord_access_revoked',
+      category: 'security',
+      description: `Revoked ${type === 'admin' ? 'Leader' : 'Member'} Discord access from ID ${cleanId}`,
+      performedBy,
+    });
+
+    return await this.getDiscordAccess();
+  },
+
+  async toggleOpenMemberAccess(enabled, performedBy = 'Red Leader') {
+    const openMemberAccess = Boolean(enabled);
+    if (isMongoConnected()) {
+      await DiscordAccessModel.updateOne(
+        { id: 'main' },
+        { $set: { openMemberAccess } },
+        { upsert: true }
+      );
+    } else {
+      if (!db.discordAccess) await this.getDiscordAccess();
+      db.discordAccess.openMemberAccess = openMemberAccess;
+      save();
+    }
+
+    await this.addAuditLog({
+      action: 'open_member_access_toggled',
+      category: 'security',
+      description: openMemberAccess
+        ? 'Enabled Open Member Access (Any Discord user can log in as Gang Member)'
+        : 'Enabled Strict Member Access (Only authorized Discord IDs can log in)',
+      performedBy,
+    });
+
+    return await this.getDiscordAccess();
+  },
 };
+
